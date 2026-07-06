@@ -9,14 +9,25 @@ import { useRef } from "react";
 
 interface CodeMirrorEditorProps {
   className?: string;
+  value?: string;
+  language?: string;
+  onChange?: (value: string) => void;
 }
 
-export default function CodeMirrorEditor({ className }: CodeMirrorEditorProps) {
+export default function CodeMirrorEditor({ 
+  className, 
+  value, 
+  language = 'html',
+  onChange 
+}: CodeMirrorEditorProps) {
   const { htmlCode, cssCode, jsCode, activeTab, setHtmlCode, setCssCode, setJsCode } = useEditorStore();
   const editorRef = useRef<any>(null);
 
-  // Determine current code based on active tab
+  // Determine current code based on active tab or prop
   const getCurrentCode = () => {
+    if (value !== undefined) {
+      return value;
+    }
     switch (activeTab) {
       case 'html': return htmlCode;
       case 'css': return cssCode;
@@ -26,17 +37,28 @@ export default function CodeMirrorEditor({ className }: CodeMirrorEditorProps) {
   };
 
   // Determine setter function based on active tab
-  const setCurrentCode = (value: string) => {
-    switch (activeTab) {
-      case 'html': return setHtmlCode(value);
-      case 'css': return setCssCode(value);
-      case 'js': return setJsCode(value);
-      default: return setHtmlCode(value);
+  const setCurrentCode = (newValue: string) => {
+    if (onChange) {
+      onChange(newValue);
+    } else {
+      switch (activeTab) {
+        case 'html': return setHtmlCode(newValue);
+        case 'css': return setCssCode(newValue);
+        case 'js': return setJsCode(newValue);
+        default: return setHtmlCode(newValue);
+      }
     }
   };
 
-  // Get language extension based on active tab
+  // Get language extension based on active tab or prop
   const getLanguageExtension = () => {
+    if (language) {
+      switch (language) {
+        case 'css': return css();
+        case 'javascript': return javascript();
+        default: return html();
+      }
+    }
     switch (activeTab) {
       case 'html': return html();
       case 'css': return css();
@@ -46,8 +68,8 @@ export default function CodeMirrorEditor({ className }: CodeMirrorEditorProps) {
   };
 
   // Handle code changes and auto-save to store
-  const handleCodeChange = (value: string) => {
-    setCurrentCode(value);
+  const handleCodeChange = (newValue: string) => {
+    setCurrentCode(newValue);
   };
 
   return (
