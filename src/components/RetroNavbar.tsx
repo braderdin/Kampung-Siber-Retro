@@ -2,26 +2,31 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import { useLanguageStore } from '@/store/useLanguageStore';
-import { dictionary, Language } from '@/lib/dictionary';
-import { Home, Code, BookOpen, Settings } from 'lucide-react';
+import { msDictionary } from '@/i18n/dictionaries';
 
 export default function RetroNavbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { language, setLanguage } = useLanguageStore();
   
-  const t = dictionary[language];
+  const t = msDictionary;
   
   const navItems = [
-    { name: t.navigation.home, href: '/', icon: Home },
-    { name: t.navigation.editor, href: '/editor', icon: Code },
-    { name: t.navigation.guestbook, href: '/guestbook', icon: BookOpen },
-    { name: t.navigation.settings, href: '/settings', icon: Settings },
+    { name: t.dashboardTitle, href: '/dashboard', icon: '🏠' },
+    { name: t.fileEditor, href: '/site_files/text_editor', icon: '📝' },
+    { name: t.guestbookTitle, href: '/guestbook', icon: '📘' },
+    { name: t.settings, href: '/settings', icon: '⚙️' },
   ];
 
   const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setLanguage(e.target.value as Language);
+    setLanguage(e.target.value as 'en' | 'ms');
   };
+
+  // Start: Handle Navigation Click
+  const handleNavClick = (href: string) => {
+    router.push(href);
+  };
+  // End: Handle Navigation Click
 
   return (
     <nav className="retro-nav bg-gray-100 dark:bg-gray-900 border-b border-gray-300 dark:border-gray-700">
@@ -38,24 +43,20 @@ export default function RetroNavbar() {
           {/* Start: Navigation Items */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
-              {navItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = pathname === item.href;
-                return (
-                  <a
-                    key={item.name}
-                    href={item.href}
-                    className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                      isActive
-                        ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200'
-                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800'
-                    }`}
-                  >
-                    <Icon className="w-4 h-4" />
-                    <span>{item.name}</span>
-                  </a>
-                );
-              })}
+              {navItems.map((item) => (
+                <button
+                  key={item.href}
+                  onClick={() => handleNavClick(item.href)}
+                  className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    pathname === item.href
+                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200'
+                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800'
+                  }`}
+                >
+                  <span className="text-lg">{item.icon}</span>
+                  <span>{item.name}</span>
+                </button>
+              ))}
             </div>
           </div>
           {/* End: Navigation Items */}

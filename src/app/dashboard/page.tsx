@@ -80,6 +80,12 @@ function DashboardContent({ className }: DashboardProps) {
   }, [searchParams]);
   // End: Effect for URL Parameters
 
+  // Start: Handle Editor Navigation
+  const handleEditorNavigation = () => {
+    window.location.href = '/site_files/text_editor';
+  };
+  // End: Handle Editor Navigation
+
   // Start: Render Dashboard Content
   return (
     <div className={`p-6 max-w-7xl mx-auto ${className || ''}`}>
@@ -171,6 +177,35 @@ function DashboardContent({ className }: DashboardProps) {
               title={t.settings}
               description="Sesuaikan tetapan laman"
               icon="⚙️"
+              className="w-full"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-6">
+        <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">
+            {t.dashboardTitle}
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <ModernRetroCard
+              title={t.fileEditor}
+              description="Buka penyunting kod"
+              icon="📝"
+              onClick={handleEditorNavigation}
+              className="w-full"
+            />
+            <ModernRetroCard
+              title={t.dashboardTitle}
+              description="Lihat statistik halaman"
+              icon="📊"
+              className="w-full"
+            />
+            <ModernRetroCard
+              title={t.guestbookTitle}
+              description="Tandatangani buku pelawat"
+              icon="📘"
               className="w-full"
             />
           </div>

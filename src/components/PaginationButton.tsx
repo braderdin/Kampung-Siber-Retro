@@ -1,4 +1,5 @@
 // Start: Imports
+"use client";
 import React from 'react';
 // End: Imports
 
