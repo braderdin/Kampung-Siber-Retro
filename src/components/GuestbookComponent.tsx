@@ -75,13 +75,13 @@ export default function GuestbookComponent({ className }: GuestbookComponentProp
   const fetchEntries = async () => {
     try {
       const { data, error } = await supabase
-        .from<GuestbookEntry>('guestbook_entries')
+        .from('guestbook_entries')
         .select('*')
         .order('timestamp', { ascending: false })
         .limit(50);
       
       if (error) throw error;
-      setEntries(data || []);
+      setEntries(data as GuestbookEntry[] || []);
     } catch (err) {
       console.error('Error fetching entries:', err);
       setError('Failed to load guestbook entries');
@@ -174,7 +174,7 @@ export default function GuestbookComponent({ className }: GuestbookComponentProp
       // Start: Real Supabase Insert
       try {
         const { error } = await supabase
-          .from<GuestbookEntry>('guestbook_entries')
+          .from('guestbook_entries')
           .insert([newEntry]);
         
         if (error) throw error;
@@ -212,7 +212,7 @@ export default function GuestbookComponent({ className }: GuestbookComponentProp
       {/* End: Card Header */}
 
       {/* Start: Entries List */}
-      <div className="mb-4 max-h-60 overflow-y-auto retro-scrollbar">
+      <div className="mb-4 max-h-60 overflow-y-auto retroscrollbar">
         {entries.length === 0 ? (
           <p className="text-center text-gray-500 dark:text-gray-400 text-sm py-4">
             No entries yet. Be the first to sign!
