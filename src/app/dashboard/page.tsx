@@ -6,6 +6,9 @@ import { useLanguageStore } from "@/store/useLanguageStore";
 import { enDictionary, msDictionary } from "@/i18n/dictionaries";
 import ModernRetroCard from '@/components/ModernRetroCard';
 import PaginationButton from '@/components/PaginationButton';
+import HeroSignUpCard from '@/components/HeroSignUpCard';
+import FeaturedSitesGrid from '@/components/FeaturedSitesGrid';
+import FollowActivityFeed from '@/components/FollowActivityFeed';
 // End: Imports
 
 // Start: Type Definitions
@@ -96,6 +99,48 @@ function DashboardContent({ className }: DashboardProps) {
         <p className="mt-2 text-gray-600 dark:text-gray-400">
           {t.dashboardSubtitle}
         </p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <div className="lg:col-span-1">
+          <HeroSignUpCard />
+        </div>
+        <div className="lg:col-span-2">
+          <FeaturedSitesGrid />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <div className="lg:col-span-2">
+          <FollowActivityFeed />
+        </div>
+        <div className="lg:col-span-1">
+          <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">
+              {t.quickActions}
+            </h3>
+            <div className="space-y-3">
+              <button
+                onClick={handleEditorNavigation}
+                className="w-full retro-btn-secondary"
+              >
+                {t.fileEditor}
+              </button>
+              <button
+                onClick={() => window.location.href = '/dashboard'}
+                className="w-full retro-btn-secondary"
+              >
+                {t.dashboardTitle}
+              </button>
+              <button
+                onClick={() => window.location.href = '/guestbook'}
+                className="w-full retro-btn-secondary"
+              >
+                {t.guestbookTitle}
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       {currentDir !== 'root' && (

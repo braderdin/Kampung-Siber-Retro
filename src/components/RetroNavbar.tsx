@@ -27,9 +27,9 @@ export default function RetroNavbar() {
   // Start: Navigation Items
   const navItems: NavItem[] = [
     { name: t.dashboardTitle, href: '/dashboard', icon: '🏠' },
-    { name: t.fileEditor, href: '/site_files/text_editor', icon: '📝' },
-    { name: t.guestbookTitle, href: '/guestbook', icon: '📘' },
-    { name: t.settings, href: '/settings', icon: '⚙️' },
+    { name: t.fileEditor, href: '/site_files', icon: '📝' },
+    { name: t.guestbookTitle, href: '/browse', icon: '📘' },
+    { name: t.settings, href: '/search', icon: '⚙️' },
   ];
   // End: Navigation Items
 
