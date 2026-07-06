@@ -6,6 +6,11 @@ import CodeMirrorEditor from "@/components/CodeMirrorEditor";
 import SandboxedPreview from "@/components/SandboxedPreview";
 import RetroToolbar from "@/components/RetroToolbar";
 import AssetManagerModal from "@/components/AssetManagerModal";
+// Start: New Social Ecosystem Imports
+import GuestbookComponent from "@/components/GuestbookComponent";
+import LiveActivityFeed from "@/components/LiveActivityFeed";
+import WebringFooter from "@/components/WebringFooter";
+// End: New Social Ecosystem Imports
 
 export default function Home() {
   const { activeTab, themeMode, setActiveTab, setThemeMode, resetToDefaults } = useEditorStore();
@@ -92,6 +97,30 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        {/* Start: Social Ecosystem Section */}
+        <div className="w-full mt-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Start: Guestbook Component */}
+            <div className="lg:col-span-1">
+              <GuestbookComponent />
+            </div>
+            {/* End: Guestbook Component */}
+
+            {/* Start: Live Activity Feed */}
+            <div className="lg:col-span-1">
+              <LiveActivityFeed />
+            </div>
+            {/* End: Live Activity Feed */}
+
+            {/* Start: Webring Footer */}
+            <div className="lg:col-span-1">
+              <WebringFooter />
+            </div>
+            {/* End: Webring Footer */}
+          </div>
+        </div>
+        {/* End: Social Ecosystem Section */}
       </main>
     </div>
   );
