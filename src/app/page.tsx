@@ -1,12 +1,18 @@
 "use client";
 
+import { useState } from 'react';
 import { useEditorStore } from "@/store/useEditorStore";
 import CodeMirrorEditor from "@/components/CodeMirrorEditor";
 import SandboxedPreview from "@/components/SandboxedPreview";
 import RetroToolbar from "@/components/RetroToolbar";
+import AssetManagerModal from "@/components/AssetManagerModal";
 
 export default function Home() {
   const { activeTab, themeMode, setActiveTab, setThemeMode, resetToDefaults } = useEditorStore();
+  
+  // Start: Modal State Management
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  // End: Modal State Management
 
   // CRT theme filter classes
   const crtThemeClasses = themeMode === 'crt' 
@@ -22,6 +28,14 @@ export default function Home() {
             Kampung Siber Retro Editor
           </h1>
           <div className="flex items-center space-x-4">
+            {/* Start: Assets Button */}
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="retro-btn-secondary"
+            >
+              Assets
+            </button>
+            {/* End: Assets Button */}
             <select
               value={themeMode}
               onChange={(e) => setThemeMode(e.target.value as 'modern' | 'crt')}
@@ -38,6 +52,13 @@ export default function Home() {
             </button>
           </div>
         </div>
+
+        {/* Start: Asset Manager Modal */}
+        <AssetManagerModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
+        {/* End: Asset Manager Modal */}
 
         {/* Tab Navigation */}
         <div className="flex items-center space-x-2 mb-4 w-full">
