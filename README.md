@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📟 Kampung Siber Retro 🌐
 
-## Getting Started
+> Platform ruang kerja retro modular gred industri yang menggabungkan estetika Windows 95 klasik dengan kuasa teknologi web moden. Dibina dengan cermat, responsif sepenuhnya, dan dioptimumkan untuk fasa Kos RM0 (Free Tier Sandbox)!
 
-First, run the development server:
+---
+
+## 🌟 Pautan Projek
+
+*   **🤖 Repositori Kod:** [GitHub Braderdin](https://github.com/braderdin/Kampung-Siber-Retro)
+*   **⚡ Pelancaran Live:** [Kampung Siber Vercel](https://kampung-siber.vercel.app/)
+
+---
+
+## 🛠️ Ringkasan Ekosistem (44 Keadaan Laluan Berantai)
+
+Kampung Siber Retro dibina menggunakan **Next.js (Turbopack)** bersama pengurusan memori **Zustand store** yang sangat ringan. Kesemua komponen dipecahkan di bawah had **500 baris kod** demi kemudahan penyelenggaraan:
+
+*   **🖥️ Papan Pemuka (/dashboard):** Hab pengurusan peribadi warga siber bersama kawalan folder direktori.
+*   **📂 Pengurus Fail (/site_files):** Antaramuka grafik (GUI) ikon folder gaya Neocities dengan sistem pensuisan Grid/Senarai kompak.
+*   **📝 Penyunting Teks (/site_files/text_editor):** Editor kod CodeMirror terbina untuk menyunting kod HTML/CSS/JS secara langsung di pelayar web.
+*   **🌐 Hab Komuniti (/activity):** Dinding coretan status komuniti lengkap dengan fungsi interaksi sosial (*Suka, Komen, Ikut*).
+*   **🌙 Suis Mod Gelap & DBP i18n:** Bar navigasi universal dengan butang pensuisan tema global dan kamus dwi-bahasa rasmi Malaysia.
+
+---
+
+## 🎛️ Disiplin Seni Bina & Perlindungan Storan (RM0 Free Tier)
+
+Untuk memastikan kelangsungan operasi berjalan tanpa kos, sistem kami dilengkapi dengan kawalan sempadan keselamatan sebelah klien:
+1. **Had Saiz Tegar Imej:** Maksimum **2MB** bagi setiap transaksi muat naik imej.
+2. **Enjin Pemampat Klien:** Menggunakan pemampatan `<canvas>` HTML5 asli pada kualiti 0.8 sebelum dihantar ke Cloudflare R2 untuk menjamin visual kekal cantik dan ringan.
+3. **Kuota Fail Maksimum:** Sekatan tegar storan akaun terkumpul sebanyak **25MB** bagi setiap warga kampung.
+
+---
+
+## 💻 Panduan Pembangun (Pembangunan Lokal)
+
+Pastikan anda mempunyai persekitaran Node.js terkini, kemudian jalankan rantaian arahan di bawah:
 
 ```bash
+# 1. Pasang dependensi modular
+npm install
+
+# 2. Jalankan server pembangunan tempatan
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# 3. Jalankan ujian build industri (Standard Ubuntu)
+npx tsc --noEmit && npm run build
