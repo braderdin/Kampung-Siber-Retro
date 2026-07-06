@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 // End: Imports
 
 // Start: Type Definitions
-interface ActivityEntry {
+export interface ActivityEntry {
   id: number;
   user: string;
   action: string;
