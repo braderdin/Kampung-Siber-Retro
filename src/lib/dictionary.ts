@@ -1,3 +1,4 @@
+// Start: Dictionary Export
 export const dictionary = {
   en: {
     navigation: {
@@ -21,13 +22,22 @@ export const dictionary = {
       tierLimitations: 'Profile Tier Limitations',
       sizeLimit: 'Individual file uploads are limited to 25MB. For larger assets, consider compression or splitting files.',
     },
+    dashboardTitle: 'Dashboard',
+    dashboardSubtitle: 'Welcome to your workspace',
+    pageInfoTitle: 'Page Information',
+    currentPage: 'Current Page',
+    totalPages: 'Total Pages',
+    quickActions: 'Quick Actions',
+    myFiles: 'My Files',
+    analytics: 'Analytics',
+    settings: 'Settings',
   },
   ms: {
     navigation: {
       home: 'Beranda',
       editor: 'Penyunting',
       guestbook: 'Buku Tamu',
-      settings: 'Penyetelan',
+      settings: 'Tetapan',
     },
     greetings: {
       welcome: 'Selamat datang',
@@ -44,7 +54,19 @@ export const dictionary = {
       tierLimitations: 'Had Penyenaraian',
       sizeLimit: 'Pengunduhan fail individu dibatasi sehingga 25MB. Untuk aset yang lebih besar, pertimbangkan pemampatan atau memecah fail.',
     },
+    dashboardTitle: 'Papan Pemuka',
+    dashboardSubtitle: 'Selamat datang di ruang kerja anda',
+    pageInfoTitle: 'Maklumat Halaman',
+    currentPage: 'Halaman Semasa',
+    totalPages: 'Jumlah Halaman',
+    quickActions: 'Tindakan Cepat',
+    myFiles: 'Fail Saya',
+    analytics: 'Analitik',
+    settings: 'Tetapan',
   },
 };
+// End: Dictionary Export
 
+// Start: Language Type Export
 export type Language = keyof typeof dictionary;
+// End: Language Type Export

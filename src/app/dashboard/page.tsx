@@ -1,9 +1,14 @@
+// Start: Imports
 "use client";
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import { useLanguageStore } from "@/store/useLanguageStore";
 import { enDictionary, msDictionary } from "@/i18n/dictionaries";
+import ModernRetroCard from '@/components/ModernRetroCard';
+import PaginationButton from '@/components/PaginationButton';
+// End: Imports
 
+// Start: Type Definitions
 interface DashboardProps {
   className?: string;
 }
@@ -27,20 +32,22 @@ interface DirectoryView {
 
 const mockDirectories: DirectoryView = {
   'galeri': [
-    { id: 1, name: 'project1.png', type: 'file', path: '/images/project1.png', size: '2.4 MB' },
-    { id: 2, name: 'project2.jpg', type: 'file', path: '/images/project2.jpg', size: '1.8 MB' },
-    { id: 3, name: 'assets', type: 'folder', path: '/assets', size: '-' },
+    { id: 1, name: 'projek1.png', type: 'file', path: '/images/projek1.png', size: '2.4 MB' },
+    { id: 2, name: 'projek2.jpg', type: 'file', path: '/images/projek2.jpg', size: '1.8 MB' },
+    { id: 3, name: 'aset', type: 'folder', path: '/aset', size: '-' },
   ],
-  'assets': [
+  'aset': [
     { id: 1, name: 'logo.svg', type: 'file', path: '/logo.svg', size: '12 KB' },
-    { id: 2, name: 'icons', type: 'folder', path: '/icons', size: '-' },
+    { id: 2, name: 'ikon', type: 'folder', path: '/ikon', size: '-' },
   ],
-  'documents': [
-    { id: 1, name: 'readme.txt', type: 'file', path: '/readme.txt', size: '4 KB' },
-    { id: 2, name: 'manual.pdf', type: 'file', path: '/manual.pdf', size: '3.2 MB' },
+  'dokumen': [
+    { id: 1, name: 'bacaan.txt', type: 'file', path: '/bacaan.txt', size: '4 KB' },
+    { id: 2, name: 'panduan.pdf', type: 'file', path: '/panduan.pdf', size: '3.2 MB' },
   ],
 };
+// End: Type Definitions
 
+// Start: DashboardContent Component
 function DashboardContent({ className }: DashboardProps) {
   const searchParams = useSearchParams();
   const { language } = useLanguageStore();
@@ -50,6 +57,7 @@ function DashboardContent({ className }: DashboardProps) {
   const [currentDir, setCurrentDir] = useState<string>('root');
   const [files, setFiles] = useState<FileItem[]>([]);
 
+  // Start: Effect for URL Parameters
   useEffect(() => {
     const pageParam = searchParams.get('page');
     if (pageParam) {
@@ -70,7 +78,9 @@ function DashboardContent({ className }: DashboardProps) {
       setFiles([]);
     }
   }, [searchParams]);
+  // End: Effect for URL Parameters
 
+  // Start: Render Dashboard Content
   return (
     <div className={`p-6 max-w-7xl mx-auto ${className || ''}`}>
       <div className="mb-6">
@@ -91,7 +101,7 @@ function DashboardContent({ className }: DashboardProps) {
             }}
             className="text-sm text-blue-600 hover:underline"
           >
-            ← Back to Root
+            ← Kembali ke Akar
           </button>
         </div>
       )}
@@ -103,24 +113,13 @@ function DashboardContent({ className }: DashboardProps) {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {files.map((file) => (
-              <div
+              <ModernRetroCard
                 key={file.id}
-                className="p-4 bg-gray-50 dark:bg-gray-800 rounded flex items-center justify-between"
-              >
-                <div className="flex items-center">
-                  <span className="text-2xl mr-2">
-                    {file.type === 'folder' ? '📁' : '📄'}
-                  </span>
-                  <div>
-                    <p className="font-medium text-gray-900 dark:text-gray-100">
-                      {file.name}
-                    </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {file.size}
-                    </p>
-                  </div>
-                </div>
-              </div>
+                title={file.name}
+                description={file.size}
+                icon={file.type === 'folder' ? '📁' : '📄'}
+                className="w-full"
+              />
             ))}
           </div>
         </div>
@@ -156,35 +155,51 @@ function DashboardContent({ className }: DashboardProps) {
             {t.quickActions}
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            <button className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 transition-colors">
-              <span className="block text-2xl mb-2">📁</span>
-              <span className="text-sm text-gray-600 dark:text-gray-300">
-                {t.myFiles}
-              </span>
-            </button>
-            <button className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 transition-colors">
-              <span className="block text-2xl mb-2">📊</span>
-              <span className="text-sm text-gray-600 dark:text-gray-300">
-                {t.analytics}
-              </span>
-            </button>
-            <button className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 transition-colors">
-              <span className="block text-2xl mb-2">⚙️</span>
-              <span className="text-sm text-gray-600 dark:text-gray-300">
-                {t.settings}
-              </span>
-            </button>
+            <ModernRetroCard
+              title={t.myFiles}
+              description="Akses fail anda secara terus"
+              icon="📁"
+              className="w-full"
+            />
+            <ModernRetroCard
+              title={t.analytics}
+              description="Lihat statistik penggunaan"
+              icon="📊"
+              className="w-full"
+            />
+            <ModernRetroCard
+              title={t.settings}
+              description="Sesuaikan tetapan laman"
+              icon="⚙️"
+              className="w-full"
+            />
           </div>
+        </div>
+      </div>
+
+      <div className="mt-6">
+        <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">
+            Navigasi Halaman
+          </h3>
+          <PaginationButton
+            currentPage={pageInfo.number}
+            totalPages={pageInfo.totalPages}
+            onPageChange={(page) => setPageInfo(prev => ({ ...prev, number: page }))}
+          />
         </div>
       </div>
     </div>
   );
 }
+// End: DashboardContent Component
 
+// Start: Dashboard Page Export
 export default function DashboardPage({ className }: DashboardProps) {
   return (
-    <Suspense fallback={<div className="p-6 max-w-7xl mx-auto">Loading dashboard...</div>}>
+    <Suspense fallback={<div className="p-6 max-w-7xl mx-auto">Memuat papan pemuka...</div>}>
       <DashboardContent className={className} />
     </Suspense>
   );
 }
+// End: Dashboard Page Export

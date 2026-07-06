@@ -2,6 +2,8 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import ModernRetroCard from '@/components/ModernRetroCard';
+import PaginationButton from '@/components/PaginationButton';
 // End: Imports
 
 // Start: Type Definitions
@@ -70,11 +72,11 @@ export default function BrowsePage({ className }: BrowsePageProps) {
       if (data.success && data.data) {
         setItems(data.data);
       } else {
-        setError(data.error || 'Failed to load items');
+        setError(data.error || 'Gagal memuat sumber');
       }
     } catch (err) {
       console.error('Error fetching items:', err);
-      setError('Failed to load items');
+      setError('Gagal memuat sumber');
     } finally {
       setLoading(false);
     }
@@ -112,35 +114,26 @@ export default function BrowsePage({ className }: BrowsePageProps) {
   };
   // End: Get Item Icon
 
+  // Start: Get Item Badge
+  const getItemBadge = (item: BrowseItem): string => {
+    if (item.rating >= 4.5) return 'Terbaik';
+    if (item.downloads >= 1000) return 'Popular';
+    return '';
+  };
+  // End: Get Item Badge
+
   // Start: Render Browse Item
   const renderBrowseItem = (item: BrowseItem) => {
     return (
-      <div
+      <ModernRetroCard
         key={item.id}
-        onClick={() => handleItemClick(item)}
-        className="retro-browse-item p-3 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 hover:shadow-lg cursor-pointer transition-shadow"
-      >
-        <div className="flex items-start">
-          <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center mr-3 text-2xl">
-            {getItemIcon(item.type)}
-          </div>
-          <div className="flex-1">
-            <h4 className="font-mono text-xs font-bold text-blue-600 dark:text-blue-400 mb-1">
-              {item.title}
-            </h4>
-            <p className="text-xs text-gray-600 dark:text-gray-300 mb-2">
-              {item.description}
-            </p>
-            <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-              <span>by {item.author}</span>
-              <div className="flex items-center space-x-2">
-                <span>📥 {item.downloads}</span>
-                <span>⭐ {item.rating.toFixed(1)}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+        title={item.title}
+        description={item.description}
+        icon={getItemIcon(item.type)}
+        href={item.url}
+        badge={getItemBadge(item)}
+        className="w-full"
+      />
     );
   };
   // End: Render Browse Item
@@ -152,7 +145,7 @@ export default function BrowsePage({ className }: BrowsePageProps) {
       <div className="retro-window-header bg-gray-200 dark:bg-gray-700 px-3 py-2 border-b border-gray-300 dark:border-gray-600">
         <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200 flex items-center">
           <span className="mr-2">🛒</span>
-          Browse Resources
+          Lihat Sumber
         </h3>
       </div>
       {/* End: Window Header */}
@@ -167,11 +160,11 @@ export default function BrowsePage({ className }: BrowsePageProps) {
               onChange={(e) => handleFilterChange('type', e.target.value)}
               className="retro-select text-xs"
             >
-              <option value="all">All Types</option>
-              <option value="tutorial">Tutorials</option>
-              <option value="asset">Assets</option>
-              <option value="project">Projects</option>
-              <option value="template">Templates</option>
+              <option value="all">Semua Jenis</option>
+              <option value="tutorial">Tutorial</option>
+              <option value="asset">Aset</option>
+              <option value="project">Projek</option>
+              <option value="template">Template</option>
             </select>
 
             <select
@@ -179,14 +172,14 @@ export default function BrowsePage({ className }: BrowsePageProps) {
               onChange={(e) => handleFilterChange('sortBy', e.target.value)}
               className="retro-select text-xs"
             >
-              <option value="popular">Most Popular</option>
-              <option value="newest">Newest</option>
-              <option value="rating">Highest Rated</option>
+              <option value="popular">Paling Popular</option>
+              <option value="newest">Terbaru</option>
+              <option value="rating">Rating Tertinggi</option>
             </select>
 
             <input
               type="text"
-              placeholder="Search..."
+              placeholder="Cari..."
               value={filters.search}
               onChange={(e) => handleFilterChange('search', e.target.value)}
               className="retro-input text-xs w-32"
@@ -198,7 +191,7 @@ export default function BrowsePage({ className }: BrowsePageProps) {
         {loading ? (
           <div className="text-center py-4">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Loading resources...</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Memuat sumber...</p>
           </div>
         ) : error ? (
           <div className="text-center py-4">
@@ -207,15 +200,15 @@ export default function BrowsePage({ className }: BrowsePageProps) {
               onClick={fetchItems}
               className="retro-btn-secondary text-xs"
             >
-              Retry
+              Cuba Semula
             </button>
           </div>
         ) : items.length === 0 ? (
           <div className="text-center py-4">
-            <p className="text-sm text-gray-500 dark:text-gray-400">No resources found</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Tiada sumber ditemui</p>
           </div>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {items.map(renderBrowseItem)}
           </div>
         )}
@@ -223,26 +216,12 @@ export default function BrowsePage({ className }: BrowsePageProps) {
       {/* End: Window Content */}
 
       {/* Start: Window Footer */}
-      <div className="retro-window-footer bg-gray-200 dark:bg-gray-700 px-3 py-2 border-t border-gray-300 dark:border-gray-600 flex justify-between items-center">
-        <span className="text-xs text-gray-600 dark:text-gray-300">
-          Page {currentPage} of {totalPages}
-        </span>
-        <div className="flex space-x-1">
-          <button
-            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-            disabled={currentPage === 1}
-            className="retro-btn-secondary text-xs"
-          >
-            Previous
-          </button>
-          <button
-            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-            disabled={currentPage === totalPages}
-            className="retro-btn-secondary text-xs"
-          >
-            Next
-          </button>
-        </div>
+      <div className="retro-window-footer bg-gray-200 dark:bg-gray-700 px-3 py-2 border-t border-gray-300 dark:border-gray-600">
+        <PaginationButton
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
       </div>
       {/* End: Window Footer */}
     </div>
