@@ -134,6 +134,18 @@ export async function POST(request: NextRequest): Promise<NextResponse<StorageRe
     }
     // End: Size Validation
 
+    // Start: Image Size Validation (2MB limit for images)
+    if (body.contentType.startsWith('image/')) {
+      const IMAGE_MAX_SIZE = 2 * 1024 * 1024; // 2MB in bytes
+      if (body.size > IMAGE_MAX_SIZE) {
+        return NextResponse.json({
+          success: false,
+          error: `Image size exceeds 2MB limit. Current size: ${(body.size / 1024 / 1024).toFixed(2)}MB`,
+        }, { status: 400 });
+      }
+    }
+    // End: Image Size Validation
+
     // Start: Bucket Path Generation
     const timestamp = new Date().toISOString().split('T')[0];
     const bucketPath = `assets/${timestamp}`;

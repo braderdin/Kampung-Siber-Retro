@@ -1,6 +1,8 @@
 // Start: Asset Upload Zone Component
 import { useState, useCallback, useRef } from 'react';
 import { Upload, FileText, AlertCircle } from 'lucide-react';
+import { useLanguageStore } from '@/store/useLanguageStore';
+import { dictionary } from '@/lib/dictionary';
 
 interface AssetUploadZoneProps {
   className?: string;
@@ -11,34 +13,92 @@ export default function AssetUploadZone({ className }: AssetUploadZoneProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { language } = useLanguageStore();
+  const t = dictionary[language];
   // End: State Management
 
   // Start: File Validation
   const validateFile = useCallback((file: File): boolean => {
-    const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
+    const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB for images
     
     if (file.size > MAX_FILE_SIZE) {
-      alert(`File size exceeds 25MB limit. Current size: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+      alert(t.upload.imageSizeExceeded);
       return false;
     }
     
     return true;
-  }, []);
+  }, [t]);
   // End: File Validation
+
+  // Start: Image Compression
+  const compressImage = useCallback(async (file: File): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        if (!ctx) {
+          reject(new Error('Canvas not supported'));
+          return;
+        }
+        
+        // Set maximum dimensions
+        const maxWidth = 1920;
+        const maxHeight = 1080;
+        let { width, height } = img;
+        
+        // Calculate new dimensions maintaining aspect ratio
+        if (width > maxWidth || height > maxHeight) {
+          const ratio = Math.min(maxWidth / width, maxHeight / height);
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const compressedFile = new File([blob], file.name, {
+              type: 'image/jpeg',
+              lastModified: Date.now(),
+            });
+            resolve(compressedFile);
+          } else {
+            reject(new Error('Canvas toBlob failed'));
+          }
+        }, 'image/jpeg', 0.8);
+      };
+      
+      img.onerror = reject;
+      img.src = URL.createObjectURL(file);
+    });
+  }, []);
+  // End: Image Compression
 
   // Start: Upload Handler
   const handleUpload = useCallback(async (file: File) => {
-    if (!validateFile(file)) return;
-
     try {
       setUploadProgress(10);
       
+      let fileToUpload = file;
+      
+      // Start: Image Compression Pipeline
+      if (file.type.startsWith('image/')) {
+        const compressedFile = await compressImage(file);
+        fileToUpload = compressedFile;
+      }
+      // End: Image Compression Pipeline
+
       // Start: File Reading
       const fileContent = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => resolve(reader.result as string);
         reader.onerror = reject;
-        reader.readAsText(file);
+        reader.readAsText(fileToUpload);
       });
       // End: File Reading
 
@@ -49,31 +109,32 @@ export default function AssetUploadZone({ className }: AssetUploadZoneProps) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          filename: file.name,
+          filename: fileToUpload.name,
           fileContent,
-          contentType: file.type,
-          size: file.size,
+          contentType: fileToUpload.type,
+          size: fileToUpload.size,
         }),
       });
 
       setUploadProgress(90);
 
       if (!response.ok) {
-        throw new Error('Upload failed');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Upload failed');
       }
 
       const result = await response.json();
       
       setUploadProgress(100);
       
-      alert(`${file.name} has been uploaded successfully`);
+      alert(`${file.name} ${t.upload.success}`);
     } catch (error) {
       console.error('Upload Error:', error);
-      alert('Failed to upload file. Please try again.');
+      alert(error instanceof Error ? error.message : t.upload.failed);
     } finally {
       setTimeout(() => setUploadProgress(0), 2000);
     }
-  }, [validateFile]);
+  }, [compressImage, t]);
   // End: Upload Handler
 
   // Start: Drag and Drop Handlers
@@ -115,7 +176,6 @@ export default function AssetUploadZone({ className }: AssetUploadZoneProps) {
     fileInputRef.current?.click();
   };
   // End: File Input Handler
-  // End: State Management
 
   // Start: Render UI
   return (
@@ -147,11 +207,11 @@ export default function AssetUploadZone({ className }: AssetUploadZoneProps) {
         <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
         
         <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-2">
-          Drop your asset here
+          {t.upload.dropZone}
         </h3>
         
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-          Or click to browse files (Max 25MB per file)
+          {t.upload.instructions}
         </p>
 
         {/* Start: File Input */}
@@ -172,7 +232,7 @@ export default function AssetUploadZone({ className }: AssetUploadZoneProps) {
           className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <FileText className="mr-2 h-4 w-4" />
-          Browse Files
+          {t.upload.browse}
         </button>
 
         {/* Start: Progress Indicator */}
@@ -185,7 +245,7 @@ export default function AssetUploadZone({ className }: AssetUploadZoneProps) {
               />
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-              Uploading... {uploadProgress}%
+              {t.upload.uploading} {uploadProgress}%
             </p>
           </div>
         )}
@@ -198,10 +258,10 @@ export default function AssetUploadZone({ className }: AssetUploadZoneProps) {
           <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
           <div>
             <p className="text-xs font-medium text-amber-800 dark:text-amber-200">
-              Profile Tier Limitations
+              {t.upload.tierLimitations}
             </p>
             <p className="text-xs text-amber-700 dark:text-amber-300">
-              Individual file uploads are limited to 25MB. For larger assets, consider compression or splitting files.
+              {t.upload.sizeLimit}
             </p>
           </div>
         </div>
