@@ -1,14 +1,13 @@
 // Start: Imports
 'use client';
 import { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { useLanguageStore } from '@/store/useLanguageStore';
+import { enDictionary, msDictionary } from '@/i18n/dictionaries';
+import DashboardProfileBanner from '@/components/DashboardProfileBanner';
+import FileManagerActions from '@/components/FileManagerActions';
+import FileManagerGrid from '@/components/FileManagerGrid';
+import FileManagerList from '@/components/FileManagerList';
 // End: Imports
-
-// Start: Supabase Client Configuration
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_KEY || 'placeholder-key';
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
-// End: Supabase Client Configuration
 
 // Start: Type Definitions
 interface SiteFile {
@@ -18,6 +17,12 @@ interface SiteFile {
   contentType: string;
   uploadedAt: string;
   url: string;
+}
+
+interface SiteFolder {
+  id: string;
+  name: string;
+  createdAt: string;
 }
 
 interface SiteFilesResponse {
@@ -30,9 +35,15 @@ interface SiteFilesResponse {
 // Start: SiteFilesPage Component
 export default function SiteFilesPage() {
   // Start: State Management
+  const { language } = useLanguageStore();
+  const t = language === 'ms' ? msDictionary : enDictionary;
+  
   const [files, setFiles] = useState<SiteFile[]>([]);
+  const [folders, setFolders] = useState<SiteFolder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [selectedFiles, setSelectedFiles] = useState<SiteFile[]>([]);
   // End: State Management
 
   // Start: Fetch Files
@@ -42,17 +53,49 @@ export default function SiteFilesPage() {
       setError(null);
 
       try {
-        const { data, error: fetchError } = await supabase
-          .from('site_files')
-          .select('*')
-          .order('uploadedAt', { ascending: false });
+        // Simulated file data
+        const mockFiles: SiteFile[] = [
+          {
+            id: '1',
+            filename: 'index.html',
+            size: 1024,
+            contentType: 'text/html',
+            uploadedAt: new Date().toISOString(),
+            url: '/files/index.html'
+          },
+          {
+            id: '2',
+            filename: 'style.css',
+            size: 2048,
+            contentType: 'text/css',
+            uploadedAt: new Date().toISOString(),
+            url: '/files/style.css'
+          },
+          {
+            id: '3',
+            filename: 'script.js',
+            size: 1536,
+            contentType: 'text/javascript',
+            uploadedAt: new Date().toISOString(),
+            url: '/files/script.js'
+          }
+        ];
 
-        if (fetchError) {
-          throw fetchError;
-        }
+        const mockFolders: SiteFolder[] = [
+          {
+            id: 'f1',
+            name: 'images',
+            createdAt: new Date().toISOString()
+          },
+          {
+            id: 'f2',
+            name: 'documents',
+            createdAt: new Date().toISOString()
+          }
+        ];
 
-        const typedFiles = (data as SiteFile[] | null) ?? [];
-        setFiles(typedFiles);
+        setFiles(mockFiles);
+        setFolders(mockFolders);
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to fetch files';
         setError(errorMessage);
@@ -65,97 +108,115 @@ export default function SiteFilesPage() {
   }, []);
   // End: Fetch Files
 
-  // Start: Format File Size
-  const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  // Start: Handle File Actions
+  const handleFileAction = (file: SiteFile | SiteFolder, action: string) => {
+    console.log(`Action ${action} on file/folder:`, file);
   };
-  // End: Format File Size
+  // End: Handle File Actions
+
+  // Start: Handle File Upload
+  const handleFileUpload = () => {
+    console.log('File upload triggered');
+  };
+  // End: Handle File Upload
+
+  // Start: Handle Folder Creation
+  const handleFolderCreate = () => {
+    console.log('Folder creation triggered');
+  };
+  // End: Handle Folder Creation
+
+  // Start: Handle File Creation
+  const handleFileCreate = () => {
+    console.log('File creation triggered');
+  };
+  // End: Handle File Creation
+
+  // Start: Handle Batch Delete
+  const handleBatchDelete = () => {
+    console.log('Batch delete triggered', selectedFiles);
+  };
+  // End: Handle Batch Delete
 
   // Start: Render Site Files Page
   return (
     <div className="p-6 max-w-7xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-          Site Files Dashboard
-        </h1>
-        <p className="mt-2 text-gray-600 dark:text-gray-400">
-          Manage your personal asset files (25MB tier)
-        </p>
-      </div>
+      {/* Start: Profile Banner */}
+      <DashboardProfileBanner />
+      {/* End: Profile Banner */}
 
-      <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
-        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-            Your Files
-          </h2>
+      {/* Start: View Toggle */}
+      <div className="flex items-center justify-end mb-4">
+        <div className="flex items-center space-x-2">
+          <span className="text-sm text-gray-600 dark:text-gray-400">
+            {t.dashboardTitle}
+          </span>
+          <button
+            onClick={() => setViewMode('grid')}
+            className={`p-2 rounded-md ${
+              viewMode === 'grid'
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+            }`}
+            title="Grid View"
+          >
+            📋
+          </button>
+          <button
+            onClick={() => setViewMode('list')}
+            className={`p-2 rounded-md ${
+              viewMode === 'list'
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+            }`}
+            title="List View"
+          >
+            📋
+          </button>
         </div>
-
-        {loading && (
-          <div className="p-6 text-center">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-            <p className="mt-2 text-gray-500 dark:text-gray-400">Loading files...</p>
-          </div>
-        )}
-
-        {error && (
-          <div className="p-6 text-center">
-            <p className="text-red-500 dark:text-red-400">{error}</p>
-          </div>
-        )}
-
-        {!loading && !error && files.length === 0 && (
-          <div className="p-6 text-center">
-            <p className="text-gray-500 dark:text-gray-400">
-              No files uploaded yet. Start uploading assets to see them here.
-            </p>
-          </div>
-        )}
-
-        {!loading && !error && files.length > 0 && (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 dark:bg-gray-700">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Filename
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Size
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Type
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                    Uploaded
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {files.map((file) => (
-                  <tr key={file.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                      {file.filename}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                      {formatFileSize(file.size)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                      {file.contentType}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                      {new Date(file.uploadedAt).toLocaleDateString()}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
       </div>
+      {/* End: View Toggle */}
+
+      {/* Start: File Manager Actions */}
+      <FileManagerActions
+        onFileUpload={handleFileUpload}
+        onFolderCreate={handleFolderCreate}
+        onFileCreate={handleFileCreate}
+        selectedCount={selectedFiles.length}
+        onBatchDelete={handleBatchDelete}
+      />
+      {/* End: File Manager Actions */}
+
+      {/* Start: File Manager Content */}
+      {loading && (
+        <div className="text-center py-8">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          <p className="mt-2 text-gray-500 dark:text-gray-400">
+            {t.loadingDashboard}
+          </p>
+        </div>
+      )}
+
+      {error && (
+        <div className="text-center py-8">
+          <p className="text-red-500 dark:text-red-400">{error}</p>
+        </div>
+      )}
+
+      {!loading && !error && (
+        viewMode === 'grid'
+          ? <FileManagerGrid
+              files={files}
+              folders={folders}
+              onFileAction={handleFileAction}
+            />
+          : <FileManagerList
+              files={files}
+              folders={folders}
+              onFileAction={handleFileAction}
+            />
+      )}
+      {/* End: File Manager Content */}
     </div>
   );
 }

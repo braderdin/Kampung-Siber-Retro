@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { enDictionary, msDictionary } from '@/i18n/dictionaries';
 import { useEffect, useState } from 'react';
+import UserDropdownMenu from '@/components/UserDropdownMenu';
 // End: Imports
 
 // Start: Type Definitions
@@ -118,6 +119,10 @@ export default function RetroNavbar() {
               </select>
             </div>
             {/* End: Language Selector */}
+
+            {/* Start: User Dropdown Menu */}
+            <UserDropdownMenu />
+            {/* End: User Dropdown Menu */}
 
             {/* Start: Dark Mode Toggle */}
             <button
