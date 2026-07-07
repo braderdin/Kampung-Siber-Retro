@@ -29,44 +29,52 @@ export default function Home() {
   return (
     <div className="flex flex-col flex-1 items-center justify-center bg-gradient-to-br from-[#060814] to-[#0c102b] font-sans">
       <main className="flex flex-1 w-full max-w-4xl flex-col items-center justify-between py-8 px-4 sm:px-8">
-        {/* Start: Purple Marquee Message Ticker */}
+        {/* Start: Cyber Marquee Message Ticker */}
         <div className="w-full text-center mb-8 overflow-hidden">
-          <div className="inline-block whitespace-nowrap animate-marquee text-white font-bold text-sm tracking-wider">
-            ✨ Selamat Datang ke Pusat Siber Komuniti Nusantara • Jumlah Teratak Digital Terkini: 1,240 buah • Pastikan kod HTML anda comel dan kreatif! ✨
+          <div className="inline-block whitespace-nowrap animate-marquee text-white font-bold text-sm tracking-wider drop-shadow-[0_0_5px_#ff007f]">
+            ✨ Selamat Batang ke Pusat Siber Komuniti Nusantara • Jumlah Teratak Digital Terkini: 1,240 buah • Pastikan kod HTML anda comel dan kreatif! ✨
           </div>
         </div>
-        {/* End: Purple Marquee Message Ticker */}
-
-        {/* Start: Cyber Neon Glow Effects */}
-        <style jsx>{`
-          @keyframes marquee {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-100%); }
-          }
-          .animate-marquee {
-            animation: marquee 20s linear infinite;
-          }
-        `}</style>
-        {/* End: Cyber Neon Glow Effects */}
+        {/* End: Cyber Marquee Message Ticker */}
 
         <div className="text-center py-16">
-          {/* Start: Digital Teratak House Emblem */}
+          {/* Start: Cyber Teratak Emblem */}
           <div className="inline-block mb-6">
             <svg 
-              className="w-20 h-20 text-cyan-400 drop-shadow-[0_0_10px_#00ffff]" 
+              className="w-20 h-20 cyber-emblem drop-shadow-[0_0_10px_#00ffff]" 
               viewBox="0 0 24 24" 
               fill="none" 
               stroke="currentColor" 
-              strokeWidth="2" 
+              strokeWidth="1.5" 
               strokeLinecap="round" 
               strokeLinejoin="round"
             >
-              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h5a2 2 0 0 1 2 2z" />
-              <line x1="12" y1="11" x2="12" y2="17" />
-              <line x1="10" y1="15" x2="14" y2="15" />
+              <defs>
+                <filter id="glow">
+                  <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                  <feMerge> 
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+              </defs>
+              {/* Traditional roof outline */}
+              <path d="M12 2 L2 7 L2 17 L22 17 L22 7 Z" fill="none" stroke="#00ffff"/>
+              {/* Circuitry lines */}
+              <line x1="12" y1="2" x2="12" y2="7" className="circuit-line"/>
+              <line x1="12" y1="7" x2="8" y2="10" className="circuit-line"/>
+              <line x1="12" y1="7" x2="16" y2="10" className="circuit-line"/>
+              <line x1="8" y1="10" x2="8" y2="14" className="circuit-line"/>
+              <line x1="16" y1="10" x2="16" y2="14" className="circuit-line"/>
+              <line x1="8" y1="14" x2="16" y2="14" className="circuit-line glow"/>
+              {/* Circuit nodes */}
+              <circle cx="12" cy="7" r="1.5" fill="#ff007f"/>
+              <circle cx="8" cy="10" r="1" fill="#00ffff"/>
+              <circle cx="16" cy="10" r="1" fill="#00ffff"/>
+              <circle cx="12" cy="14" r="1.5" fill="#ff007f"/>
             </svg>
           </div>
-          {/* End: Digital Teratak House Emblem */}
+          {/* End: Cyber Teratak Emblem */}
 
           <h1 className="text-5xl md:text-6xl font-bold text-white dark:text-gray-200 mb-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 via-cyan-400 to-purple-600 uppercase tracking-wider drop-shadow-[0_0_15px_#ff007f]">
             KAMPUNG SIBER

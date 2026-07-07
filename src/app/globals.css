@@ -173,7 +173,7 @@ body.crt-enabled .crt-enabled {
   letter-spacing: 0.05em;
 }
 
-/* Cyber Neon Theme */
+/* Cyber Neon Theme - Dark Mode */
 :root {
   --cyber-blue: #0c102b;
   --cyber-pink: #ff007f;
@@ -186,25 +186,29 @@ body.crt-enabled .crt-enabled {
 .dark {
   --background: var(--cyber-midnight);
   --foreground: #ffffff;
+  --border-color: #ff007f;
+  --accent-color: #00ffff;
 }
 
 .light {
-  --background: var(--cyber-blue);
+  --background: #0c102b;
   --foreground: #ffffff;
+  --border-color: #ffb703;
+  --accent-color: #00ffff;
 }
 
 body.light {
-  background: var(--cyber-blue);
+  background: #0c102b;
 }
 
 body.dark {
-  background: var(--cyber-midnight);
+  background: #060814;
 }
 
 /* Retro UI Styles */
 .retro-btn-secondary {
   padding: 8px 16px;
-  border: 2px solid #00ffff;
+  border: 2px solid var(--border-color);
   border-radius: 6px;
   color: #ffffff;
   font-weight: 500;
@@ -219,7 +223,7 @@ body.dark {
 
 .retro-btn-primary {
   padding: 12px 24px;
-  border: 2px solid #ff007f;
+  border: 2px solid var(--border-color);
   border-radius: 8px;
   color: #ffffff;
   font-weight: 600;
@@ -236,7 +240,7 @@ body.dark {
 
 .retro-input {
   padding: 10px 14px;
-  border: 2px solid #00ffff;
+  border: 2px solid var(--accent-color);
   border-radius: 6px;
   background: rgba(10, 10, 10, 0.5);
   color: #ffffff;
@@ -252,7 +256,7 @@ body.dark {
 
 .retro-textarea {
   padding: 10px 14px;
-  border: 2px solid #00ffff;
+  border: 2px solid var(--accent-color);
   border-radius: 6px;
   background: rgba(10, 10, 10, 0.5);
   color: #ffffff;
@@ -266,3 +270,34 @@ body.dark {
   border-color: #ff007f;
   box-shadow: 0 0 10px rgba(255, 0, 127, 0.5);
 }
+
+/* Start: Marquee Animation Styles */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+.animate-marquee {
+  animation: marquee 25s linear infinite;
+}
+
+.marquee-container {
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
+}
+/* End: Marquee Animation Styles */
+
+/* Start: Cyber Emblem SVG Styles */
+.cyber-emblem {
+  filter: drop-shadow(0 0 8px #00ffff) drop-shadow(0 0 16px #ff007f);
+}
+
+.circuit-line {
+  stroke: #00ffff;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.circuit-line.glow {
+  stroke: #ff007f;
+}
+/* End: Cyber Emblem SVG Styles */

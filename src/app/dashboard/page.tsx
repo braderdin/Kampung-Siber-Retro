@@ -237,7 +237,7 @@ function DashboardContent({ className }: DashboardProps) {
       {/* Start: Recommended Tutorials Section */}
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-          Tutorial Disyorkan
+          {t.tutorials}
         </h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {mockTutorialPreviews.map((tutorial) => (
@@ -335,13 +335,13 @@ function DashboardContent({ className }: DashboardProps) {
       <div className="mt-6">
         <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 border border-cyan-500/30">
           <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">
-            {t.quickActions}
+            {t.dashboardTitle}
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <ModernRetroCard
-              title={t.myFiles}
+              title={t.fileEditor}
               description="Akses fail anda secara terus"
-              icon="📁"
+              icon="📝"
               className="w-full"
             />
             <ModernRetroCard
@@ -363,7 +363,7 @@ function DashboardContent({ className }: DashboardProps) {
       <div className="mt-6">
         <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 border border-cyan-500/30">
           <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">
-            {t.dashboardTitle}
+            Papan Pemuka
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <ModernRetroCard

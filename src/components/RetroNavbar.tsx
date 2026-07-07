@@ -22,6 +22,7 @@ export default function RetroNavbar() {
   const router = useRouter();
   const { language, setLanguage } = useLanguageStore();
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const t = language === 'ms' ? msDictionary : enDictionary;
   
@@ -67,6 +68,7 @@ export default function RetroNavbar() {
 
   // Start: Handle Navigation Click
   const handleNavClick = (href: string) => {
+    setMobileMenuOpen(false);
     router.push(href);
   };
   // End: Handle Navigation Click
@@ -84,9 +86,9 @@ export default function RetroNavbar() {
           </div>
           {/* End: Logo/Brand */}
 
-          {/* Start: Navigation Items */}
+          {/* Start: Navigation Items - Desktop */}
           <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-4">
+            <div className="ml-10 flex items-baseline space-x-2">
               {navItems.map((item) => (
                 <button
                   key={item.href}
@@ -98,15 +100,32 @@ export default function RetroNavbar() {
                   }`}
                 >
                   <span className="text-lg">{item.icon}</span>
-                  <span>{item.name}</span>
+                  <span className="hidden sm:inline">{item.name}</span>
                 </button>
               ))}
             </div>
           </div>
           {/* End: Navigation Items */}
 
+          {/* Start: Mobile Menu Button */}
+          <div className="md:hidden">
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="text-gray-300 hover:text-white focus:outline-none p-2"
+            >
+              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {mobileMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
+          </div>
+          {/* End: Mobile Menu Button */}
+
           {/* Start: Controls Container */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
             {/* Start: Language Selector */}
             <div>
               <select
@@ -127,16 +146,39 @@ export default function RetroNavbar() {
             {/* Start: Dark Mode Toggle */}
             <button
               onClick={handleDarkModeToggle}
-              className="retro-btn-secondary text-xs px-3 py-1 flex items-center space-x-1 border-pink-400 hover:border-pink-300"
+              className="retro-btn-secondary text-xs px-2 py-1 flex items-center space-x-1 border-pink-400 hover:border-pink-300"
             >
               <span>{isDarkMode ? '🌙' : '☀️'}</span>
-              <span>{isDarkMode ? t.greetings.hello : 'Penapis CRT'}</span>
+              <span className="hidden sm:inline">{isDarkMode ? t.greetings.hello : 'Penapis CRT'}</span>
             </button>
             {/* End: Dark Mode Toggle */}
           </div>
           {/* End: Controls Container */}
         </div>
       </div>
+      
+      {/* Start: Mobile Navigation Menu */}
+      {mobileMenuOpen && (
+        <div id="mobile-nav" className="md:hidden bg-black/50 border-t border-cyan-500/20">
+          <div className="px-2 pt-2 pb-3 space-y-1">
+            {navItems.map((item) => (
+              <button
+                key={item.href}
+                onClick={() => handleNavClick(item.href)}
+                className={`flex items-center w-full px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                  pathname === item.href
+                    ? 'bg-pink-500/20 text-pink-400'
+                    : 'text-gray-300 hover:text-white hover:bg-cyan-500/10'
+                }`}
+              >
+                <span className="text-lg mr-2">{item.icon}</span>
+                {item.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      {/* End: Mobile Navigation Menu */}
     </nav>
   );
 }
