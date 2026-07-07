@@ -42,7 +42,7 @@ export default function UserSitePage({ params }: UserSitePageProps) {
         </div>
         <div className="retro-window-client p-6">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <h1 className="retro-heading text-2xl font-bold">Selamat datang ke laman retro {username}</h1>
+            <h1 className="retro-heading text-2xl font-bold">Laman Peribadi {username}</h1>
             <CrtThemeController />
           </div>
 

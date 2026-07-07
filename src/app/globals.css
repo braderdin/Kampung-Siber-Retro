@@ -273,16 +273,18 @@ body.dark {
 
 /* Start: Marquee Animation Styles */
 @keyframes marquee {
-  0% { transform: translateX(0); }
+  0% { transform: translateX(100%); }
   100% { transform: translateX(-100%); }
 }
 
 .animate-marquee {
   animation: marquee 25s linear infinite;
+  white-space: nowrap;
 }
 
 .marquee-container {
   background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
+  overflow: hidden;
 }
 
 /* Start: Responsive Marquee Fix */
@@ -301,18 +303,31 @@ body.dark {
 }
 /* End: Responsive Marquee Fix */
 
-/* Start: Cyber Emblem SVG Styles */
-.cyber-emblem {
+/* Start: Cozy Traditional Malay House SVG Styles */
+.cozy-house-emblem {
   filter: drop-shadow(0 0 8px #00ffff) drop-shadow(0 0 16px #ff007f);
+  width: 48px;
+  height: 48px;
 }
 
-.circuit-line {
+.cozy-house-path {
+  fill: none;
   stroke: #00ffff;
-  stroke-width: 2;
-  stroke-linecap: round;
+  strokeWidth: 1.5;
+  strokeLinecap: round;
+  strokeLinejoin: round;
 }
 
-.circuit-line.glow {
-  stroke: #ff007f;
+.cozy-house-fill {
+  fill: #ff007f;
+  stroke: #00ffff;
+  strokeWidth: 0.5;
 }
-/* End: Cyber Emblem SVG Styles */
+
+.webring-halo {
+  fill: none;
+  stroke: rgba(0, 255, 255, 0.3);
+  strokeWidth: 1;
+  strokeLinecap: round;
+}
+/* End: Cozy Traditional Malay House SVG Styles */

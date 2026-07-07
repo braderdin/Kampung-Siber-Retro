@@ -38,10 +38,10 @@ export default function Home() {
         {/* End: Cyber Marquee Message Ticker */}
 
         <div className="text-center py-16">
-          {/* Start: Cyber Teratak Emblem */}
+          {/* Start: Cozy Traditional Malay House Emblem */}
           <div className="inline-block mb-6">
             <svg 
-              className="w-20 h-20 cyber-emblem drop-shadow-[0_0_10px_#00ffff]" 
+              className="w-20 h-20 cozy-house-emblem drop-shadow-[0_0_10px_#00ffff]" 
               viewBox="0 0 24 24" 
               fill="none" 
               stroke="currentColor" 
@@ -49,28 +49,19 @@ export default function Home() {
               strokeLinecap="round" 
               strokeLinejoin="round"
             >
-              <defs>
-                <filter id="glow">
-                  <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
-                  <feMerge> 
-                    <feMergeNode in="coloredBlur"/>
-                    <feMergeNode in="SourceGraphic"/>
-                  </feMerge>
-                </filter>
-              </defs>
               {/* Traditional Malay Teratak House - Roof */}
-              <path d="M4 18 L12 6 L20 18 Z" fill="none" stroke="#00ffff"/>
+              <path d="M4 18 L12 6 L20 18 Z" className="cozy-house-path"/>
               {/* Walls */}
-              <rect x="6" y="18" width="12" height="8" fill="none" stroke="#00ffff"/>
+              <rect x="6" y="18" width="12" height="8" className="cozy-house-path"/>
               {/* Center Pixel Door */}
-              <rect x="10" y="20" width="4" height="4" fill="#ff007f" stroke="#00ffff" strokeWidth="0.5"/>
+              <rect x="10" y="20" width="4" height="4" className="cozy-house-fill"/>
               {/* Soft Glowing Digital Webring Arcs */}
-              <path d="M8 16 C10 14, 14 14, 16 16" fill="none" stroke="rgba(0,255,255,0.3)" strokeWidth="1.5" strokeLinecap="round"/>
-              <path d="M8 18 C10 16, 14 16, 16 18" fill="none" stroke="rgba(0,255,255,0.2)" strokeWidth="1" strokeLinecap="round"/>
-              <path d="M8 20 C10 18, 14 18, 16 20" fill="none" stroke="rgba(0,255,255,0.1)" strokeWidth="0.5" strokeLinecap="round"/>
+              <path d="M8 16 C10 14, 14 14, 16 16" className="webring-halo"/>
+              <path d="M8 18 C10 16, 14 16, 16 18" className="webring-halo"/>
+              <path d="M8 20 C10 18, 14 18, 16 20" className="webring-halo"/>
             </svg>
           </div>
-          {/* End: Cyber Teratak Emblem */}
+          {/* End: Cozy Traditional Malay House Emblem */}
 
           <h1 className="text-5xl md:text-6xl font-bold text-white dark:text-gray-200 mb-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 via-cyan-400 to-purple-600 uppercase tracking-wider drop-shadow-[0_0_15px_#ff007f]">
             KAMPUNG SIBER

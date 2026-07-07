@@ -1,16 +1,15 @@
 // Start: Imports
 'use client';
 import { useEffect, useState } from 'react';
-import CodeMirrorEditor from '@/components/CodeMirrorEditor';
+import { useRouter } from 'next/navigation';
 import CrtThemeController from '@/components/CrtThemeController';
 import DashboardProfileBanner from '@/components/DashboardProfileBanner';
 import FileManagerActions from '@/components/FileManagerActions';
 import FileManagerGrid from '@/components/FileManagerGrid';
 import RetroToolbar from '@/components/RetroToolbar';
-import SandboxedPreview from '@/components/SandboxedPreview';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { enDictionary, msDictionary } from '@/i18n/dictionaries';
-import type { FileAction, FileManagerItem, SiteFile, SiteFolder } from '@/types/fileManager';
+import type { FileManagerItem, SiteFile, SiteFolder } from '@/types/fileManager';
 // End: Imports
 
 // Start: SiteFilesPage Component
@@ -25,8 +24,7 @@ export default function SiteFilesPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedFiles, setSelectedFiles] = useState<SiteFile[]>([]);
   const [crtEnabled, setCrtEnabled] = useState(false);
-  const [activeFileContent, setActiveFileContent] = useState<string>('');
-  const [activeFileName, setActiveFileName] = useState<string>('');
+  const router = useRouter();
   // End: State Management
 
   // Start: Fetch Files
@@ -110,11 +108,9 @@ export default function SiteFilesPage() {
   // End: Theme Sync
 
   // Start: Handle File Actions
-  const handleFileAction = (file: FileManagerItem, action: FileAction, newName?: string) => {
+  const handleFileAction = (file: FileManagerItem, action: string, newName?: string) => {
     if (action === 'edit' && file.type === 'file') {
-      setActiveFileName(file.filename);
-      const mockContent = `/* Content of ${file.filename} */\n\n`;
-      setActiveFileContent(mockContent);
+      router.push(`/site_files/text_editor?filename=${encodeURIComponent(file.filename)}`);
     } else if (action === 'navigate' && file.type === 'folder') {
       console.log('Navigating to folder:', file.name);
     } else if (action === 'rename' && newName) {
@@ -148,12 +144,6 @@ export default function SiteFilesPage() {
     console.log('Batch delete triggered', selectedFiles);
   };
   // End: Handle Batch Delete
-
-  // Start: Handle File Content Change
-  const handleFileContentChange = (content: string) => {
-    setActiveFileContent(content);
-  };
-  // End: Handle File Content Change
 
   // Start: Render Site Files Page
   return (
@@ -198,24 +188,6 @@ export default function SiteFilesPage() {
             </div>
             <div className="space-y-4">
               <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">{t.fileEditor}</h2>
-              <div className="mb-2 grid grid-cols-2 gap-2">
-                {(['html', 'css', 'js'] as const).map((tab) => (
-                  <button key={tab} className="retro-tab-btn retro-tab-active">
-                    {t[`${tab}Tab` as keyof typeof t] as string}
-                  </button>
-                ))}
-              </div>
-              <div className="grid h-96 grid-cols-1 gap-4 md:grid-cols-2">
-                <div className="overflow-hidden rounded-md border-2 border-gray-300 dark:border-gray-600">
-                  <CodeMirrorEditor 
-                    value={activeFileContent}
-                    onChange={handleFileContentChange}
-                  />
-                </div>
-                <div className="overflow-hidden rounded-md border-2 border-gray-300 dark:border-gray-600">
-                  <SandboxedPreview />
-                </div>
-              </div>
               <RetroToolbar className="mt-2" />
             </div>
           </div>

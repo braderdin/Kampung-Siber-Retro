@@ -73,7 +73,9 @@ function TextEditorContent({ className }: TextEditorProps) {
   const [filename, setFilename] = useState<string>('');
   const [content, setContent] = useState<string>('');
   const [fileLanguage, setFileLanguage] = useState<string>('html');
+  const [isSaved, setIsSaved] = useState<boolean>(false);
 
+  // Start: File Loading Handler
   useEffect(() => {
     const filenameParam = searchParams.get('filename');
     if (filenameParam) {
@@ -88,6 +90,23 @@ function TextEditorContent({ className }: TextEditorProps) {
       }
     }
   }, [searchParams]);
+  // End: File Loading Handler
+
+  // Start: Save Handler
+  const handleSave = () => {
+    setIsSaved(true);
+    setTimeout(() => setIsSaved(false), 2000);
+  };
+  // End: Save Handler
+
+  // Start: Rename Handler
+  const handleRename = () => {
+    const newFilename = prompt('Sila masukkan nama fail baru:', filename);
+    if (newFilename && newFilename.trim()) {
+      setFilename(newFilename.trim());
+    }
+  };
+  // End: Rename Handler
 
   return (
     <div className={`flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4 ${className || ''}`}>
@@ -98,13 +117,47 @@ function TextEditorContent({ className }: TextEditorProps) {
           </div>
         </div>
         <div className="retro-window-client p-6">
-          <div className="retro-editor-container">
-            <CodeMirrorEditor 
-              value={content}
-              language={fileLanguage}
-              onChange={setContent}
-            />
+          {/* Start: VSCode Dark Theme Editor Container */}
+          <div className="flex flex-col h-full">
+            {/* Start: Top Toolbar */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-2">
+                <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">Line 1</span>
+                <span className="text-xs text-gray-400 dark:text-gray-500">Col 1</span>
+                {isSaved && (
+                  <span className="text-xs text-green-500 font-semibold">✓ Simpan</span>
+                )}
+              </div>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={handleSave}
+                  className="retro-btn-secondary text-xs px-3 py-1"
+                >
+                  Simpan Fail
+                </button>
+                <button
+                  onClick={handleRename}
+                  className="retro-btn-secondary text-xs px-3 py-1"
+                >
+                  Tukar Nama
+                </button>
+              </div>
+            </div>
+            {/* End: Top Toolbar */}
+            
+            {/* Start: Editor Content Area */}
+            <div className="flex-1 overflow-hidden">
+              <div className="h-full border-2 border-gray-300 dark:border-gray-600 rounded-md overflow-hidden">
+                <CodeMirrorEditor 
+                  value={content}
+                  language={fileLanguage}
+                  onChange={setContent}
+                />
+              </div>
+            </div>
+            {/* End: Editor Content Area */}
           </div>
+          {/* End: VSCode Dark Theme Editor Container */}
         </div>
       </div>
     </div>
