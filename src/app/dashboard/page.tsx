@@ -33,6 +33,19 @@ interface DirectoryView {
   [key: string]: FileItem[];
 }
 
+interface UserQuote {
+  id: number;
+  username: string;
+  quote: string;
+  timestamp: string;
+}
+
+interface AccountAllocation {
+  total: number;
+  used: number;
+  remaining: number;
+}
+
 const mockDirectories: DirectoryView = {
   'galeri': [
     { id: 1, name: 'projek1.png', type: 'file', path: '/images/projek1.png', size: '2.4 MB' },
@@ -48,6 +61,12 @@ const mockDirectories: DirectoryView = {
     { id: 2, name: 'panduan.pdf', type: 'file', path: '/panduan.pdf', size: '3.2 MB' },
   ],
 };
+
+const mockUserQuotes: UserQuote[] = [
+  { id: 1, username: 'RetroCoder', quote: 'This editor brings back the good old days!', timestamp: new Date().toISOString() },
+  { id: 2, username: 'PixelPioneer', quote: 'Love the CRT filter effect!', timestamp: new Date().toISOString() },
+  { id: 3, username: 'ByteBandit', quote: 'The code sandbox is brilliant!', timestamp: new Date().toISOString() },
+];
 // End: Type Definitions
 
 // Start: DashboardContent Component
@@ -59,6 +78,13 @@ function DashboardContent({ className }: DashboardProps) {
   const [pageInfo, setPageInfo] = useState<PageInfo>({ number: 1, totalPages: 10 });
   const [currentDir, setCurrentDir] = useState<string>('root');
   const [files, setFiles] = useState<FileItem[]>([]);
+  const [accountAllocation, setAccountAllocation] = useState<AccountAllocation>({
+    total: 1000000,
+    used: 0,
+    remaining: 1000000,
+  });
+  const [userQuotes, setUserQuotes] = useState<UserQuote[]>(mockUserQuotes);
+  // End: State Management
 
   // Start: Effect for URL Parameters
   useEffect(() => {
@@ -101,6 +127,34 @@ function DashboardContent({ className }: DashboardProps) {
         </p>
       </div>
 
+      {/* Start: Account Allocation Display */}
+      <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+        <h3 className="text-lg font-semibold text-blue-800 dark:text-blue-200 mb-2">
+          Penggunaan Akaun
+        </h3>
+        <div className="grid grid-cols-3 gap-4 text-center">
+          <div>
+            <p className="text-sm text-blue-600 dark:text-blue-400">Total</p>
+            <p className="text-xl font-bold text-blue-800 dark:text-blue-200">
+              {accountAllocation.total.toLocaleString()}
+            </p>
+          </div>
+          <div>
+            <p className="text-sm text-blue-600 dark:text-blue-400">Digunakan</p>
+            <p className="text-xl font-bold text-blue-800 dark:text-blue-200">
+              {accountAllocation.used.toLocaleString()}
+            </p>
+          </div>
+          <div>
+            <p className="text-sm text-blue-600 dark:text-blue-400">Tersisa</p>
+            <p className="text-xl font-bold text-blue-800 dark:text-blue-200">
+              {accountAllocation.remaining.toLocaleString()}
+            </p>
+          </div>
+        </div>
+      </div>
+      {/* End: Account Allocation Display */}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <div className="lg:col-span-1">
           <HeroSignUpCard />
@@ -136,12 +190,32 @@ function DashboardContent({ className }: DashboardProps) {
                 onClick={() => window.location.href = '/guestbook'}
                 className="w-full retro-btn-secondary"
               >
-                {t.guestbookTitle}
+                Buku Pelawat Retro
               </button>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Start: User Quotes Section */}
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+          Kutipan Pengguna
+        </h2>
+        <div className="space-y-4">
+          {userQuotes.map((quote) => (
+            <div key={quote.id} className="bg-white dark:bg-gray-800 shadow rounded-lg p-4">
+              <p className="text-gray-700 dark:text-gray-300 italic">
+                "{quote.quote}"
+              </p>
+              <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                — {quote.username}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      {/* End: User Quotes Section */}
 
       {currentDir !== 'root' && (
         <div className="mb-4">

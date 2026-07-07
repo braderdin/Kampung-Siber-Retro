@@ -10,24 +10,8 @@ import RetroToolbar from '@/components/RetroToolbar';
 import SandboxedPreview from '@/components/SandboxedPreview';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { enDictionary, msDictionary } from '@/i18n/dictionaries';
+import type { FileAction, FileManagerItem, SiteFile, SiteFolder } from '@/types/fileManager';
 // End: Imports
-
-// Start: Type Definitions
-interface SiteFile {
-  id: string;
-  filename: string;
-  size: number;
-  contentType: string;
-  uploadedAt: string;
-  url: string;
-}
-
-interface SiteFolder {
-  id: string;
-  name: string;
-  createdAt: string;
-}
-// End: Type Definitions
 
 // Start: SiteFilesPage Component
 export default function SiteFilesPage() {
@@ -41,6 +25,8 @@ export default function SiteFilesPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedFiles, setSelectedFiles] = useState<SiteFile[]>([]);
   const [crtEnabled, setCrtEnabled] = useState(false);
+  const [activeFileContent, setActiveFileContent] = useState<string>('');
+  const [activeFileName, setActiveFileName] = useState<string>('');
   // End: State Management
 
   // Start: Fetch Files
@@ -58,6 +44,7 @@ export default function SiteFilesPage() {
             contentType: 'text/html',
             uploadedAt: new Date().toISOString(),
             url: '/files/index.html',
+            type: 'file',
           },
           {
             id: '2',
@@ -66,6 +53,7 @@ export default function SiteFilesPage() {
             contentType: 'text/css',
             uploadedAt: new Date().toISOString(),
             url: '/files/style.css',
+            type: 'file',
           },
           {
             id: '3',
@@ -74,6 +62,7 @@ export default function SiteFilesPage() {
             contentType: 'text/javascript',
             uploadedAt: new Date().toISOString(),
             url: '/files/script.js',
+            type: 'file',
           },
         ];
 
@@ -82,11 +71,13 @@ export default function SiteFilesPage() {
             id: 'f1',
             name: 'images',
             createdAt: new Date().toISOString(),
+            type: 'folder',
           },
           {
             id: 'f2',
             name: 'documents',
             createdAt: new Date().toISOString(),
+            type: 'folder',
           },
         ];
 
@@ -119,8 +110,17 @@ export default function SiteFilesPage() {
   // End: Theme Sync
 
   // Start: Handle File Actions
-  const handleFileAction = (file: SiteFile | SiteFolder, action: string) => {
-    console.log(`Action ${action} on file/folder:`, file);
+  const handleFileAction = (file: FileManagerItem, action: FileAction, newName?: string) => {
+    if (action === 'edit' && file.type === 'file') {
+      setActiveFileName(file.filename);
+      setActiveFileContent(`/* Content of ${file.filename} */\n\n`);
+    } else if (action === 'navigate' && file.type === 'folder') {
+      console.log('Navigating to folder:', file.name);
+    } else if (action === 'rename' && newName) {
+      console.log('Renaming item to:', newName);
+    } else if (action === 'delete') {
+      console.log('Deleting item:', file);
+    }
   };
   // End: Handle File Actions
 
@@ -147,6 +147,12 @@ export default function SiteFilesPage() {
     console.log('Batch delete triggered', selectedFiles);
   };
   // End: Handle Batch Delete
+
+  // Start: Handle File Content Change
+  const handleFileContentChange = (content: string) => {
+    setActiveFileContent(content);
+  };
+  // End: Handle File Content Change
 
   // Start: Render Site Files Page
   return (
@@ -200,7 +206,10 @@ export default function SiteFilesPage() {
               </div>
               <div className="grid h-96 grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="overflow-hidden rounded-md border-2 border-gray-300 dark:border-gray-600">
-                  <CodeMirrorEditor />
+                  <CodeMirrorEditor 
+                    value={activeFileContent}
+                    onChange={handleFileContentChange}
+                  />
                 </div>
                 <div className="overflow-hidden rounded-md border-2 border-gray-300 dark:border-gray-600">
                   <SandboxedPreview />
@@ -215,4 +224,3 @@ export default function SiteFilesPage() {
     </div>
   );
 }
-// End: SiteFilesPage Component

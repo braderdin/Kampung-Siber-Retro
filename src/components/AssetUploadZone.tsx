@@ -82,6 +82,15 @@ export default function AssetUploadZone({ className }: AssetUploadZoneProps) {
   // Start: Upload Handler
   const handleUpload = useCallback(async (file: File) => {
     try {
+      // Start: File Size Validation
+      const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+      
+      if (file.size > MAX_FILE_SIZE) {
+        alert(`Saiz fail ${file.name} melebihi had 2MB`);
+        return;
+      }
+      // End: File Size Validation
+
       setUploadProgress(10);
       
       let fileToUpload = file;
@@ -89,6 +98,14 @@ export default function AssetUploadZone({ className }: AssetUploadZoneProps) {
       // Start: Image Compression Pipeline
       if (file.type.startsWith('image/')) {
         const compressedFile = await compressImage(file);
+        
+        // Start: Post-Compression Size Check
+        if (compressedFile.size > MAX_FILE_SIZE) {
+          alert(`Saiz fail bocor ${compressedFile.name} masih melebihi had 2MB`);
+          return;
+        }
+        // End: Post-Compression Size Check
+        
         fileToUpload = compressedFile;
       }
       // End: Image Compression Pipeline
@@ -120,7 +137,7 @@ export default function AssetUploadZone({ className }: AssetUploadZoneProps) {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Upload failed');
+        throw new Error(errorData.error || 'Muat naik gagal');
       }
 
       const result = await response.json();
@@ -271,4 +288,3 @@ export default function AssetUploadZone({ className }: AssetUploadZoneProps) {
   );
   // End: Render UI
 }
-// End: Asset Upload Zone Component

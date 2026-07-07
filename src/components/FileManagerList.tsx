@@ -3,13 +3,14 @@
 
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { enDictionary, msDictionary } from '@/i18n/dictionaries';
+import type { FileAction, FileManagerItem, SiteFile, SiteFolder } from '@/types/fileManager';
 // End: Imports
 
 // Start: Type Definitions
 interface FileManagerListProps {
-  files: any[];
-  folders: any[];
-  onFileAction: (file: any, action: string) => void;
+  files: SiteFile[];
+  folders: SiteFolder[];
+  onFileAction: (file: FileManagerItem, action: FileAction, newName?: string) => void;
   className?: string;
 }
 // End: Type Definitions
@@ -19,6 +20,25 @@ export default function FileManagerList({ files, folders, onFileAction, classNam
   const { language } = useLanguageStore();
   const t = language === 'ms' ? msDictionary : enDictionary;
 
+  // Start: Handle Rename
+  const handleRename = (item: FileManagerItem) => {
+    const promptLabel = item.type === 'folder' ? item.name : item.filename;
+    const newName = prompt('Masukkan nama baru:', promptLabel);
+    if (newName && newName.trim() !== promptLabel) {
+      onFileAction(item, 'rename', newName.trim());
+    }
+  };
+  // End: Handle Rename
+
+  // Start: Handle Delete
+  const handleDelete = (item: FileManagerItem) => {
+    const itemName = item.type === 'folder' ? item.name : item.filename;
+    if (window.confirm(`Anda yakin mahu memadamkan ${itemName}?`)) {
+      onFileAction(item, 'delete');
+    }
+  };
+  // End: Handle Delete
+
   // Start: Render List View
   return (
     <div className={`space-y-2 ${className || ''}`}>
@@ -26,7 +46,7 @@ export default function FileManagerList({ files, folders, onFileAction, classNam
       {folders.map((folder) => (
         <div
           key={folder.id}
-          className="flex items-center justify-between p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+          className="flex items-center justify-between p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
         >
           <div className="flex items-center space-x-3">
             <span className="text-2xl">📁</span>
@@ -43,14 +63,14 @@ export default function FileManagerList({ files, folders, onFileAction, classNam
               👁️
             </button>
             <button
-              onClick={() => onFileAction(folder, 'rename')}
+              onClick={() => handleRename(folder)}
               className="text-green-500 hover:text-green-700"
               title="Tukar Nama"
             >
               ✏️
             </button>
             <button
-              onClick={() => onFileAction(folder, 'delete')}
+              onClick={() => handleDelete(folder)}
               className="text-red-500 hover:text-red-700"
               title="Padam"
             >
@@ -65,31 +85,31 @@ export default function FileManagerList({ files, folders, onFileAction, classNam
       {files.map((file) => (
         <div
           key={file.id}
-          className="flex items-center justify-between p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+          className="flex items-center justify-between p-3 border-2 border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
         >
           <div className="flex items-center space-x-3">
             <span className="text-2xl">📄</span>
             <span className="font-medium text-gray-700 dark:text-gray-300">
-              {file.name}
+              {file.filename}
             </span>
           </div>
           <div className="flex items-center space-x-2">
             <button
               onClick={() => onFileAction(file, 'edit')}
               className="text-blue-500 hover:text-blue-700"
-              title="Urus"
+              title="Edit"
             >
               ✏️
             </button>
             <button
-              onClick={() => onFileAction(file, 'rename')}
+              onClick={() => handleRename(file)}
               className="text-green-500 hover:text-green-700"
               title="Tukar Nama"
             >
               ✏️
             </button>
             <button
-              onClick={() => onFileAction(file, 'delete')}
+              onClick={() => handleDelete(file)}
               className="text-red-500 hover:text-red-700"
               title="Padam"
             >
@@ -102,4 +122,3 @@ export default function FileManagerList({ files, folders, onFileAction, classNam
     </div>
   );
 }
-// End: FileManagerList Component

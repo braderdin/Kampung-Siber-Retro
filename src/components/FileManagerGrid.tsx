@@ -3,13 +3,14 @@
 
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { enDictionary, msDictionary } from '@/i18n/dictionaries';
+import type { FileAction, FileManagerItem, SiteFile, SiteFolder } from '@/types/fileManager';
 // End: Imports
 
 // Start: Type Definitions
 interface FileManagerGridProps {
-  files: any[];
-  folders: any[];
-  onFileAction: (file: any, action: string) => void;
+  files: SiteFile[];
+  folders: SiteFolder[];
+  onFileAction: (file: FileManagerItem, action: FileAction, newName?: string) => void;
   className?: string;
 }
 // End: Type Definitions
@@ -19,6 +20,12 @@ export default function FileManagerGrid({ files, folders, onFileAction, classNam
   const { language } = useLanguageStore();
   const t = language === 'ms' ? msDictionary : enDictionary;
 
+  // Start: Handle Double Click
+  const handleFolderDoubleClick = (folder: SiteFolder) => {
+    onFileAction(folder, 'navigate');
+  };
+  // End: Handle Double Click
+
   // Start: Render Grid View
   return (
     <div className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 ${className || ''}`}>
@@ -26,7 +33,8 @@ export default function FileManagerGrid({ files, folders, onFileAction, classNam
       {folders.map((folder) => (
         <div
           key={folder.id}
-          className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 flex flex-col items-center justify-center hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
+          className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 flex flex-col items-center justify-center hover:border-gray-400 dark:hover:border-gray-500 transition-colors cursor-pointer"
+          onDoubleClick={() => handleFolderDoubleClick(folder)}
         >
           <span className="text-3xl mb-2">📁</span>
           <span className="text-sm font-medium text-gray-700 dark:text-gray-300 text-center">
@@ -44,7 +52,7 @@ export default function FileManagerGrid({ files, folders, onFileAction, classNam
         >
           <span className="text-2xl mb-2">📄</span>
           <span className="text-xs font-medium text-gray-700 dark:text-gray-300 text-center truncate w-full">
-            {file.name}
+            {file.filename}
           </span>
           <div className="flex space-x-1 mt-2">
             <button
@@ -75,4 +83,3 @@ export default function FileManagerGrid({ files, folders, onFileAction, classNam
     </div>
   );
 }
-// End: FileManagerGrid Component
