@@ -284,7 +284,22 @@ body.dark {
 .marquee-container {
   background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
 }
-/* End: Marquee Animation Styles */
+
+/* Start: Responsive Marquee Fix */
+@media (max-width: 640px) {
+  .animate-marquee {
+    animation-duration: 15s;
+    font-size: 0.875rem;
+  }
+}
+
+@media (min-width: 641px) {
+  .animate-marquee {
+    animation-duration: 25s;
+    font-size: 1rem;
+  }
+}
+/* End: Responsive Marquee Fix */
 
 /* Start: Cyber Emblem SVG Styles */
 .cyber-emblem {

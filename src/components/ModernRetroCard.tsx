@@ -40,9 +40,9 @@ export default function ModernRetroCard({
       onClick={handleClick}
       className={`group cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl ${className}`}
     >
-      <div className="relative overflow-hidden rounded-lg border-2 border-cyan-400/30">
+      <div className="relative overflow-hidden rounded-lg border-2 border-cyan-400/30 dark:border-pink-400/30">
         {/* Start: Card Background Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0e1330] to-[#121b4a] opacity-90"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0e1330] to-[#121b4a] opacity-90 dark:from-[#0e1330] dark:to-[#121b4a]"></div>
         {/* End: Card Background Gradient */}
         
         <div className="relative retro-card-header px-4 py-3">
@@ -65,7 +65,7 @@ export default function ModernRetroCard({
             {description}
           </p>
         </div>
-        <div className="relative retro-card-footer px-4 py-2 bg-black/20 border-t border-cyan-400/20 rounded-b">
+        <div className="relative retro-card-footer px-4 py-2 bg-black/20 border-t border-cyan-400/20 dark:border-pink-400/20 rounded-b">
           <div className="flex items-center justify-between">
             <span className="text-xs text-cyan-300 font-mono">
               Klik untuk lihat

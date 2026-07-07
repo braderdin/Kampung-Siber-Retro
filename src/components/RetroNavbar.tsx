@@ -125,13 +125,13 @@ export default function RetroNavbar() {
           {/* End: Mobile Menu Button */}
 
           {/* Start: Controls Container */}
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-1 sm:space-x-2">
             {/* Start: Language Selector */}
             <div>
               <select
                 value={language}
                 onChange={handleLanguageChange}
-                className="retro-input w-auto text-sm bg-black/50 border-cyan-400 text-white"
+                className="retro-input w-auto text-sm bg-black/50 border-cyan-400 text-white min-w-[60px] max-w-[80px]"
               >
                 <option value="en">EN</option>
                 <option value="ms">MS</option>
@@ -146,7 +146,7 @@ export default function RetroNavbar() {
             {/* Start: Dark Mode Toggle */}
             <button
               onClick={handleDarkModeToggle}
-              className="retro-btn-secondary text-xs px-2 py-1 flex items-center space-x-1 border-pink-400 hover:border-pink-300"
+              className="retro-btn-secondary text-xs px-2 py-1 flex items-center space-x-1 border-pink-400 hover:border-pink-300 min-w-[80px] justify-center"
             >
               <span>{isDarkMode ? '🌙' : '☀️'}</span>
               <span className="hidden sm:inline">{isDarkMode ? t.greetings.hello : 'Penapis CRT'}</span>

@@ -165,7 +165,7 @@ function DashboardContent({ className }: DashboardProps) {
       </div>
 
       {/* Start: Account Allocation Display */}
-      <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-cyan-500/30">
+      <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-cyan-500/30 dark:border-pink-500/30">
         <h3 className="text-lg font-semibold text-blue-800 dark:text-blue-200 mb-2">
           Penggunaan Akaun
         </h3>
@@ -206,7 +206,7 @@ function DashboardContent({ className }: DashboardProps) {
           <FollowActivityFeed />
         </div>
         <div className="lg:col-span-1">
-          <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 border border-cyan-500/30">
+          <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 border border-cyan-500/30 dark:border-pink-500/30">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">
               {t.quickActions}
             </h3>
@@ -262,7 +262,7 @@ function DashboardContent({ className }: DashboardProps) {
         </h2>
         <div className="space-y-4">
           {userQuotes.map((quote) => (
-            <div key={quote.id} className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 border border-cyan-500/30">
+            <div key={quote.id} className="bg-white dark:bg-gray-800 shadow rounded-lg p-4 border border-cyan-500/30 dark:border-pink-500/30">
               <p className="text-gray-700 dark:text-gray-300 italic">
                 "{quote.quote}"
               </p>
@@ -290,7 +290,7 @@ function DashboardContent({ className }: DashboardProps) {
       )}
 
       {currentDir !== 'root' && files.length > 0 && (
-        <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mb-6 border border-cyan-500/30">
+        <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 mb-6 border border-cyan-500/30 dark:border-pink-500/30">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
             {t.pageInfoTitle} - {currentDir}
           </h2>
@@ -308,7 +308,7 @@ function DashboardContent({ className }: DashboardProps) {
         </div>
       )}
 
-      <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 border border-cyan-500/30">
+      <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 border border-cyan-500/30 dark:border-pink-500/30">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
           {t.pageInfoTitle}
         </h2>
@@ -333,7 +333,7 @@ function DashboardContent({ className }: DashboardProps) {
       </div>
 
       <div className="mt-6">
-        <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 border border-cyan-500/30">
+        <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 border border-cyan-500/30 dark:border-pink-500/30">
           <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">
             {t.dashboardTitle}
           </h3>
@@ -361,7 +361,7 @@ function DashboardContent({ className }: DashboardProps) {
       </div>
 
       <div className="mt-6">
-        <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 border border-cyan-500/30">
+        <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 border border-cyan-500/30 dark:border-pink-500/30">
           <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">
             Papan Pemuka
           </h3>
@@ -390,7 +390,7 @@ function DashboardContent({ className }: DashboardProps) {
       </div>
 
       <div className="mt-6">
-        <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 border border-cyan-500/30">
+        <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 border border-cyan-500/30 dark:border-pink-500/30">
           <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">
             Navigasi Halaman
           </h3>

@@ -32,7 +32,7 @@ export default function Home() {
         {/* Start: Cyber Marquee Message Ticker */}
         <div className="w-full text-center mb-8 overflow-hidden">
           <div className="inline-block whitespace-nowrap animate-marquee text-white font-bold text-sm tracking-wider drop-shadow-[0_0_5px_#ff007f]">
-            ✨ Selamat Batang ke Pusat Siber Komuniti Nusantara • Jumlah Teratak Digital Terkini: 1,240 buah • Pastikan kod HTML anda comel dan kreatif! ✨
+            ✨ Selamat Datang ke Pusat Siber Komuniti Nusantara • Jumlah Teratak Digital Terkini: 1,240 buah • Pastikan kod HTML anda comel dan kreatif! ✨
           </div>
         </div>
         {/* End: Cyber Marquee Message Ticker */}
@@ -58,20 +58,16 @@ export default function Home() {
                   </feMerge>
                 </filter>
               </defs>
-              {/* Traditional roof outline */}
-              <path d="M12 2 L2 7 L2 17 L22 17 L22 7 Z" fill="none" stroke="#00ffff"/>
-              {/* Circuitry lines */}
-              <line x1="12" y1="2" x2="12" y2="7" className="circuit-line"/>
-              <line x1="12" y1="7" x2="8" y2="10" className="circuit-line"/>
-              <line x1="12" y1="7" x2="16" y2="10" className="circuit-line"/>
-              <line x1="8" y1="10" x2="8" y2="14" className="circuit-line"/>
-              <line x1="16" y1="10" x2="16" y2="14" className="circuit-line"/>
-              <line x1="8" y1="14" x2="16" y2="14" className="circuit-line glow"/>
-              {/* Circuit nodes */}
-              <circle cx="12" cy="7" r="1.5" fill="#ff007f"/>
-              <circle cx="8" cy="10" r="1" fill="#00ffff"/>
-              <circle cx="16" cy="10" r="1" fill="#00ffff"/>
-              <circle cx="12" cy="14" r="1.5" fill="#ff007f"/>
+              {/* Traditional Malay Teratak House - Roof */}
+              <path d="M4 18 L12 6 L20 18 Z" fill="none" stroke="#00ffff"/>
+              {/* Walls */}
+              <rect x="6" y="18" width="12" height="8" fill="none" stroke="#00ffff"/>
+              {/* Center Pixel Door */}
+              <rect x="10" y="20" width="4" height="4" fill="#ff007f" stroke="#00ffff" strokeWidth="0.5"/>
+              {/* Soft Glowing Digital Webring Arcs */}
+              <path d="M8 16 C10 14, 14 14, 16 16" fill="none" stroke="rgba(0,255,255,0.3)" strokeWidth="1.5" strokeLinecap="round"/>
+              <path d="M8 18 C10 16, 14 16, 16 18" fill="none" stroke="rgba(0,255,255,0.2)" strokeWidth="1" strokeLinecap="round"/>
+              <path d="M8 20 C10 18, 14 18, 16 20" fill="none" stroke="rgba(0,255,255,0.1)" strokeWidth="0.5" strokeLinecap="round"/>
             </svg>
           </div>
           {/* End: Cyber Teratak Emblem */}
@@ -82,7 +78,9 @@ export default function Home() {
           
           {/* Start: Bilingual Welcome Message */}
           <p className="text-xl text-gray-300 dark:text-gray-400 mb-10 max-w-2xl mx-auto drop-shadow-[0_0_10px_#00ffff]">
-            {t.dashboardSubtitle}
+            {language === 'ms' 
+              ? 'Ekosistem pembinaan teratak digital tanpa kekangan algoritma dan pengiklanan. Bina dan miliki laman web HTML & CSS tulunya secara bebas selamanya!'
+              : 'An algorithmic-free and ad-free digital workspace ecosystem. Build and own your pure HTML & CSS websites freely forever!'}
           </p>
           {/* End: Bilingual Welcome Message */}
           
