@@ -14,208 +14,88 @@ interface TermsSection {
   title: string;
   content: string[];
 }
-
-interface TermsData {
-  title: string;
-  lastUpdated: string;
-  sections: TermsSection[];
-}
 // End: Type Definitions
 
 // Start: TermsPage Component
 export default function TermsPage({ className }: TermsPageProps) {
   // Start: State Management
   const [activeSection, setActiveSection] = useState<string | null>(null);
-  const [showFullContent, setShowFullContent] = useState(false);
   const router = useRouter();
   // End: State Management
 
   // Start: Terms Data
-  const termsData: TermsData = {
-    title: 'Terms of Service',
-    lastUpdated: '2024-01-15',
-    sections: [
-      {
-        id: 'acceptance',
-        title: 'Acceptance of Terms',
-        content: [
-          'By accessing or using the Kampung Siber Retro platform, you agree to be bound by these Terms of Service.',
-          'These Terms constitute a legally binding agreement between you and Kampung Siber Retro.',
-          'If you do not agree to all the terms and conditions, you may not use the platform.',
-          'We reserve the right to modify these Terms at any time, and such modifications will be effective immediately upon posting.',
-        ],
-      },
-      {
-        id: 'use',
-        title: 'Use of Service',
-        content: [
-          'The platform is intended for educational and entertainment purposes only.',
-          'You agree to use the service in accordance with all applicable laws and regulations.',
-          'You must not use the service for any unlawful purpose or in any manner which could damage, disable, or impair the service.',
-          'You may not reverse engineer, decompile, or disassemble any portion of the platform.',
-        ],
-      },
-      {
-        id: 'content',
-        title: 'User Content',
-        content: [
-          'You retain all rights to any content you submit to the platform.',
-          'By submitting content, you grant us a worldwide, non-exclusive, royalty-free license to use, reproduce, and display such content.',
-          'You represent and warrant that you own or have the necessary rights to submit the content.',
-          'We reserve the right to remove any content that violates these Terms or is otherwise objectionable.',
-        ],
-      },
-      {
-        id: 'intellectual',
-        title: 'Intellectual Property',
-        content: [
-          'All content, features, and functionality on the platform are owned by or licensed to Kampung Siber Retro.',
-          'The platform name, logo, and associated design elements are trademarks of Kampung Siber Retro.',
-          'You may not reproduce, distribute, or create derivative works without our express written permission.',
-          'Open source components used in the platform remain subject to their respective licenses.',
-        ],
-      },
-      {
-        id: 'disclaimer',
-        title: 'Disclaimer of Warranties',
-        content: [
-          'The platform is provided "as is" and "as available" without warranties of any kind.',
-          'We do not warrant that the platform will be uninterrupted, secure, or error-free.',
-          'We do not warrant that the results obtained from using the platform will be accurate or reliable.',
-          'Some jurisdictions do not allow the exclusion of implied warranties, so the above may not apply to you.',
-        ],
-      },
-      {
-        id: 'limitation',
-        title: 'Limitation of Liability',
-        content: [
-          'To the maximum extent permitted by law, we shall not be liable for any indirect, incidental, special, or consequential damages.',
-          'Our total liability to you for all claims arising out of or related to these Terms shall not exceed $100.',
-          'Some jurisdictions do not allow the exclusion or limitation of certain damages, so the above may not apply to you.',
-          'The foregoing limitations apply even if the limited remedy fails of its essential purpose.',
-        ],
-      },
-      {
-        id: 'termination',
-        title: 'Termination',
-        content: [
-          'We may terminate or suspend your access to the platform immediately, without prior notice or liability.',
-          'Upon termination, your right to use the platform will cease immediately.',
-          'All provisions that by their nature should survive termination shall survive termination.',
-          'If you violate any of the terms, we may terminate your access immediately.',
-        ],
-      },
-      {
-        id: 'governing',
-        title: 'Governing Law',
-        content: [
-          'These Terms are governed by and construed in accordance with the laws of Malaysia.',
-          'Any disputes arising under or related to these Terms shall be subject to the exclusive jurisdiction of the courts in Malaysia.',
-          'We may bring legal proceedings in any court that has jurisdiction over the parties.',
-          'These Terms constitute the entire agreement between you and us regarding the subject matter.',
-        ],
-      },
-    ],
-  };
+  const termsData: TermsSection[] = [
+    {
+      id: 'acceptance',
+      title: 'Penerimaan Terma',
+      content: [
+        'Dengan mengakses atau menggunakan platform Kampung Siber Retro, anda bersetuju untuk terikat dengan Terma Perkhidmatan ini.',
+        'Terma ini membentuk perjanjian yang mengikat secara sah antara anda dan Kampung Siber Retro.',
+      ],
+    },
+    {
+      id: 'use',
+      title: 'Penggunaan Perkhidmatan',
+      content: [
+        'Platform ini bertujuan untuk tujuan pendidikan dan hiburan semata-mata.',
+        'Anda bersetuju untuk menggunakan perkhidmatan ini mengikut undang-undang dan peraturan yang berkenaan.',
+      ],
+    },
+    {
+      id: 'content',
+      title: 'Kandungan Pengguna',
+      content: [
+        'Anda mengekalkan semua hak ke atas kandungan yang anda hantar ke platform ini.',
+        'Dengan menghantar kandungan, anda memberi kami lesen dunia yang tidak eksklusif dan tanpa royalti untuk menggunakannya.',
+      ],
+    },
+  ];
   // End: Terms Data
 
   // Start: Handle Section Click
   const handleSectionClick = (sectionId: string) => {
-    setActiveSection(sectionId === activeSection ? null : sectionId);
+    setActiveSection((current) => (current === sectionId ? null : sectionId));
   };
   // End: Handle Section Click
 
-  // Start: Handle Back to Top
-  const handleBackToTop = () => {
-    setActiveSection(null);
-    setShowFullContent(false);
-  };
-  // End: Handle Back to Top
-
   // Start: Render Terms Page
   return (
-    <div className={`retro-window flex flex-col ${className || ''}`}>
-      {/* Start: Window Header */}
-      <div className="retro-window-header bg-gray-200 dark:bg-gray-700 px-3 py-2 border-b border-gray-300 dark:border-gray-600">
-        <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200 flex items-center">
-          <span className="mr-2">📜</span>
-          {termsData.title}
-        </h3>
-      </div>
-      {/* End: Window Header */}
-
-      {/* Start: Window Content */}
-      <div className="p-3 flex-1 overflow-y-auto">
-        <div className="mb-3">
-          <p className="text-xs text-gray-600 dark:text-gray-300 mb-2">
-            Last Updated: {termsData.lastUpdated}
-          </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
-            These Terms of Service govern your use of the Kampung Siber Retro platform. Please read them carefully before using our services.
-          </p>
+    <div className={`rounded border border-gray-300 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900 ${className || ''}`}>
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Terma Perkhidmatan</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400">Semakan ringkas untuk setiap bahagian yang penting dalam platform.</p>
         </div>
+        <button onClick={() => router.push('/privacy')} className="retro-btn-secondary px-3 py-2 text-xs">
+          Dasar Privasi
+        </button>
+      </div>
 
-        <div className="space-y-1">
-          {termsData.sections.map((section) => (
-            <div key={section.id} className="border border-gray-300 dark:border-gray-600 rounded">
+      <div className="space-y-2">
+        {termsData.map((section) => {
+          const isOpen = activeSection === section.id;
+          return (
+            <div key={section.id} className="overflow-hidden rounded border border-gray-300 dark:border-gray-700">
               <button
                 onClick={() => handleSectionClick(section.id)}
-                className="w-full px-3 py-2 text-left flex justify-between items-center retro-btn-secondary text-xs"
+                className="flex w-full items-center justify-between bg-gray-50 px-3 py-2 text-left text-sm font-semibold text-gray-800 dark:bg-gray-800 dark:text-gray-200"
               >
-                <span className="font-mono font-bold text-blue-600 dark:text-blue-400">
-                  {section.title}
-                </span>
-                <span className="text-xs">
-                  {activeSection === section.id ? '▼' : '▶'}
-                </span>
+                <span>{section.title}</span>
+                <span className="text-xs">{isOpen ? '▾' : '▸'}</span>
               </button>
-              
-              {activeSection === section.id && (
-                <div className="px-3 pb-2">
-                  <ul className="space-y-1">
+              <div className={`grid transition-all duration-300 ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
+                <div className="overflow-hidden">
+                  <ul className="space-y-2 px-3 py-3 text-sm text-gray-600 dark:text-gray-400">
                     {section.content.map((paragraph, index) => (
-                      <li key={index} className="text-xs text-gray-700 dark:text-gray-300">
-                        {paragraph}
-                      </li>
+                      <li key={`${section.id}-${index}`}>{paragraph}</li>
                     ))}
                   </ul>
                 </div>
-              )}
+              </div>
             </div>
-          ))}
-        </div>
-
-        {!showFullContent && (
-          <div className="mt-3 p-2 bg-gray-50 dark:bg-gray-900/20 rounded border border-gray-200 dark:border-gray-700">
-            <p className="text-xs text-gray-600 dark:text-gray-300">
-              These are the key terms. For complete terms, please visit our full legal documentation.
-            </p>
-          </div>
-        )}
+          );
+        })}
       </div>
-      {/* End: Window Content */}
-
-      {/* Start: Window Footer */}
-      <div className="retro-window-footer bg-gray-200 dark:bg-gray-700 px-3 py-2 border-t border-gray-300 dark:border-gray-600 flex justify-between items-center">
-        <span className="text-xs text-gray-600 dark:text-gray-300">
-          {termsData.sections.length} sections
-        </span>
-        <div className="flex space-x-2">
-          <button
-            onClick={() => router.push('/privacy')}
-            className="retro-btn-secondary text-xs"
-          >
-            Privacy Policy
-          </button>
-          <button
-            onClick={handleBackToTop}
-            className="retro-btn-secondary text-xs"
-          >
-            Top
-          </button>
-        </div>
-      </div>
-      {/* End: Window Footer */}
     </div>
   );
 }

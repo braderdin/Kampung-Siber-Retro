@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { enDictionary, msDictionary } from '@/i18n/dictionaries';
 import SettingsTipping from '@/components/SettingsTipping';
 import SettingsApiKey from '@/components/SettingsApiKey';
 import SettingsNsfw from '@/components/SettingsNsfw';
+import SettingsGithub from '@/components/SettingsGithub';
+import SettingsDeleteAccount from '@/components/SettingsDeleteAccount';
 
 // Start: Type Definitions
 type SettingsPageProps = {
@@ -17,12 +19,13 @@ type ActiveSection = 'tipping' | 'api_key' | 'nsfw' | 'github' | 'delete' | null
 
 // Start: Main Component
 export default function SettingsPage({ params }: SettingsPageProps) {
-  const [username, setUsername] = useState<string>('');
+  // Start: State Management
+  const [username, setUsername] = useState('');
   const [activeSection, setActiveSection] = useState<ActiveSection>(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const { language } = useLanguageStore();
-  
   const t = language === 'ms' ? msDictionary : enDictionary;
+  // End: State Management
 
   // Start: Load Username
   useEffect(() => {
@@ -58,156 +61,89 @@ export default function SettingsPage({ params }: SettingsPageProps) {
       document.documentElement.classList.add('dark');
       localStorage.setItem('theme', 'dark');
     }
-    setIsDarkMode(!isDarkMode);
+    setIsDarkMode((current) => !current);
   };
+  // End: Dark Mode Toggle
 
   // Start: Initialize Dark Mode
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-      document.documentElement.classList.add('dark');
-      setIsDarkMode(true);
-    } else if (savedTheme === 'light') {
-      document.documentElement.classList.remove('dark');
-      setIsDarkMode(false);
-    } else {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (prefersDark) {
+    const applyTheme = () => {
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+        setIsDarkMode(true);
+      } else if (savedTheme === 'light') {
+        document.documentElement.classList.remove('dark');
+        setIsDarkMode(false);
+      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
         document.documentElement.classList.add('dark');
         setIsDarkMode(true);
       }
-    }
+    };
+
+    const timer = window.setTimeout(applyTheme, 0);
+    return () => window.clearTimeout(timer);
   }, []);
   // End: Initialize Dark Mode
 
   // Start: Section Navigation
   const navigateToSection = (section: ActiveSection) => {
     setActiveSection(section);
-    window.location.hash = section ? `#${section}` : '';
+    window.history.replaceState({}, '', `${window.location.pathname}${section ? `#${section}` : ''}`);
   };
   // End: Section Navigation
 
   // Start: Render Settings Page
   return (
-    <main className="min-h-screen bg-gray-50 p-6 text-gray-900 dark:bg-gray-950 dark:text-gray-100 transition-colors duration-300">
+    <main className="min-h-screen bg-gray-50 p-6 text-gray-900 transition-colors duration-300 dark:bg-gray-950 dark:text-gray-100">
       <div className="mx-auto max-w-4xl">
-        {/* Start: Page Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+          <h1 className="mb-2 text-3xl font-bold text-gray-900 dark:text-gray-100">
             {t.settings} - {username}
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Manage your account settings and preferences
-          </p>
+          <p className="text-gray-600 dark:text-gray-400">Tetapan akaun dan keutamaan anda.</p>
         </div>
-        {/* End: Page Header */}
 
-        {/* Start: Dark Mode Toggle */}
         <div className="mb-6">
-          <button
-            onClick={toggleDarkMode}
-            className="retro-btn-secondary flex items-center space-x-2 px-4 py-2 text-sm font-medium"
-          >
+          <button onClick={toggleDarkMode} className="retro-btn-secondary flex items-center space-x-2 px-4 py-2 text-sm font-medium">
             <span>{isDarkMode ? '☀️' : '🌙'}</span>
             <span>{isDarkMode ? t.modernTheme : t.crtTheme}</span>
           </button>
         </div>
-        {/* End: Dark Mode Toggle */}
 
-        {/* Start: Section Navigation */}
         <nav className="mb-8">
           <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => navigateToSection('tipping')}
-              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                activeSection === 'tipping'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700'
-              }`}
-            >
-              Tipping
-            </button>
-            <button
-              onClick={() => navigateToSection('api_key')}
-              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                activeSection === 'api_key'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700'
-              }`}
-            >
-              API Key
-            </button>
-            <button
-              onClick={() => navigateToSection('nsfw')}
-              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                activeSection === 'nsfw'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700'
-              }`}
-            >
-              NSFW Content
-            </button>
-            <button
-              onClick={() => navigateToSection('github')}
-              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                activeSection === 'github'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700'
-              }`}
-            >
-              GitHub
-            </button>
-            <button
-              onClick={() => navigateToSection('delete')}
-              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                activeSection === 'delete'
-                  ? 'bg-red-600 text-white'
-                  : 'bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700'
-              }`}
-            >
-              Delete Account
-            </button>
+            {[
+              ['tipping', 'Pemindahan'],
+              ['api_key', 'Kunci API'],
+              ['nsfw', 'Kandungan NSFW'],
+              ['github', 'GitHub'],
+              ['delete', 'Padam Akaun'],
+            ].map(([value, label]) => (
+              <button
+                key={value}
+                onClick={() => navigateToSection(value as ActiveSection)}
+                className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${activeSection === value ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'}`}
+              >
+                {label}
+              </button>
+            ))}
           </div>
         </nav>
-        {/* End: Section Navigation */}
 
-        {/* Start: Section Content */}
         <div className="retro-card">
           {activeSection === 'tipping' && <SettingsTipping />}
           {activeSection === 'api_key' && <SettingsApiKey />}
           {activeSection === 'nsfw' && <SettingsNsfw />}
-          {activeSection === 'github' && (
-            <div className="p-6">
-              <h2 className="text-xl font-semibold mb-4">GitHub Integration</h2>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
-                Connect your GitHub account to sync repositories and collaborate on projects.
-              </p>
-              <button className="retro-btn-primary">
-                Connect GitHub
-              </button>
-            </div>
-          )}
-          {activeSection === 'delete' && (
-            <div className="p-6">
-              <h2 className="text-xl font-semibold text-red-600 mb-4">Delete Account</h2>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
-                This action cannot be undone. All your data will be permanently deleted.
-              </p>
-              <button className="retro-btn-secondary bg-red-600 hover:bg-red-700 text-white">
-                Delete My Account
-              </button>
-            </div>
-          )}
+          {activeSection === 'github' && <SettingsGithub username={username} />}
+          {activeSection === 'delete' && <SettingsDeleteAccount />}
           {activeSection === null && (
             <div className="p-6">
-              <h2 className="text-xl font-semibold mb-4">General Settings</h2>
-              <p className="text-gray-600 dark:text-gray-400">
-                Select a section above to configure your settings.
-              </p>
+              <h2 className="mb-4 text-xl font-semibold">Papan Pemuka Tetapan</h2>
+              <p className="text-gray-600 dark:text-gray-400">Pilih bahagian di atas untuk mengurus Tetapan anda.</p>
             </div>
           )}
         </div>
-        {/* End: Section Content */}
       </div>
     </main>
   );

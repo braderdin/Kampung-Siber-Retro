@@ -2,6 +2,7 @@
 'use client';
 import { useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
+import HumanFeedbackToast from '@/components/HumanFeedbackToast';
 // End: Imports
 
 // Start: Supabase Client Configuration
@@ -14,12 +15,6 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 interface ForgotUsernameFormData {
   email: string;
 }
-
-interface ForgotUsernameResponse {
-  success: boolean;
-  username?: string;
-  error?: string;
-}
 // End: Type Definitions
 
 // Start: ForgotUsernamePage Component
@@ -27,41 +22,36 @@ export default function ForgotUsernamePage() {
   // Start: State Management
   const [formData, setFormData] = useState<ForgotUsernameFormData>({ email: '' });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
   // End: State Management
 
   // Start: Handle Input Changes
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ email: e.target.value });
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ email: event.target.value });
   };
   // End: Handle Input Changes
 
   // Start: Handle Form Submission
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
     setLoading(true);
-    setError(null);
+    setToastMessage(null);
 
     try {
-      const { data, error: fetchError } = await supabase
-        .from('profiles')
-        .select('username')
-        .eq('email', formData.email)
-        .single();
+      const { data, error: fetchError } = await supabase.from('profiles').select('username').eq('email', formData.email).single();
 
-      if (fetchError) {
-        throw new Error('Emel tidak ditemui dalam pelayan');
+      if (fetchError || !data) {
+        setToastMessage('Tiada rekod padanan ditemui dalam pelayan.');
+        setUsername(null);
+        return;
       }
 
-      if (data) {
-        setUsername(data.username);
-      } else {
-        setError('Tidak dapat menemui nama pengguna untuk emel ini');
-      }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Gagal mendapatkan nama pengguna';
-      setError(errorMessage);
+      setUsername(data.username);
+      setToastMessage('Pemberitahuan berjaya dimuatkan.');
+    } catch {
+      setToastMessage('Tiada rekod padanan ditemui dalam pelayan.');
+      setUsername(null);
     } finally {
       setLoading(false);
     }
@@ -70,61 +60,38 @@ export default function ForgotUsernamePage() {
 
   // Start: Render ForgotUsernamePage Component
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 py-12 px-4 sm:px-6">
-      <div className="max-w-md w-full space-y-8">
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 py-12 dark:bg-gray-900 sm:px-6">
+      <div className="w-full max-w-md space-y-8 rounded border border-gray-300 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-900">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-gray-100">
-            Lupa Nama Pengguna
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-300">
-            Masukkan emel anda untuk mendapatkan nama pengguna anda
-          </p>
+          <h2 className="text-center text-3xl font-extrabold text-gray-900 dark:text-gray-100">Lupa Nama Pengguna</h2>
+          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-300">Masukkan emel anda untuk mendapatkan nama pengguna anda.</p>
         </div>
-        
+
         {username ? (
-          <div className="text-center py-4">
-            <div className="rounded-md bg-blue-100 dark:bg-blue-900 p-4">
-              <p className="text-sm text-blue-800 dark:text-blue-200">
-                Nama pengguna anda ialah: <strong>{username}</strong>
-              </p>
-            </div>
+          <div className="rounded border border-emerald-300 bg-emerald-50 p-4 text-center text-sm text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
+            Nama pengguna anda ialah: <strong>{username}</strong>
           </div>
         ) : (
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-            {error && (
-              <div className="text-sm text-red-600 dark:text-red-400 text-center">
-                {error}
-              </div>
-            )}
-            
-            <div>
-              <label htmlFor="email" className="sr-only">
-                Emel
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={formData.email}
-                onChange={handleInputChange}
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 dark:text-gray-100 dark:bg-gray-800 dark:border-gray-700 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Emel"
-              />
-            </div>
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              value={formData.email}
+              onChange={handleInputChange}
+              className="w-full rounded border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+              placeholder="Emel"
+            />
 
-            <div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? 'Mencari...' : 'Cari Nama Pengguna'}
-              </button>
-            </div>
+            <button type="submit" disabled={loading} className="w-full rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
+              {loading ? 'Mencari...' : 'Cari Nama Pengguna'}
+            </button>
           </form>
         )}
+
+        {toastMessage ? <HumanFeedbackToast message={toastMessage} type="warning" duration={2600} onClose={() => setToastMessage(null)} /> : null}
       </div>
     </div>
   );
