@@ -49,13 +49,16 @@ export default function Home() {
               strokeLinecap="round" 
               strokeLinejoin="round"
             >
-              {/* Traditional Malay Teratak House - Roof */}
+              {/* Traditional Malay Teratak House - Pitched Roof */}
               <path d="M4 18 L12 6 L20 18 Z" className="cozy-house-path"/>
               {/* Walls */}
               <rect x="6" y="18" width="12" height="8" className="cozy-house-path"/>
+              {/* Classic Window Frames */}
+              <rect x="7" y="19" width="3" height="3" className="cozy-house-fill"/>
+              <rect x="14" y="19" width="3" height="3" className="cozy-house-fill"/>
               {/* Center Pixel Door */}
               <rect x="10" y="20" width="4" height="4" className="cozy-house-fill"/>
-              {/* Soft Glowing Digital Webring Arcs */}
+              {/* Glowing Curved Ambient Webring Halo Graphics */}
               <path d="M8 16 C10 14, 14 14, 16 16" className="webring-halo"/>
               <path d="M8 18 C10 16, 14 16, 16 18" className="webring-halo"/>
               <path d="M8 20 C10 18, 14 18, 16 20" className="webring-halo"/>
@@ -70,7 +73,7 @@ export default function Home() {
           {/* Start: Bilingual Welcome Message */}
           <p className="text-xl text-gray-300 dark:text-gray-400 mb-10 max-w-2xl mx-auto drop-shadow-[0_0_10px_#00ffff]">
             {language === 'ms' 
-              ? 'Ekosistem pembinaan teratak digital tanpa kekangan algoritma dan pengiklanan. Bina dan miliki laman web HTML & CSS tulunya secara bebas selamanya!'
+              ? 'Ekosistem pembinaan teratak digital tanpa kekangan algoritma dan pengiklanan. Bina dan miliki laman web HTML & CSS tulen anda secara bebas selamanya!'
               : 'An algorithmic-free and ad-free digital workspace ecosystem. Build and own your pure HTML & CSS websites freely forever!'}
           </p>
           {/* End: Bilingual Welcome Message */}

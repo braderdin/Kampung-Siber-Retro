@@ -1,4 +1,3 @@
-// Start: Imports
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -9,8 +8,7 @@ import FileManagerGrid from '@/components/FileManagerGrid';
 import RetroToolbar from '@/components/RetroToolbar';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { enDictionary, msDictionary } from '@/i18n/dictionaries';
-import type { FileManagerItem, SiteFile, SiteFolder } from '@/types/fileManager';
-// End: Imports
+import type { FileAction, FileManagerItem, SiteFile, SiteFolder } from '@/types/fileManager';
 
 // Start: SiteFilesPage Component
 export default function SiteFilesPage() {
@@ -107,8 +105,8 @@ export default function SiteFilesPage() {
   }, []);
   // End: Theme Sync
 
-  // Start: Handle File Actions
-  const handleFileAction = (file: FileManagerItem, action: string, newName?: string) => {
+  // Start: Handle File Actions - Pure Directory Browser
+  const handleFileAction = (file: FileManagerItem, action: FileAction, newName?: string) => {
     if (action === 'edit' && file.type === 'file') {
       router.push(`/site_files/text_editor?filename=${encodeURIComponent(file.filename)}`);
     } else if (action === 'navigate' && file.type === 'folder') {
