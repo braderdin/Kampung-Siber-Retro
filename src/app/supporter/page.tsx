@@ -96,9 +96,9 @@ export default function SupporterPage({ className }: SupporterPageProps) {
       </div>
 
       <div className="mb-4 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="retro-window border-2 border-gray-400 bg-white p-3 retro-shadow">
-          <h3 className="mb-2 text-sm font-bold text-gray-800">Papan Pemuka Penyokong</h3>
-          <p className="text-xs leading-relaxed text-gray-600">
+        <div className="retro-window border-2 border-pink-500 bg-gradient-to-br from-[#0e1330] to-[#121b4a] p-3 retro-shadow">
+          <h3 className="mb-2 text-sm font-bold text-white">Papan Pemuka Penyokong</h3>
+          <p className="text-xs leading-relaxed text-cyan-200">
             Senarai penyumbang yang menjaga projek ini dengan dedikasi, kepakaran, dan semangat komuniti yang kukuh.
           </p>
         </div>
@@ -110,17 +110,17 @@ export default function SupporterPage({ className }: SupporterPageProps) {
 
       <SupporterHallOfFame supporters={supporters} />
 
-      <div className="retro-window mt-4 border-2 border-gray-400 bg-white p-3 retro-shadow">
+      <div className="retro-window mt-4 border-2 border-pink-500 bg-gradient-to-br from-[#0e1330] to-[#121b4a] p-3 retro-shadow">
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-sm font-bold text-gray-800">Penjelajah Laman</h3>
+          <h3 className="text-sm font-bold text-white">Penjelajah Laman</h3>
           <span className="rounded bg-amber-100 px-2 py-1 text-[10px] font-semibold text-amber-700">Rangkaian Komuniti</span>
         </div>
         <SiteDirectoryGrid sites={communitySites} className="mb-3" />
       </div>
 
-      <div className="retro-window mt-4 border-2 border-gray-400 bg-white p-3 retro-shadow">
-        <h3 className="mb-2 text-sm font-bold text-gray-800">Tetapan Penyertaan</h3>
-        <p className="mb-3 text-xs leading-relaxed text-gray-600">
+      <div className="retro-window mt-4 border-2 border-pink-500 bg-gradient-to-br from-[#0e1330] to-[#121b4a] p-3 retro-shadow">
+        <h3 className="mb-2 text-sm font-bold text-white">Tetapan Penyertaan</h3>
+        <p className="mb-3 text-xs leading-relaxed text-cyan-200">
           Sertai usaha ini dengan menyumbang kod, reka bentuk, dokumentasi, atau sokongan komuniti yang berterusan.
         </p>
         <button className="retro-btn-primary px-3 py-1 text-xs">Lihat Garis Panduan</button>

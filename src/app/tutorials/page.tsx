@@ -38,7 +38,7 @@ export default function TutorialsPage({ className }: TutorialsPageProps) {
     {
       id: 2,
       title: 'Gaya CSS dengan Estetika Windows 95',
-      description: 'Kuasai teknik CSS untuk mencipta antara muka yang terdengar klasik dan berfungsi dengan baik.',
+      description: 'Kuasali teknik CSS untuk mencipta antara muka yang terdengar klasik dan berfungsi dengan baik.',
       difficulty: 'Beginner',
       category: 'CSS',
       completed: false,
@@ -86,7 +86,7 @@ export default function TutorialsPage({ className }: TutorialsPageProps) {
       </div>
 
       <div className="mb-4 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="retro-window border-2 border-gray-400 bg-white p-3 retro-shadow">
+        <div className="retro-window border-2 border-pink-500 bg-white p-3 retro-shadow">
           <div className="mb-3 flex items-center justify-between">
             <h3 className="text-sm font-bold text-gray-800">Peta Kursus</h3>
             <span className="rounded bg-blue-100 px-2 py-1 text-[10px] font-semibold text-blue-700">Kemajuan {progressPercent}%</span>
@@ -105,18 +105,18 @@ export default function TutorialsPage({ className }: TutorialsPageProps) {
         </div>
       </div>
 
-      <div className="retro-window mb-4 border-2 border-gray-400 bg-white p-3 retro-shadow">
+      <div className="retro-window border-2 border-pink-500 bg-white p-3 retro-shadow">
         <div className="mb-3 flex flex-wrap gap-2">
-          <button onClick={() => setFilter('all')} className={`rounded px-3 py-1 text-xs ${filter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
+          <button onClick={() => setFilter('all')} className={`rounded px-3 py-1 text-xs border-2 border-pink-500 ${filter === 'all' ? 'bg-pink-500 text-white' : 'bg-pink-50 hover:bg-pink-100'}`}>
             Semua Siri
           </button>
-          <button onClick={() => setFilter('Beginner')} className={`rounded px-3 py-1 text-xs ${filter === 'Beginner' ? 'bg-emerald-500 text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
+          <button onClick={() => setFilter('Beginner')} className={`rounded px-3 py-1 text-xs border-2 border-emerald-500 ${filter === 'Beginner' ? 'bg-emerald-500 text-white' : 'bg-emerald-50 hover:bg-emerald-100'}`}>
             Pemula
           </button>
-          <button onClick={() => setFilter('Intermediate')} className={`rounded px-3 py-1 text-xs ${filter === 'Intermediate' ? 'bg-amber-500 text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
+          <button onClick={() => setFilter('Intermediate')} className={`rounded px-3 py-1 text-xs border-2 border-amber-500 ${filter === 'Intermediate' ? 'bg-amber-500 text-white' : 'bg-amber-50 hover:bg-amber-100'}`}>
             Pertengahan
           </button>
-          <button onClick={() => setFilter('Advanced')} className={`rounded px-3 py-1 text-xs ${filter === 'Advanced' ? 'bg-rose-500 text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
+          <button onClick={() => setFilter('Advanced')} className={`rounded px-3 py-1 text-xs border-2 border-rose-500 ${filter === 'Advanced' ? 'bg-rose-500 text-white' : 'bg-rose-50 hover:bg-rose-100'}`}>
             Lanjutan
           </button>
         </div>
@@ -137,7 +137,7 @@ export default function TutorialsPage({ className }: TutorialsPageProps) {
             />
           ))
         ) : (
-          <div className="retro-window border-2 border-gray-400 bg-white p-4 text-center retro-shadow md:col-span-2">
+          <div className="retro-window border-2 border-pink-500 bg-white p-4 text-center retro-shadow md:col-span-2">
             <p className="text-sm text-gray-500">Tiada modul yang sepadan dengan penapis yang dipilih.</p>
           </div>
         )}

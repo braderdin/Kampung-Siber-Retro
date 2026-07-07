@@ -121,7 +121,7 @@ export default function ActivityPage({ className }: ActivityPageProps) {
 
   // Start: Render Activity Page
   return (
-    <div className={`retro-window ${className || ''}`}>
+    <div className={`retro-window border-2 border-cyan-500 ${className || ''}`}>
       <div className="retro-window-header border-b border-gray-300 bg-gray-200 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
         <div className="flex items-center justify-between">
           <h3 className="flex items-center text-sm font-bold text-gray-800 dark:text-gray-200">

@@ -47,7 +47,7 @@ export default function RetroTerminalWidget({ title = 'Coretan Terminal', classN
 
   // Start: Render Terminal Widget
   return (
-    <div className={`retro-window border-2 border-gray-400 bg-[#111827] p-3 text-sm text-green-200 retro-shadow ${className || ''}`}>
+    <div className={`retro-window border-2 border-pink-500 bg-[#0e1330] p-3 text-sm text-green-200 retro-shadow ${className || ''}`}>
       <div className="mb-2 flex items-center justify-between border-b border-green-800 pb-2">
         <span className="font-bold uppercase tracking-wide text-green-300">{title}</span>
         <span className="rounded bg-green-900/70 px-2 py-1 text-[10px] text-green-100">Live</span>

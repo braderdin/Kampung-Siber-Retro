@@ -31,7 +31,7 @@ export default function TutorialCard({
 
   // Start: Render Tutorial Card
   return (
-    <article className="retro-window border-2 border-gray-400 bg-white p-4 retro-shadow">
+    <article className="retro-window border-2 border-pink-500 bg-white p-4 retro-shadow transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl">
       <div className="mb-3 flex items-center justify-between gap-2">
         <h4 className="text-sm font-bold text-gray-800">{title}</h4>
         <span className={`rounded px-2 py-1 text-[10px] font-semibold ${difficultyStyle}`}>{difficulty}</span>
