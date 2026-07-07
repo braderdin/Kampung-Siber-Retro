@@ -16,12 +16,16 @@ export default function CrtThemeController({ className }: CrtThemeControllerProp
 
   // Start: Apply Theme
   useEffect(() => {
-    const root = document.documentElement;
-    if (enabled) {
-      root.classList.add('crt-enabled');
-    } else {
-      root.classList.remove('crt-enabled');
+    const storedValue = window.localStorage.getItem('retro-crt-enabled');
+    if (storedValue !== null) {
+      setEnabled(storedValue === 'true');
     }
+  }, []);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.toggle('crt-enabled', enabled);
+    window.localStorage.setItem('retro-crt-enabled', enabled ? 'true' : 'false');
   }, [enabled]);
   // End: Apply Theme
 
@@ -29,8 +33,9 @@ export default function CrtThemeController({ className }: CrtThemeControllerProp
   return (
     <button
       type="button"
+      aria-pressed={enabled}
       onClick={() => setEnabled((current) => !current)}
-      className={`rounded border border-gray-300 bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 ${className || ''}`}
+      className={`rounded border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 ${className || ''}`}
     >
       {enabled ? 'Penapis CRT Aktif' : 'Aktifkan Penapis CRT'}
     </button>

@@ -22,20 +22,21 @@ export default function SiteDirectoryGrid({ sites, className }: SiteDirectoryGri
         <a
           key={site.id}
           href={site.href}
-          className="rounded border border-gray-300 bg-white p-4 shadow-sm transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-gray-700 dark:bg-gray-900"
+          rel="noreferrer"
+          className="rounded border border-slate-300 bg-white p-4 shadow-sm transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-slate-700 dark:bg-slate-900"
         >
           <div className="mb-3 flex items-start justify-between gap-3">
             <div>
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{site.title}</h3>
-              <p className="mt-1 text-xs leading-relaxed text-gray-600 dark:text-gray-400">{site.description}</p>
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">{site.title}</h3>
+              <p className="mt-1 text-xs leading-relaxed text-slate-600 dark:text-slate-400">{site.description}</p>
             </div>
             <span className="rounded bg-amber-100 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-700 dark:bg-amber-950/50 dark:text-amber-300">
-              Laman
+              Penjelajah Laman
             </span>
           </div>
           <div className="flex flex-wrap gap-2">
             {site.tags.map((tag) => (
-              <span key={tag} className="rounded bg-gray-100 px-2 py-1 text-[10px] text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+              <span key={tag} className="rounded bg-slate-100 px-2 py-1 text-[10px] text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                 #{tag}
               </span>
             ))}

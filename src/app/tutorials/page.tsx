@@ -1,7 +1,9 @@
 'use client';
 
 // Start: Imports
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import CrtThemeController from '@/components/CrtThemeController';
+import RetroHitCounter from '@/components/RetroHitCounter';
 import RetroTerminalWidget from '@/components/RetroTerminalWidget';
 import TutorialCard from '@/components/TutorialCard';
 // End: Imports
@@ -66,36 +68,41 @@ export default function TutorialsPage({ className }: TutorialsPageProps) {
       completed: false,
     },
   ]);
+  const [filter, setFilter] = useState<'all' | 'Beginner' | 'Intermediate' | 'Advanced'>('all');
   // End: State Management
 
-  // Start: Filter State
-  const [filter, setFilter] = useState<'all' | 'Beginner' | 'Intermediate' | 'Advanced'>('all');
-  // End: Filter State
-
-  // Start: Filtered Tutorials
+  // Start: Progress Metrics
+  const completedCount = useMemo(() => tutorials.filter((tutorial) => tutorial.completed).length, [tutorials]);
+  const progressPercent = Math.round((completedCount / tutorials.length) * 100);
   const filteredTutorials = tutorials.filter((tutorial) => filter === 'all' || tutorial.difficulty === filter);
-  // End: Filtered Tutorials
+  // End: Progress Metrics
 
   // Start: Render Tutorials Page
   return (
     <div className={`p-4 ${className || ''}`}>
       <div className="retro-title-bar mb-4 flex items-center justify-between px-3 py-2">
         <h2 className="text-lg font-bold text-white">📚 Siri Tutorial</h2>
-        <div className="flex space-x-1">
-          <div className="h-8 w-8" />
-          <div className="h-8 w-8" />
-          <div className="h-8 w-8" />
-        </div>
+        <CrtThemeController className="hidden sm:inline-flex" />
       </div>
 
-      <div className="mb-4 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+      <div className="mb-4 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
         <div className="retro-window border-2 border-gray-400 bg-white p-3 retro-shadow">
-          <h3 className="mb-2 text-sm font-bold text-gray-800">Peta Kursus</h3>
-          <p className="text-xs leading-relaxed text-gray-600">
+          <div className="mb-3 flex items-center justify-between">
+            <h3 className="text-sm font-bold text-gray-800">Peta Kursus</h3>
+            <span className="rounded bg-blue-100 px-2 py-1 text-[10px] font-semibold text-blue-700">Kemajuan {progressPercent}%</span>
+          </div>
+          <p className="mb-3 text-xs leading-relaxed text-gray-600">
             Navigasi Siri Tutorial dengan penunjuk kemajuan yang bersih bagi setiap modul retro yang disusun.
           </p>
+          <div className="h-2 rounded bg-gray-200">
+            <div className="h-2 rounded bg-emerald-500" style={{ width: `${progressPercent}%` }} />
+          </div>
+          <p className="mt-2 text-[11px] text-gray-500">{completedCount} daripada {tutorials.length} modul siap.</p>
         </div>
-        <RetroTerminalWidget title="Coretan Terminal" />
+        <div className="space-y-3">
+          <RetroHitCounter value={1200 + completedCount * 340} label="Kaunter Pelawat" />
+          <RetroTerminalWidget title="Coretan Terminal" />
+        </div>
       </div>
 
       <div className="retro-window mb-4 border-2 border-gray-400 bg-white p-3 retro-shadow">

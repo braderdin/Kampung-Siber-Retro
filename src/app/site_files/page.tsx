@@ -1,14 +1,15 @@
 // Start: Imports
 'use client';
-import { useState, useEffect } from 'react';
-import { useLanguageStore } from '@/store/useLanguageStore';
-import { enDictionary, msDictionary } from '@/i18n/dictionaries';
+import { useEffect, useState } from 'react';
+import CodeMirrorEditor from '@/components/CodeMirrorEditor';
+import CrtThemeController from '@/components/CrtThemeController';
 import DashboardProfileBanner from '@/components/DashboardProfileBanner';
 import FileManagerActions from '@/components/FileManagerActions';
 import FileManagerGrid from '@/components/FileManagerGrid';
-import CodeMirrorEditor from '@/components/CodeMirrorEditor';
-import SandboxedPreview from '@/components/SandboxedPreview';
 import RetroToolbar from '@/components/RetroToolbar';
+import SandboxedPreview from '@/components/SandboxedPreview';
+import { useLanguageStore } from '@/store/useLanguageStore';
+import { enDictionary, msDictionary } from '@/i18n/dictionaries';
 // End: Imports
 
 // Start: Type Definitions
@@ -26,12 +27,6 @@ interface SiteFolder {
   name: string;
   createdAt: string;
 }
-
-interface SiteFilesResponse {
-  success: boolean;
-  data?: SiteFile[];
-  error?: string;
-}
 // End: Type Definitions
 
 // Start: SiteFilesPage Component
@@ -39,12 +34,13 @@ export default function SiteFilesPage() {
   // Start: State Management
   const { language } = useLanguageStore();
   const t = language === 'ms' ? msDictionary : enDictionary;
-  
+
   const [files, setFiles] = useState<SiteFile[]>([]);
   const [folders, setFolders] = useState<SiteFolder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedFiles, setSelectedFiles] = useState<SiteFile[]>([]);
+  const [crtEnabled, setCrtEnabled] = useState(false);
   // End: State Management
 
   // Start: Fetch Files
@@ -54,7 +50,6 @@ export default function SiteFilesPage() {
       setError(null);
 
       try {
-        // Simulated file data
         const mockFiles: SiteFile[] = [
           {
             id: '1',
@@ -62,7 +57,7 @@ export default function SiteFilesPage() {
             size: 1024,
             contentType: 'text/html',
             uploadedAt: new Date().toISOString(),
-            url: '/files/index.html'
+            url: '/files/index.html',
           },
           {
             id: '2',
@@ -70,7 +65,7 @@ export default function SiteFilesPage() {
             size: 2048,
             contentType: 'text/css',
             uploadedAt: new Date().toISOString(),
-            url: '/files/style.css'
+            url: '/files/style.css',
           },
           {
             id: '3',
@@ -78,21 +73,21 @@ export default function SiteFilesPage() {
             size: 1536,
             contentType: 'text/javascript',
             uploadedAt: new Date().toISOString(),
-            url: '/files/script.js'
-          }
+            url: '/files/script.js',
+          },
         ];
 
         const mockFolders: SiteFolder[] = [
           {
             id: 'f1',
             name: 'images',
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
           },
           {
             id: 'f2',
             name: 'documents',
-            createdAt: new Date().toISOString()
-          }
+            createdAt: new Date().toISOString(),
+          },
         ];
 
         setFiles(mockFiles);
@@ -108,6 +103,20 @@ export default function SiteFilesPage() {
     fetchFiles();
   }, []);
   // End: Fetch Files
+
+  // Start: Theme Sync
+  useEffect(() => {
+    const syncCrtState = () => {
+      setCrtEnabled(document.documentElement.classList.contains('crt-enabled'));
+    };
+
+    syncCrtState();
+    const observer = new MutationObserver(syncCrtState);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
+  }, []);
+  // End: Theme Sync
 
   // Start: Handle File Actions
   const handleFileAction = (file: SiteFile | SiteFolder, action: string) => {
@@ -141,22 +150,17 @@ export default function SiteFilesPage() {
 
   // Start: Render Site Files Page
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      {/* Start: Profile Banner */}
+    <div className="mx-auto max-w-7xl p-6">
       <DashboardProfileBanner />
-      {/* End: Profile Banner */}
 
-      {/* Start: View Toggle */}
-      <div className="flex items-center justify-end mb-4">
-        <div className="flex items-center space-x-2">
-          <span className="text-sm text-gray-600 dark:text-gray-400">
-            {t.dashboardTitle}
-          </span>
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200">Papan Pemuka</h2>
+          <p className="text-sm text-slate-600 dark:text-slate-400">{t.dashboardTitle}</p>
         </div>
+        <CrtThemeController />
       </div>
-      {/* End: View Toggle */}
 
-      {/* Start: File Manager Actions */}
       <FileManagerActions
         onFileUpload={handleFileUpload}
         onFolderCreate={handleFolderCreate}
@@ -164,59 +168,46 @@ export default function SiteFilesPage() {
         selectedCount={selectedFiles.length}
         onBatchDelete={handleBatchDelete}
       />
-      {/* End: File Manager Actions */}
 
-      {/* Start: File Manager Content */}
       {loading && (
-        <div className="text-center py-8">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-          <p className="mt-2 text-gray-500 dark:text-gray-400">
-            {t.loadingDashboard}
-          </p>
+        <div className="py-8 text-center">
+          <div className="mx-auto mb-2 inline-block h-8 w-8 animate-spin rounded-full border-b-2 border-blue-500"></div>
+          <p className="mt-2 text-gray-500 dark:text-gray-400">{t.loadingDashboard}</p>
         </div>
       )}
 
       {error && (
-        <div className="text-center py-8">
+        <div className="py-8 text-center">
           <p className="text-red-500 dark:text-red-400">{error}</p>
         </div>
       )}
 
       {!loading && !error && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-4">
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
-              {t.myFiles}
-            </h2>
-            <FileManagerGrid
-              files={files}
-              folders={folders}
-              onFileAction={handleFileAction}
-            />
-          </div>
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
-              {t.fileEditor}
-            </h2>
-            <div className="grid grid-cols-2 gap-2 mb-2">
-              {(['html', 'css', 'js'] as const).map((tab) => (
-                <button
-                  key={tab}
-                  className="retro-tab-btn retro-tab-active"
-                >
-                  {t[`${tab}Tab` as keyof typeof t] as string}
-                </button>
-              ))}
+        <div className={`mt-4 rounded-2xl border p-4 transition-all duration-200 ${crtEnabled ? 'border-slate-400 bg-slate-100/90 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.4)]' : 'border-slate-300 bg-white/80 shadow-sm'}`}>
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div className="space-y-4 lg:col-span-2">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">{t.myFiles}</h2>
+              <FileManagerGrid files={files} folders={folders} onFileAction={handleFileAction} />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-96">
-              <div className="border-2 border-gray-300 dark:border-gray-600 rounded-md overflow-hidden">
-                <CodeMirrorEditor />
+            <div className="space-y-4">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">{t.fileEditor}</h2>
+              <div className="mb-2 grid grid-cols-2 gap-2">
+                {(['html', 'css', 'js'] as const).map((tab) => (
+                  <button key={tab} className="retro-tab-btn retro-tab-active">
+                    {t[`${tab}Tab` as keyof typeof t] as string}
+                  </button>
+                ))}
               </div>
-              <div className="border-2 border-gray-300 dark:border-gray-600 rounded-md overflow-hidden">
-                <SandboxedPreview />
+              <div className="grid h-96 grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="overflow-hidden rounded-md border-2 border-gray-300 dark:border-gray-600">
+                  <CodeMirrorEditor />
+                </div>
+                <div className="overflow-hidden rounded-md border-2 border-gray-300 dark:border-gray-600">
+                  <SandboxedPreview />
+                </div>
               </div>
+              <RetroToolbar className="mt-2" />
             </div>
-            <RetroToolbar className="mt-2" />
           </div>
         </div>
       )}
