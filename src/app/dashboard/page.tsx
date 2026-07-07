@@ -9,6 +9,7 @@ import PaginationButton from '@/components/PaginationButton';
 import HeroSignUpCard from '@/components/HeroSignUpCard';
 import FeaturedSitesGrid from '@/components/FeaturedSitesGrid';
 import FollowActivityFeed from '@/components/FollowActivityFeed';
+import TutorialCard from '@/components/TutorialCard';
 // End: Imports
 
 // Start: Type Definitions
@@ -46,6 +47,15 @@ interface AccountAllocation {
   remaining: number;
 }
 
+interface TutorialPreview {
+  id: number;
+  title: string;
+  description: string;
+  difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
+  category: string;
+  completed: boolean;
+}
+
 const mockDirectories: DirectoryView = {
   'galeri': [
     { id: 1, name: 'projek1.png', type: 'file', path: '/images/projek1.png', size: '2.4 MB' },
@@ -66,6 +76,33 @@ const mockUserQuotes: UserQuote[] = [
   { id: 1, username: 'RetroCoder', quote: 'This editor brings back the good old days!', timestamp: new Date().toISOString() },
   { id: 2, username: 'PixelPioneer', quote: 'Love the CRT filter effect!', timestamp: new Date().toISOString() },
   { id: 3, username: 'ByteBandit', quote: 'The code sandbox is brilliant!', timestamp: new Date().toISOString() },
+];
+
+const mockTutorialPreviews: TutorialPreview[] = [
+  {
+    id: 1,
+    title: 'Asas HTML untuk Pembangunan Web Retro',
+    description: 'Pelajari asas HTML dengan penekanan pada teknik gaya retro yang bersih.',
+    difficulty: 'Beginner',
+    category: 'HTML',
+    completed: false,
+  },
+  {
+    id: 2,
+    title: 'Gaya CSS dengan Estetika Windows 95',
+    description: 'Kuasali teknik CSS untuk mencipta antara muka yang terdengar klasik.',
+    difficulty: 'Beginner',
+    category: 'CSS',
+    completed: false,
+  },
+  {
+    id: 3,
+    title: 'Asas JavaScript untuk Permainan Retro',
+    description: 'Bina permainan gaya arked menggunakan JavaScript tulen.',
+    difficulty: 'Intermediate',
+    category: 'JavaScript',
+    completed: false,
+  },
 ];
 // End: Type Definitions
 
@@ -196,6 +233,27 @@ function DashboardContent({ className }: DashboardProps) {
           </div>
         </div>
       </div>
+
+      {/* Start: Recommended Tutorials Section */}
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+          Tutorial Disyorkan
+        </h2>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {mockTutorialPreviews.map((tutorial) => (
+            <TutorialCard
+              key={tutorial.id}
+              title={tutorial.title}
+              description={tutorial.description}
+              difficulty={tutorial.difficulty}
+              category={tutorial.category}
+              completed={tutorial.completed}
+              onStart={() => alert(`Memulakan ${tutorial.title}`)}
+            />
+          ))}
+        </div>
+      </div>
+      {/* End: Recommended Tutorials Section */}
 
       {/* Start: User Quotes Section */}
       <div className="mb-6">

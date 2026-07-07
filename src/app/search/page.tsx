@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import HumanFeedbackToast from '@/components/HumanFeedbackToast';
 import ModernRetroCard from '@/components/ModernRetroCard';
+import TutorialCard from '@/components/TutorialCard';
 // End: Imports
 
 // Start: Type Definitions
@@ -18,6 +19,9 @@ interface SearchResult {
   type: 'tutorial' | 'asset' | 'project' | 'page';
   url: string;
   tags: string[];
+  difficulty?: 'Beginner' | 'Intermediate' | 'Advanced';
+  category?: string;
+  completed?: boolean;
 }
 // End: Type Definitions
 
@@ -40,6 +44,9 @@ export default function SearchPage({ className }: SearchPageProps) {
       type: 'tutorial',
       url: '/tutorials',
       tags: ['html', 'css', 'retro'],
+      difficulty: 'Beginner',
+      category: 'HTML',
+      completed: false,
     },
     {
       id: '2',
@@ -56,6 +63,28 @@ export default function SearchPage({ className }: SearchPageProps) {
       type: 'project',
       url: '/press',
       tags: ['news', 'project'],
+    },
+    {
+      id: '4',
+      title: 'Gaya CSS dengan Estetika Windows 95',
+      description: 'Kuasali teknik CSS untuk mencipta antara muka yang terdengar klasik.',
+      type: 'tutorial',
+      url: '/tutorials',
+      tags: ['css', 'design'],
+      difficulty: 'Beginner',
+      category: 'CSS',
+      completed: false,
+    },
+    {
+      id: '5',
+      title: 'Asas JavaScript untuk Permainan Retro',
+      description: 'Bina permainan gaya arked menggunakan JavaScript tulen.',
+      type: 'tutorial',
+      url: '/tutorials',
+      tags: ['javascript', 'game'],
+      difficulty: 'Intermediate',
+      category: 'JavaScript',
+      completed: false,
     },
   ], []);
   // End: Demo Search Data
@@ -109,7 +138,7 @@ export default function SearchPage({ className }: SearchPageProps) {
             }
           }}
           className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-          placeholder="Cari dalam Carian"
+          placeholder="Carian dalam Carian"
         />
       </div>
 
@@ -117,16 +146,36 @@ export default function SearchPage({ className }: SearchPageProps) {
         <div className="rounded border border-dashed border-gray-300 p-4 text-sm text-gray-600 dark:border-gray-700 dark:text-gray-400">Memproses Carian...</div>
       ) : results.length > 0 ? (
         <div className="grid gap-3 md:grid-cols-2">
-          {results.map((result) => (
-            <ModernRetroCard
-              key={result.id}
-              title={result.title}
-              description={result.description}
-              icon={result.type === 'tutorial' ? '📚' : result.type === 'asset' ? '🧰' : result.type === 'project' ? '🛠️' : '📄'}
-              onClick={() => handleResultClick(result.url)}
-              badge={result.tags[0]}
-            />
-          ))}
+          {results.map((result) => {
+            // Start: Tutorial Result Rendering with Glowing Badge
+            if (result.type === 'tutorial' && result.difficulty && result.category) {
+              return (
+                <TutorialCard
+                  key={result.id}
+                  title={result.title}
+                  description={result.description}
+                  difficulty={result.difficulty}
+                  category={result.category}
+                  completed={result.completed || false}
+                  onStart={() => handleResultClick(result.url)}
+                />
+              );
+            }
+            // End: Tutorial Result Rendering with Glowing Badge
+            
+            // Start: Other Result Types
+            return (
+              <ModernRetroCard
+                key={result.id}
+                title={result.title}
+                description={result.description}
+                icon={result.type === 'asset' ? '🧰' : result.type === 'project' ? '🛠️' : '📄'}
+                onClick={() => handleResultClick(result.url)}
+                badge={result.tags[0]}
+              />
+            );
+            // End: Other Result Types
+          })}
         </div>
       ) : (
         <div className="rounded border border-dashed border-gray-300 p-4 text-sm text-gray-600 dark:border-gray-700 dark:text-gray-400">

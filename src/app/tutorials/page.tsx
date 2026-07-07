@@ -77,6 +77,19 @@ export default function TutorialsPage({ className }: TutorialsPageProps) {
   const filteredTutorials = tutorials.filter((tutorial) => filter === 'all' || tutorial.difficulty === filter);
   // End: Progress Metrics
 
+  // Start: Category Filter Glow Sync
+  const getCategoryGlow = (category: string) => {
+    const glows: Record<string, string> = {
+      HTML: 'border-emerald-500',
+      CSS: 'border-amber-500',
+      JavaScript: 'border-sky-500',
+      'Reka Bentuk': 'border-rose-500',
+      Audio: 'border-cyan-500',
+    };
+    return glows[category] || 'border-pink-500';
+  };
+  // End: Category Filter Glow Sync
+
   // Start: Render Tutorials Page
   return (
     <div className={`p-4 ${className || ''}`}>
@@ -107,16 +120,44 @@ export default function TutorialsPage({ className }: TutorialsPageProps) {
 
       <div className="retro-window border-2 border-pink-500 bg-white p-3 retro-shadow">
         <div className="mb-3 flex flex-wrap gap-2">
-          <button onClick={() => setFilter('all')} className={`rounded px-3 py-1 text-xs border-2 border-pink-500 ${filter === 'all' ? 'bg-pink-500 text-white' : 'bg-pink-50 hover:bg-pink-100'}`}>
+          <button 
+            onClick={() => setFilter('all')} 
+            className={`rounded px-3 py-1 text-xs border-2 transition-all duration-300 ${
+              filter === 'all' 
+                ? 'bg-pink-500 text-white border-pink-500 shadow-[0_0_10px_rgba(255,0,127,0.5)]' 
+                : 'border-pink-500 bg-pink-50 hover:bg-pink-100'
+            }`}
+          >
             Semua Siri
           </button>
-          <button onClick={() => setFilter('Beginner')} className={`rounded px-3 py-1 text-xs border-2 border-emerald-500 ${filter === 'Beginner' ? 'bg-emerald-500 text-white' : 'bg-emerald-50 hover:bg-emerald-100'}`}>
+          <button 
+            onClick={() => setFilter('Beginner')} 
+            className={`rounded px-3 py-1 text-xs border-2 transition-all duration-300 ${
+              filter === 'Beginner' 
+                ? 'bg-emerald-500 text-white border-emerald-500 shadow-[0_0_10px_rgba(0,255,102,0.5)]' 
+                : 'border-emerald-500 bg-emerald-50 hover:bg-emerald-100'
+            }`}
+          >
             Pemula
           </button>
-          <button onClick={() => setFilter('Intermediate')} className={`rounded px-3 py-1 text-xs border-2 border-amber-500 ${filter === 'Intermediate' ? 'bg-amber-500 text-white' : 'bg-amber-50 hover:bg-amber-100'}`}>
+          <button 
+            onClick={() => setFilter('Intermediate')} 
+            className={`rounded px-3 py-1 text-xs border-2 transition-all duration-300 ${
+              filter === 'Intermediate' 
+                ? 'bg-amber-500 text-white border-amber-500 shadow-[0_0_10px_rgba(255,170,0,0.5)]' 
+                : 'border-amber-500 bg-amber-50 hover:bg-amber-100'
+            }`}
+          >
             Pertengahan
           </button>
-          <button onClick={() => setFilter('Advanced')} className={`rounded px-3 py-1 text-xs border-2 border-rose-500 ${filter === 'Advanced' ? 'bg-rose-500 text-white' : 'bg-rose-50 hover:bg-rose-100'}`}>
+          <button 
+            onClick={() => setFilter('Advanced')} 
+            className={`rounded px-3 py-1 text-xs border-2 transition-all duration-300 ${
+              filter === 'Advanced' 
+                ? 'bg-rose-500 text-white border-rose-500 shadow-[0_0_10px_rgba(255,0,85,0.5)]' 
+                : 'border-rose-500 bg-rose-50 hover:bg-rose-100'
+            }`}
+          >
             Lanjutan
           </button>
         </div>
