@@ -5,12 +5,11 @@ import CrtThemeController from '@/components/CrtThemeController';
 import DashboardProfileBanner from '@/components/DashboardProfileBanner';
 import FileManagerActions from '@/components/FileManagerActions';
 import FileManagerGrid from '@/components/FileManagerGrid';
-import RetroToolbar from '@/components/RetroToolbar';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { enDictionary, msDictionary } from '@/i18n/dictionaries';
 import type { FileAction, FileManagerItem, SiteFile, SiteFolder } from '@/types/fileManager';
 
-// Start: SiteFilesPage Component
+// Start: Pure File Explorer Directory - SiteFilesPage Component
 export default function SiteFilesPage() {
   // Start: State Management
   const { language } = useLanguageStore();
@@ -108,7 +107,7 @@ export default function SiteFilesPage() {
   // Start: Handle File Actions - Pure Directory Browser
   const handleFileAction = (file: FileManagerItem, action: FileAction, newName?: string) => {
     if (action === 'edit' && file.type === 'file') {
-      router.push(`/site_files/text_editor?filename=${encodeURIComponent(file.filename)}`);
+      router.push('/site_files/text_editor?filename=' + encodeURIComponent(file.filename));
     } else if (action === 'navigate' && file.type === 'folder') {
       console.log('Navigating to folder:', file.name);
     } else if (action === 'rename' && newName) {
@@ -143,14 +142,14 @@ export default function SiteFilesPage() {
   };
   // End: Handle Batch Delete
 
-  // Start: Render Site Files Page
+  // Start: Render Site Files Page - Pure File Explorer Directory
   return (
     <div className="mx-auto max-w-7xl p-6">
       <DashboardProfileBanner />
 
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200">Papan Pemuka</h2>
+          <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200">Paparan Fail</h2>
           <p className="text-sm text-slate-600 dark:text-slate-400">{t.dashboardTitle}</p>
         </div>
         <CrtThemeController />
@@ -178,20 +177,16 @@ export default function SiteFilesPage() {
       )}
 
       {!loading && !error && (
-        <div className={`mt-4 rounded-2xl border p-4 transition-all duration-200 ${crtEnabled ? 'border-slate-400 bg-slate-100/90 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.4)]' : 'border-slate-300 bg-white/80 shadow-sm'}`}>
+        <div className={'mt-4 rounded-2xl border p-4 transition-all duration-200 ' + (crtEnabled ? 'border-slate-400 bg-slate-100/90 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.4)]' : 'border-slate-300 bg-white/80 shadow-sm')}>
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-            <div className="space-y-4 lg:col-span-2">
+            <div className="space-y-4 lg:col-span-3">
               <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">{t.myFiles}</h2>
               <FileManagerGrid files={files} folders={folders} onFileAction={handleFileAction} />
-            </div>
-            <div className="space-y-4">
-              <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">{t.fileEditor}</h2>
-              <RetroToolbar className="mt-2" />
             </div>
           </div>
         </div>
       )}
-      {/* End: File Manager Content */}
+      {/* End: Render Site Files Page - Pure File Explorer Directory */}
     </div>
   );
 }

@@ -58,20 +58,20 @@ export default function UserSitePage({ params }: UserSitePageProps) {
           <div className="retro-controls-grid">
             <div className="retro-control-item">
               <span className="retro-control-label">📁</span>
-              <span className="retro-control-name">Fail Saya</span>
+              <span className="retro-control-name">Paparan Fail</span>
             </div>
             <div className="retro-control-item">
               <span className="retro-control-label">📊</span>
-              <span className="retro-control-name">Statistik</span>
+              <span className="retro-control-name">Paparkan Statistik</span>
             </div>
             <div className="retro-control-item">
               <span className="retro-control-label">⚙️</span>
-              <span className="retro-control-name">Tetapan</span>
+              <span className="retro-control-name">Siri Tutorial</span>
             </div>
           </div>
           <div className="mt-6 rounded border-2 border-gray-300 bg-white p-4 retro-border">
             <p className="text-gray-600">
-              Ini ialah ruang placeholder untuk laman retro peribadi {username}. Kandungan akan dimuatkan secara dinamik berdasarkan Tetapan pengguna.
+              Inilah ruang canvas portfolio awam untuk laman web HTML, CSS, dan JS yang dibina oleh warga resident. Kandungan akan dimuatkan secara dinamik berdasarkan pilihan pengguna.
             </p>
           </div>
           <div className="mt-6">

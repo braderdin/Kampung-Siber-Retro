@@ -117,15 +117,15 @@ function TextEditorContent({ className }: TextEditorProps) {
           </div>
         </div>
         <div className="retro-window-client p-6">
-          {/* Start: VSCode Dark Theme Editor Container */}
-          <div className="flex flex-col h-full">
-            {/* Start: Top Toolbar */}
-            <div className="flex items-center justify-between mb-4">
+          {/* Start: VSCode Dark Theme Editor Container - Premium Frame */}
+          <div className="flex flex-col h-full bg-gray-900 border border-gray-600 rounded-lg overflow-hidden shadow-xl">
+            {/* Start: Top Navbar Editor Row - Absolute Header */}
+            <div className="flex items-center justify-between px-4 py-2 bg-gray-800 border-b border-gray-700">
               <div className="flex items-center space-x-2">
-                <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">Line 1</span>
-                <span className="text-xs text-gray-400 dark:text-gray-500">Col 1</span>
+                <span className="text-xs text-gray-400 font-mono bg-gray-700 px-2 py-1 rounded font-mono">Line 1</span>
+                <span className="text-xs text-gray-500">Col 1</span>
                 {isSaved && (
-                  <span className="text-xs text-green-500 font-semibold">✓ Simpan</span>
+                  <span className="text-xs text-green-400 font-semibold">✓ Simpan</span>
                 )}
               </div>
               <div className="flex items-center space-x-2">
@@ -133,21 +133,21 @@ function TextEditorContent({ className }: TextEditorProps) {
                   onClick={handleSave}
                   className="retro-btn-secondary text-xs px-3 py-1"
                 >
-                  Simpan Fail
+                  SIMPAN
                 </button>
                 <button
                   onClick={handleRename}
                   className="retro-btn-secondary text-xs px-3 py-1"
                 >
-                  Tukar Nama
+                  TUKAR NAMA
                 </button>
               </div>
             </div>
-            {/* End: Top Toolbar */}
+            {/* End: Top Navbar Editor Row - Absolute Header */}
             
             {/* Start: Editor Content Area */}
             <div className="flex-1 overflow-hidden">
-              <div className="h-full border-2 border-gray-300 dark:border-gray-600 rounded-md overflow-hidden">
+              <div className="h-full border-2 border-gray-600 rounded-md overflow-hidden">
                 <CodeMirrorEditor 
                   value={content}
                   language={fileLanguage}
@@ -157,7 +157,7 @@ function TextEditorContent({ className }: TextEditorProps) {
             </div>
             {/* End: Editor Content Area */}
           </div>
-          {/* End: VSCode Dark Theme Editor Container */}
+          {/* End: VSCode Dark Theme Editor Container - Premium Frame */}
         </div>
       </div>
     </div>
@@ -171,3 +171,5 @@ export default function TextEditorPage({ className }: TextEditorProps) {
     </Suspense>
   );
 }
+
+

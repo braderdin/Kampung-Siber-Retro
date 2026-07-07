@@ -29,10 +29,10 @@ export default function Home() {
   return (
     <div className="flex flex-col flex-1 items-center justify-center bg-gradient-to-br from-[#060814] to-[#0c102b] font-sans">
       <main className="flex flex-1 w-full max-w-4xl flex-col items-center justify-between py-8 px-4 sm:px-8">
-        {/* Start: Cyber Marquee Message Ticker */}
-        <div className="w-full text-center mb-8 overflow-hidden">
-          <div className="inline-block whitespace-nowrap animate-marquee text-white font-bold text-sm tracking-wider drop-shadow-[0_0_5px_#ff007f]">
-            ✨ Selamat Datang ke Pusat Siber Komuniti Nusantara • Jumlah Teratak Digital Terkini: 1,240 buah • Pastikan kod HTML anda comel dan kreatif! ✨
+        {/* Start: Cyber Marquee Message Ticker - Rigid Overflow Container */}
+        <div className="marquee-rigid-container w-full text-center mb-8">
+          <div className="marquee-content inline-block whitespace-nowrap animate-marquee text-white font-bold text-sm tracking-wider drop-shadow-[0_0_5px_#ff007f]">
+            ✨ Selamat Datang ke Pusat Siber Komuniti Nusantara • Jumlah Teratak Digital Terkini: 1,240 buah • Pastakan kod HTML anda comel dan kreatif! ✨
           </div>
         </div>
         {/* End: Cyber Marquee Message Ticker */}
@@ -49,16 +49,16 @@ export default function Home() {
               strokeLinecap="round" 
               strokeLinejoin="round"
             >
-              {/* Traditional Malay Teratak House - Pitched Roof */}
+              {/* Pitched Roof with Gabled Design */}
               <path d="M4 18 L12 6 L20 18 Z" className="cozy-house-path"/>
               {/* Walls */}
               <rect x="6" y="18" width="12" height="8" className="cozy-house-path"/>
-              {/* Classic Window Frames */}
+              {/* Window Frames - Traditional Malay Style */}
               <rect x="7" y="19" width="3" height="3" className="cozy-house-fill"/>
               <rect x="14" y="19" width="3" height="3" className="cozy-house-fill"/>
-              {/* Center Pixel Door */}
+              {/* Pixel Door - Center Entry */}
               <rect x="10" y="20" width="4" height="4" className="cozy-house-fill"/>
-              {/* Glowing Curved Ambient Webring Halo Graphics */}
+              {/* Glowing Curved Ambient Webring Halo Paths */}
               <path d="M8 16 C10 14, 14 14, 16 16" className="webring-halo"/>
               <path d="M8 18 C10 16, 14 16, 16 18" className="webring-halo"/>
               <path d="M8 20 C10 18, 14 18, 16 20" className="webring-halo"/>
@@ -73,8 +73,8 @@ export default function Home() {
           {/* Start: Bilingual Welcome Message */}
           <p className="text-xl text-gray-300 dark:text-gray-400 mb-10 max-w-2xl mx-auto drop-shadow-[0_0_10px_#00ffff]">
             {language === 'ms' 
-              ? 'Ekosistem pembinaan teratak digital tanpa kekangan algoritma dan pengiklanan. Bina dan miliki laman web HTML & CSS tulen anda secara bebas selamanya!'
-              : 'An algorithmic-free and ad-free digital workspace ecosystem. Build and own your pure HTML & CSS websites freely forever!'}
+              ? 'Ekosistem pembinaan teratak digital tanpa kekangan algoritma dan pengiklanan. Bina dan miliki laman web HTML & CSS tulen anda secara bebas selamanya! / An algorithmic-free and ad-free digital workspace ecosystem. Build and own your pure HTML & CSS websites freely forever!'
+              : 'An algorithmic-free and ad-free digital workspace ecosystem. Build and own your pure HTML & CSS websites freely forever! / Ekosistem pembinaan teratak digital tanpa kekangan algoritma dan pengiklanan. Bina dan miliki laman web HTML & CSS tulen anda secara bebas selamanya!'}
           </p>
           {/* End: Bilingual Welcome Message */}
           

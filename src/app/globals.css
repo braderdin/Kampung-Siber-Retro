@@ -286,6 +286,19 @@ body.dark {
   background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
   overflow: hidden;
 }
+/* Start: Rigid Overflow Hidden Container for Marquee Ticker */
+.marquee-rigid-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  clip-path: inset(0);
+}
+
+.marquee-rigid-container .marquee-content {
+  display: inline-block;
+  will-change: transform;
+}
+/* End: Rigid Overflow Hidden Container for Marquee Ticker */
 
 /* Start: Responsive Marquee Fix */
 @media (max-width: 640px) {
