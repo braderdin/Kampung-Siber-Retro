@@ -2,6 +2,8 @@
 
 // Start: Imports
 import { useState } from 'react';
+import RetroTerminalWidget from '@/components/RetroTerminalWidget';
+import TutorialCard from '@/components/TutorialCard';
 // End: Imports
 
 // Start: Type Definitions
@@ -25,40 +27,40 @@ export default function TutorialsPage({ className }: TutorialsPageProps) {
   const [tutorials] = useState<Tutorial[]>([
     {
       id: 1,
-      title: 'HTML Basics for Retro Web Development',
-      description: 'Learn the fundamentals of HTML with a focus on retro styling techniques.',
+      title: 'Asas HTML untuk Pembangunan Web Retro',
+      description: 'Pelajari asas HTML dengan penekanan pada teknik gaya retro yang bersih dan mudah difahami.',
       difficulty: 'Beginner',
       category: 'HTML',
       completed: false,
     },
     {
       id: 2,
-      title: 'CSS Styling with Windows 95 Aesthetics',
-      description: 'Master CSS techniques to create authentic Windows 95 style interfaces.',
+      title: 'Gaya CSS dengan Estetika Windows 95',
+      description: 'Kuasai teknik CSS untuk mencipta antara muka yang terdengar klasik dan berfungsi dengan baik.',
       difficulty: 'Beginner',
       category: 'CSS',
       completed: false,
     },
     {
       id: 3,
-      title: 'JavaScript Fundamentals for Retro Games',
-      description: 'Build classic arcade-style games using vanilla JavaScript.',
+      title: 'Asas JavaScript untuk Permainan Retro',
+      description: 'Bina permainan gaya arked menggunakan JavaScript tulen dengan struktur yang jelas.',
       difficulty: 'Intermediate',
       category: 'JavaScript',
       completed: false,
     },
     {
       id: 4,
-      title: 'Pixel Art Creation Techniques',
-      description: 'Learn to create and optimize pixel art for retro web experiences.',
+      title: 'Teknik Seni Piksel untuk Paparan Retro',
+      description: 'Pelajari cara menghasilkan seni piksel yang bersih dan mudah dioptimumkan untuk laman web.',
       difficulty: 'Intermediate',
-      category: 'Design',
-      completed: false,
+      category: 'Reka Bentuk',
+      completed: true,
     },
     {
       id: 5,
-      title: 'Audio Synthesis for Retro Sound Effects',
-      description: 'Create authentic retro sound effects using the Web Audio API.',
+      title: 'Sintesis Audio untuk Kesan Bunyi Retro',
+      description: 'Cipta kesan bunyi retro yang berkesan menggunakan Web Audio API secara teratur.',
       difficulty: 'Advanced',
       category: 'Audio',
       completed: false,
@@ -71,127 +73,68 @@ export default function TutorialsPage({ className }: TutorialsPageProps) {
   // End: Filter State
 
   // Start: Filtered Tutorials
-  const filteredTutorials = tutorials.filter(tutorial => 
-    filter === 'all' || tutorial.difficulty === filter
-  );
+  const filteredTutorials = tutorials.filter((tutorial) => filter === 'all' || tutorial.difficulty === filter);
   // End: Filtered Tutorials
-
-  // Start: Render Tutorial Card
-  const renderTutorialCard = (tutorial: Tutorial) => (
-    <div
-      key={tutorial.id}
-      className="retro-window p-4 mb-3 border-2 border-gray-400 bg-white retro-shadow"
-    >
-      <div className="flex items-center justify-between mb-2">
-        <h4 className="font-bold text-sm text-gray-800">{tutorial.title}</h4>
-        <span className={`px-2 py-1 text-xs rounded ${getDifficultyColor(tutorial.difficulty)}`}>
-          {tutorial.difficulty}
-        </span>
-      </div>
-      <p className="text-xs text-gray-600 mb-2">{tutorial.description}</p>
-      <div className="flex items-center justify-between">
-        <span className="text-xs bg-gray-100 px-2 py-1 rounded">{tutorial.category}</span>
-        <button
-          onClick={() => alert(`Starting tutorial: ${tutorial.title}`)}
-          className="retro-btn-primary text-xs px-3 py-1"
-        >
-          Start Tutorial
-        </button>
-      </div>
-    </div>
-  );
-  // End: Render Tutorial Card
-
-  // Start: Get Difficulty Color
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'Beginner':
-        return 'bg-green-100 text-green-800';
-      case 'Intermediate':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'Advanced':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-  // End: Get Difficulty Color
 
   // Start: Render Tutorials Page
   return (
     <div className={`p-4 ${className || ''}`}>
-      {/* Start: Window Title Bar */}
-      <div className="retro-title-bar px-3 py-2 mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-bold text-white">📚 Tutorials</h2>
+      <div className="retro-title-bar mb-4 flex items-center justify-between px-3 py-2">
+        <h2 className="text-lg font-bold text-white">📚 Siri Tutorial</h2>
         <div className="flex space-x-1">
-          <div className="w-8 h-8"></div>
-          <div className="w-8 h-8"></div>
-          <div className="w-8 h-8"></div>
+          <div className="h-8 w-8" />
+          <div className="h-8 w-8" />
+          <div className="h-8 w-8" />
         </div>
       </div>
-      {/* End: Window Title Bar */}
 
-      {/* Start: Filter Buttons */}
-      <div className="retro-window p-3 mb-4 border-2 border-gray-400 bg-white retro-shadow">
-        <div className="flex space-x-2 mb-3">
-          <button
-            onClick={() => setFilter('all')}
-            className={`px-3 py-1 text-xs rounded ${
-              filter === 'all' 
-                ? 'bg-blue-500 text-white' 
-                : 'bg-gray-100 hover:bg-gray-200'
-            }`}
-          >
-            All Tutorials
+      <div className="mb-4 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+        <div className="retro-window border-2 border-gray-400 bg-white p-3 retro-shadow">
+          <h3 className="mb-2 text-sm font-bold text-gray-800">Peta Kursus</h3>
+          <p className="text-xs leading-relaxed text-gray-600">
+            Navigasi Siri Tutorial dengan penunjuk kemajuan yang bersih bagi setiap modul retro yang disusun.
+          </p>
+        </div>
+        <RetroTerminalWidget title="Coretan Terminal" />
+      </div>
+
+      <div className="retro-window mb-4 border-2 border-gray-400 bg-white p-3 retro-shadow">
+        <div className="mb-3 flex flex-wrap gap-2">
+          <button onClick={() => setFilter('all')} className={`rounded px-3 py-1 text-xs ${filter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
+            Semua Siri
           </button>
-          <button
-            onClick={() => setFilter('Beginner')}
-            className={`px-3 py-1 text-xs rounded ${
-              filter === 'Beginner' 
-                ? 'bg-green-500 text-white' 
-                : 'bg-gray-100 hover:bg-gray-200'
-            }`}
-          >
-            Beginner
+          <button onClick={() => setFilter('Beginner')} className={`rounded px-3 py-1 text-xs ${filter === 'Beginner' ? 'bg-emerald-500 text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
+            Pemula
           </button>
-          <button
-            onClick={() => setFilter('Intermediate')}
-            className={`px-3 py-1 text-xs rounded ${
-              filter === 'Intermediate' 
-                ? 'bg-yellow-500 text-white' 
-                : 'bg-gray-100 hover:bg-gray-200'
-            }`}
-          >
-            Intermediate
+          <button onClick={() => setFilter('Intermediate')} className={`rounded px-3 py-1 text-xs ${filter === 'Intermediate' ? 'bg-amber-500 text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
+            Pertengahan
           </button>
-          <button
-            onClick={() => setFilter('Advanced')}
-            className={`px-3 py-1 text-xs rounded ${
-              filter === 'Advanced' 
-                ? 'bg-red-500 text-white' 
-                : 'bg-gray-100 hover:bg-gray-200'
-            }`}
-          >
-            Advanced
+          <button onClick={() => setFilter('Advanced')} className={`rounded px-3 py-1 text-xs ${filter === 'Advanced' ? 'bg-rose-500 text-white' : 'bg-gray-100 hover:bg-gray-200'}`}>
+            Lanjutan
           </button>
         </div>
-        <p className="text-xs text-gray-600">
-          Showing {filteredTutorials.length} of {tutorials.length} tutorials
-        </p>
+        <p className="text-xs text-gray-600">Menunjukkan {filteredTutorials.length} daripada {tutorials.length} modul.</p>
       </div>
-      {/* End: Filter Buttons */}
 
-      {/* Start: Tutorials List */}
-      <div className="space-y-3">
+      <div className="grid gap-3 md:grid-cols-2">
         {filteredTutorials.length > 0 ? (
-          filteredTutorials.map(renderTutorialCard)
+          filteredTutorials.map((tutorial) => (
+            <TutorialCard
+              key={tutorial.id}
+              title={tutorial.title}
+              description={tutorial.description}
+              difficulty={tutorial.difficulty}
+              category={tutorial.category}
+              completed={tutorial.completed}
+              onStart={() => alert(`Memulakan ${tutorial.title}`)}
+            />
+          ))
         ) : (
-          <div className="retro-window p-4 border-2 border-gray-400 bg-white retro-shadow text-center">
-            <p className="text-gray-500 text-sm">No tutorials match the selected filter.</p>
+          <div className="retro-window border-2 border-gray-400 bg-white p-4 text-center retro-shadow md:col-span-2">
+            <p className="text-sm text-gray-500">Tiada modul yang sepadan dengan penapis yang dipilih.</p>
           </div>
         )}
       </div>
-      {/* End: Tutorials List */}
     </div>
   );
 }
