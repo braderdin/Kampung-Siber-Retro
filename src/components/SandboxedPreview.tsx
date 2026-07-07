@@ -10,12 +10,13 @@ interface SandboxedPreviewProps {
 export default function SandboxedPreview({ className }: SandboxedPreviewProps) {
   const { htmlCode, cssCode, jsCode } = useEditorStore();
   
-  // Debounce all code values for performance
+  // Start: Debounce All Code Values
   const debouncedHtml = useDebounce(htmlCode, { delay: 100 });
   const debouncedCss = useDebounce(cssCode, { delay: 100 });
   const debouncedJs = useDebounce(jsCode, { delay: 100 });
+  // End: Debounce All Code Values
 
-  // Generate complete HTML document with injected CSS and JS
+  // Start: Generate Preview Content
   const generatePreviewContent = () => {
     const fullHtml = `
       <!DOCTYPE html>
@@ -46,6 +47,7 @@ export default function SandboxedPreview({ className }: SandboxedPreviewProps) {
     `;
     return fullHtml;
   };
+  // End: Generate Preview Content
 
   return (
     <div className={className || "w-full h-full"}>

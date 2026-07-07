@@ -23,7 +23,7 @@ export default function CodeMirrorEditor({
   const { htmlCode, cssCode, jsCode, activeTab, setHtmlCode, setCssCode, setJsCode } = useEditorStore();
   const editorRef = useRef<any>(null);
 
-  // Determine current code based on active tab or prop
+  // Start: Determine Current Code
   const getCurrentCode = () => {
     if (value !== undefined) {
       return value;
@@ -35,8 +35,9 @@ export default function CodeMirrorEditor({
       default: return htmlCode;
     }
   };
+  // End: Determine Current Code
 
-  // Determine setter function based on active tab
+  // Start: Determine Setter Function
   const setCurrentCode = (newValue: string) => {
     if (onChange) {
       onChange(newValue);
@@ -49,8 +50,9 @@ export default function CodeMirrorEditor({
       }
     }
   };
+  // End: Determine Setter Function
 
-  // Get language extension based on active tab or prop
+  // Start: Get Language Extension
   const getLanguageExtension = () => {
     if (language) {
       switch (language) {
@@ -66,11 +68,13 @@ export default function CodeMirrorEditor({
       default: return html();
     }
   };
+  // End: Get Language Extension
 
-  // Handle code changes and auto-save to store
+  // Start: Handle Code Changes
   const handleCodeChange = (value: string) => {
     setCurrentCode(value);
   };
+  // End: Handle Code Changes
 
   return (
     <div className={className || "w-full h-full"}>

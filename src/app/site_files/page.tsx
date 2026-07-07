@@ -7,6 +7,9 @@ import DashboardProfileBanner from '@/components/DashboardProfileBanner';
 import FileManagerActions from '@/components/FileManagerActions';
 import FileManagerGrid from '@/components/FileManagerGrid';
 import FileManagerList from '@/components/FileManagerList';
+import CodeMirrorEditor from '@/components/CodeMirrorEditor';
+import SandboxedPreview from '@/components/SandboxedPreview';
+import RetroToolbar from '@/components/RetroToolbar';
 // End: Imports
 
 // Start: Type Definitions
@@ -42,8 +45,8 @@ export default function SiteFilesPage() {
   const [folders, setFolders] = useState<SiteFolder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [selectedFiles, setSelectedFiles] = useState<SiteFile[]>([]);
+  const [showEditor, setShowEditor] = useState(false);
   // End: State Management
 
   // Start: Fetch Files
@@ -151,28 +154,6 @@ export default function SiteFilesPage() {
           <span className="text-sm text-gray-600 dark:text-gray-400">
             {t.dashboardTitle}
           </span>
-          <button
-            onClick={() => setViewMode('grid')}
-            className={`p-2 rounded-md ${
-              viewMode === 'grid'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-            }`}
-            title="Grid View"
-          >
-            📋
-          </button>
-          <button
-            onClick={() => setViewMode('list')}
-            className={`p-2 rounded-md ${
-              viewMode === 'list'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-            }`}
-            title="List View"
-          >
-            📋
-          </button>
         </div>
       </div>
       {/* End: View Toggle */}
@@ -204,17 +185,42 @@ export default function SiteFilesPage() {
       )}
 
       {!loading && !error && (
-        viewMode === 'grid'
-          ? <FileManagerGrid
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+              {t.myFiles}
+            </h2>
+            <FileManagerGrid
               files={files}
               folders={folders}
               onFileAction={handleFileAction}
             />
-          : <FileManagerList
-              files={files}
-              folders={folders}
-              onFileAction={handleFileAction}
-            />
+          </div>
+          <div className="space-y-4">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+              {t.fileEditor}
+            </h2>
+            <div className="grid grid-cols-2 gap-2 mb-2">
+              {(['html', 'css', 'js'] as const).map((tab) => (
+                <button
+                  key={tab}
+                  className="retro-tab-btn retro-tab-active"
+                >
+                  {t[`${tab}Tab` as keyof typeof t] as string}
+                </button>
+              ))}
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="border-2 border-gray-300 dark:border-gray-600 rounded-md overflow-hidden">
+                <CodeMirrorEditor />
+              </div>
+              <div className="border-2 border-gray-300 dark:border-gray-600 rounded-md overflow-hidden">
+                <SandboxedPreview />
+              </div>
+            </div>
+            <RetroToolbar className="mt-2" />
+          </div>
+        </div>
       )}
       {/* End: File Manager Content */}
     </div>
