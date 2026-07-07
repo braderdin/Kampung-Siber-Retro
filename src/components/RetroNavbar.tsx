@@ -73,13 +73,13 @@ export default function RetroNavbar() {
 
   // Start: Render Navbar
   return (
-    <nav className="retro-nav bg-gray-100 dark:bg-gray-900 border-b border-gray-300 dark:border-gray-700">
+    <nav className="fixed top-0 left-0 right-0 z-50 retro-nav bg-black/30 backdrop-blur-md border-b border-cyan-500/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Start: Logo/Brand */}
           <div className="flex-shrink-0 flex items-center">
-            <span className="text-2xl font-pixel text-blue-600 dark:text-blue-400">
-              🖥️ Kampung Siber
+            <span className="text-2xl font-pixel text-pink-500 dark:text-pink-400">
+              🖥️ Penjelajah Laman
             </span>
           </div>
           {/* End: Logo/Brand */}
@@ -93,8 +93,8 @@ export default function RetroNavbar() {
                   onClick={() => handleNavClick(item.href)}
                   className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                     pathname === item.href
-                      ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200'
-                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800'
+                      ? 'bg-pink-500/20 text-pink-400 dark:bg-pink-500/30 dark:text-pink-300'
+                      : 'text-gray-300 hover:text-white hover:bg-cyan-500/10 dark:text-gray-400 dark:hover:text-white dark:hover:bg-cyan-500/10'
                   }`}
                 >
                   <span className="text-lg">{item.icon}</span>
@@ -112,7 +112,7 @@ export default function RetroNavbar() {
               <select
                 value={language}
                 onChange={handleLanguageChange}
-                className="retro-input w-auto text-sm"
+                className="retro-input w-auto text-sm bg-black/50 border-cyan-400 text-white"
               >
                 <option value="en">EN</option>
                 <option value="ms">MS</option>
@@ -127,10 +127,10 @@ export default function RetroNavbar() {
             {/* Start: Dark Mode Toggle */}
             <button
               onClick={handleDarkModeToggle}
-              className="retro-btn-secondary text-xs px-3 py-1 flex items-center space-x-1"
+              className="retro-btn-secondary text-xs px-3 py-1 flex items-center space-x-1 border-pink-400 hover:border-pink-300"
             >
               <span>{isDarkMode ? '🌙' : '☀️'}</span>
-              <span>{isDarkMode ? t.greetings.hello : 'Mod Gelap'}</span>
+              <span>{isDarkMode ? t.greetings.hello : 'Penapis CRT'}</span>
             </button>
             {/* End: Dark Mode Toggle */}
           </div>

@@ -25,20 +25,28 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 font-sans">
+    <div className="flex flex-col flex-1 items-center justify-center bg-gradient-to-br from-[#060814] to-[#0c102b] font-sans">
       <main className="flex flex-1 w-full max-w-4xl flex-col items-center justify-between py-8 px-4 sm:px-8">
+        {/* Start: Purple Marquee Message Ticker */}
+        <div className="w-full text-center mb-8">
+          <div className="inline-block px-6 py-3 bg-gradient-to-r from-purple-600 via-pink-500 to-cyan-500 rounded-full text-white font-bold text-sm tracking-wider animate-pulse">
+            SELAMAT DATANG KE KAMPUNG SIBER NUSANTARA - TEMPAT KITA BERKAITAN DENGAN TEKNOLOGI MALAYSIA
+          </div>
+        </div>
+        {/* End: Purple Marquee Message Ticker */}
+
         <div className="text-center py-16">
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-800 dark:text-gray-200 mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
-            {t.workspaceTitle}
+          <h1 className="text-5xl md:text-6xl font-bold text-white dark:text-gray-200 mb-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 via-cyan-400 to-purple-600 uppercase tracking-wider">
+            KAMPUNG SIBER
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-400 mb-10 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-300 dark:text-gray-400 mb-10 max-w-2xl mx-auto">
             {t.dashboardSubtitle}
           </p>
           <button
             onClick={handleEnterWorkspace}
-            className="retro-btn-primary text-xl px-12 py-4 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+            className="retro-btn-primary text-xl px-12 py-4 rounded-full shadow-2xl hover:shadow-cyan-500/50 transform hover:scale-105 transition-all duration-300 font-bold"
           >
-            {t.assetsButton}
+            MASUK & PACAK TERATAK SEKARANG
           </button>
         </div>
       </main>

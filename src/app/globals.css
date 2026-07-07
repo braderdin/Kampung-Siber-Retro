@@ -1,16 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --crt-scanline-color: rgba(0, 0, 0, 0.1);
+  --background: #060814;
+  --foreground: #ffffff;
+  --crt-scanline-color: rgba(255, 0, 127, 0.3);
   --crt-scanline-height: 2px;
   --crt-scanline-spacing: 4px;
-  --crt-scanline-opacity: 0.3;
+  --crt-scanline-opacity: 0.25;
   --crt-flicker-min: 0.95;
   --crt-flicker-max: 1.05;
   --crt-flicker-intensity: 0.02;
-  --crt-glow-color: rgba(0, 255, 0, 0.2);
+  --crt-glow-color: rgba(0, 255, 255, 0.4);
   --crt-glow-blur: 10px;
   --font-pixel: 'VT323', monospace;
 }
@@ -24,8 +24,8 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #060814;
+    --foreground: #ffffff;
   }
 }
 
@@ -33,6 +33,16 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  min-height: 100vh;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(135deg, #060814 0%, #0c102b 50%, #060814 100%);
+  z-index: -1;
 }
 
 body.crt-enabled {
@@ -40,14 +50,19 @@ body.crt-enabled {
   overflow-x: hidden;
 }
 
-body.crt-enabled::before {
+body.crt-enabled::after {
   content: '';
   position: fixed;
   inset: 0;
   pointer-events: none;
-  background: repeating-linear-gradient(180deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.08) 1px, transparent 1px, transparent 3px);
-  opacity: 0.25;
-  mix-blend-mode: soft-light;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 2px,
+    rgba(255, 0, 127, 0.1) 2px,
+    rgba(255, 0, 127, 0.1) 4px
+  );
+  opacity: 0.3;
   z-index: 50;
 }
 
@@ -55,7 +70,6 @@ body.crt-enabled .crt-enabled {
   animation: micro-flicker 0.18s linear infinite;
 }
 
-/* CRT Scanline Filter */
 .crt-scanline-filter {
   position: relative;
   overflow: hidden;
@@ -70,8 +84,8 @@ body.crt-enabled .crt-enabled {
   height: 100%;
   background: repeating-linear-gradient(
     0deg,
-    var(--crt-scanline-color, rgba(0, 0, 0, 0.1)),
-    var(--crt-scanline-color, rgba(0, 0, 0, 0.1)) var(--crt-scanline-height, 2px),
+    var(--crt-scanline-color, rgba(255, 0, 127, 0.1)),
+    var(--crt-scanline-color, rgba(255, 0, 127, 0.1)) var(--crt-scanline-height, 2px),
     transparent var(--crt-scanline-height, 2px),
     transparent var(--crt-scanline-spacing, 4px)
   );
@@ -104,7 +118,7 @@ body.crt-enabled .crt-enabled {
   background: linear-gradient(
     to bottom,
     transparent 0%,
-    var(--crt-scanline-color, rgba(0, 0, 0, 0.1)) 50%,
+    var(--crt-scanline-color, rgba(255, 0, 127, 0.1)) 50%,
     transparent 100%
   );
   animation: vertical-scan 4s linear infinite;
@@ -144,12 +158,12 @@ body.crt-enabled .crt-enabled {
 }
 
 .crt-glow {
-  filter: drop-shadow(0 0 var(--crt-glow-blur, 10px) var(--crt-glow-color, rgba(0, 255, 0, 0.2)));
+  filter: drop-shadow(0 0 var(--crt-glow-blur, 10px) var(--crt-glow-color, rgba(0, 255, 255, 0.4)));
   transition: filter 0.3s ease;
 }
 
 .crt-glow:hover {
-  filter: drop-shadow(0 0 calc(var(--crt-glow-blur, 10px) * 1.5) var(--crt-glow-color, rgba(0, 255, 0, 0.4)));
+  filter: drop-shadow(0 0 calc(var(--crt-glow-blur, 10px) * 1.5) var(--crt-glow-color, rgba(0, 255, 255, 0.6)));
 }
 
 .pixel-font {
@@ -159,98 +173,96 @@ body.crt-enabled .crt-enabled {
   letter-spacing: 0.05em;
 }
 
+/* Cyber Neon Theme */
+:root {
+  --cyber-blue: #0c102b;
+  --cyber-pink: #ff007f;
+  --cyber-cyan: #00ffff;
+  --cyber-midnight: #060814;
+  --cyber-space-1: #0e1330;
+  --cyber-space-2: #121b4a;
+}
+
+.dark {
+  --background: var(--cyber-midnight);
+  --foreground: #ffffff;
+}
+
+.light {
+  --background: var(--cyber-blue);
+  --foreground: #ffffff;
+}
+
+body.light {
+  background: var(--cyber-blue);
+}
+
+body.dark {
+  background: var(--cyber-midnight);
+}
+
 /* Retro UI Styles */
-
-/* Retro Editor Styles */
-.retro-editor-bg {
-  background: #f0f0f0;
-}
-
-.retro-editor-fg {
-  color: #333;
-}
-
-.retro-editor-border {
-  border: 1px solid #ccc;
-}
-
-/* Retro Toolbar */
-.retro-toolbar-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 4px;
-  border: 2px solid #d1d5db;
-  background-color: #ffffff;
-  color: #374151;
-  font-weight: bold;
-  font-size: 12px;
-  transition: all 0.2s ease;
-}
-
-.retro-toolbar-btn:hover {
-  background-color: #f3f4f6;
-  border-color: #9ca3af;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-}
-
-/* Retro Select */
-.retro-select {
-  padding: 8px 12px;
-  border: 2px solid #d1d5db;
-  border-radius: 6px;
-  background-color: #ffffff;
-  color: #374151;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.retro-select:hover {
-  border-color: #9ca3af;
-}
-
-.retro-select:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
-}
-
-/* Retro Buttons */
 .retro-btn-secondary {
   padding: 8px 16px;
-  border: 2px solid #6b7280;
+  border: 2px solid #00ffff;
   border-radius: 6px;
-  color: #374151;
+  color: #ffffff;
   font-weight: 500;
   transition: all 0.2s ease;
+  background: transparent;
 }
 
 .retro-btn-secondary:hover {
-  background-color: #f3f4f6;
-  border-color: #4b5563;
+  background: rgba(0, 255, 255, 0.1);
+  border-color: #ff007f;
 }
 
-/* Retro Tabs */
-.retro-tab-btn {
-  padding: 8px 16px;
-  border: 2px solid #d1d5db;
-  border-radius: 6px 6px 0 0;
-  background-color: #ffffff;
-  color: #374151;
+.retro-btn-primary {
+  padding: 12px 24px;
+  border: 2px solid #ff007f;
+  border-radius: 8px;
+  color: #ffffff;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #ff007f, #00ffff);
+  backdrop-filter: blur(10px);
+}
+
+.retro-btn-primary:hover {
+  background: linear-gradient(135deg, #ff007f, #00ffff);
+  box-shadow: 0 0 20px rgba(255, 0, 127, 0.5), 0 0 20px rgba(0, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.retro-input {
+  padding: 10px 14px;
+  border: 2px solid #00ffff;
+  border-radius: 6px;
+  background: rgba(10, 10, 10, 0.5);
+  color: #ffffff;
   font-weight: 500;
   transition: all 0.2s ease;
 }
 
-.retro-tab-btn:hover {
-  background-color: #f3f4f6;
-  border-color: #9ca3af;
+.retro-input:focus {
+  outline: none;
+  border-color: #ff007f;
+  box-shadow: 0 0 10px rgba(255, 0, 127, 0.5);
 }
 
-.retro-tab-active {
-  background-color: #3b82f6;
+.retro-textarea {
+  padding: 10px 14px;
+  border: 2px solid #00ffff;
+  border-radius: 6px;
+  background: rgba(10, 10, 10, 0.5);
   color: #ffffff;
-  border-color: #2563eb;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  resize: vertical;
+}
+
+.retro-textarea:focus {
+  outline: none;
+  border-color: #ff007f;
+  box-shadow: 0 0 10px rgba(255, 0, 127, 0.5);
 }
