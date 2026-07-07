@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import RetroHitCounter from '@/components/RetroHitCounter';
 
 interface StatsPageProps {
   params: {
@@ -47,53 +48,37 @@ export default function StatsPage({ params }: StatsPageProps) {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100 p-4">
       <div className="retro-window w-full max-w-4xl">
         <div className="retro-window-title-bar">
-          <div className="retro-window-title">Statistics - {username}</div>
+          <div className="retro-window-title">Statistik - {username}</div>
         </div>
         <div className="retro-window-client p-6">
-          <h1 className="text-2xl font-bold mb-6 retro-heading">
-            Site Statistics
-          </h1>
-          
-          <div className="retro-stats-grid">
-            <div className="retro-stat-card">
-              <div className="retro-stat-value">{stats.visitors.toLocaleString()}</div>
-              <div className="retro-stat-label">Total Visitors</div>
+          <h1 className="retro-heading mb-6 text-2xl font-bold">Papan Pemuka Statstik Laman</h1>
+
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            <div className="rounded border border-gray-300 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900">
+              <div className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{stats.visitors.toLocaleString()}</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">Jumlah Pelawat</div>
             </div>
-            
-            <div className="retro-stat-card">
-              <div className="retro-stat-value">{stats.pageViews.toLocaleString()}</div>
-              <div className="retro-stat-label">Page Views</div>
+            <div className="rounded border border-gray-300 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900">
+              <div className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{stats.pageViews.toLocaleString()}</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">Paparan Laman</div>
             </div>
-            
-            <div className="retro-stat-card">
-              <div className="retro-stat-value">{stats.uniqueVisitors.toLocaleString()}</div>
-              <div className="retro-stat-label">Unique Visitors</div>
-            </div>
-            
-            <div className="retro-stat-card">
-              <div className="retro-stat-value">{stats.avgTime}</div>
-              <div className="retro-stat-label">Avg. Time</div>
-            </div>
-            
-            <div className="retro-stat-card">
-              <div className="retro-stat-value">{stats.bounceRate}%</div>
-              <div className="retro-stat-label">Bounce Rate</div>
+            <div className="rounded border border-gray-300 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900">
+              <div className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{stats.uniqueVisitors.toLocaleString()}</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">Pelawat Unik</div>
             </div>
           </div>
-          
-          <div className="mt-8 p-4 bg-white rounded border-2 retro-border">
-            <h2 className="text-lg font-semibold mb-2">Visitor Counter</h2>
-            <div className="retro-counter">
-              <div className="retro-counter-display">
-                {stats.visitors.toLocaleString().split('').map((digit, index) => (
-                  <div key={index} className="retro-counter-digit">
-                    {digit}
-                  </div>
-                ))}
-              </div>
+
+          <div className="mt-6 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+            <div className="rounded border border-gray-300 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900">
+              <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">Kaunter Pelawat</h2>
+              <RetroHitCounter value={stats.visitors} label="Kaunter Pelawat" />
+            </div>
+            <div className="rounded border border-gray-300 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900">
+              <h2 className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">Tetapan Ringkas</h2>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Purata masa lawatan ialah {stats.avgTime} dengan kadar lantunan {stats.bounceRate}%.</p>
             </div>
           </div>
         </div>

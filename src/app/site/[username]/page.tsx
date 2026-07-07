@@ -3,6 +3,7 @@
 import { notFound } from 'next/navigation';
 import { useState } from 'react';
 import CommunityInteraction from '@/components/CommunityInteraction';
+import CrtThemeController from '@/components/CrtThemeController';
 
 interface UserSitePageProps {
   params: {
@@ -34,52 +35,47 @@ export default function UserSitePage({ params }: UserSitePageProps) {
 
   // Start: Render UserSitePage Component
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100 p-4">
       <div className="retro-window w-full max-w-4xl">
         <div className="retro-window-title-bar">
-          <div className="retro-window-title">{username}'s Site</div>
+          <div className="retro-window-title">Laman {username}</div>
         </div>
         <div className="retro-window-client p-6">
-          <h1 className="text-2xl font-bold mb-4 retro-heading">
-            Welcome to {username}'s Retro Website
-          </h1>
-          
-          {/* Start: Interaction Buttons */}
-          <div className="flex space-x-2 mb-4">
-            <button
-              onClick={handleLike}
-              className={`retro-btn-secondary text-xs ${liked ? 'bg-green-500 text-white' : ''}`}
-            >
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <h1 className="retro-heading text-2xl font-bold">Selamat datang ke laman retro {username}</h1>
+            <CrtThemeController />
+          </div>
+
+          <div className="mb-4 flex flex-wrap gap-2">
+            <button onClick={handleLike} className={`retro-btn-secondary text-xs ${liked ? 'bg-green-500 text-white' : ''}`}>
               ❤️ Suka
             </button>
-            <button
-              onClick={handleFollow}
-              className={`retro-btn-secondary text-xs ${following ? 'bg-blue-500 text-white' : ''}`}
-            >
+            <button onClick={handleFollow} className={`retro-btn-secondary text-xs ${following ? 'bg-blue-500 text-white' : ''}`}>
               👤 Ikut
             </button>
           </div>
-          {/* End: Interaction Buttons */}
-          
+
           <div className="retro-controls-grid">
             <div className="retro-control-item">
               <span className="retro-control-label">📁</span>
-              <span className="retro-control-name">My Files</span>
+              <span className="retro-control-name">Fail Saya</span>
             </div>
             <div className="retro-control-item">
               <span className="retro-control-label">📊</span>
-              <span className="retro-control-name">Statistics</span>
+              <span className="retro-control-name">Statistik</span>
             </div>
             <div className="retro-control-item">
               <span className="retro-control-label">⚙️</span>
               <span className="retro-control-name">Tetapan</span>
             </div>
           </div>
-          <div className="mt-6 p-4 bg-white rounded border-2 retro-border">
+          <div className="mt-6 rounded border-2 border-gray-300 bg-white p-4 retro-border">
             <p className="text-gray-600">
-              This is a placeholder for {username}'s personal retro website.
-              Content will be loaded dynamically based on user configuration.
+              Ini ialah ruang placeholder untuk laman retro peribadi {username}. Kandungan akan dimuatkan secara dinamik berdasarkan Tetapan pengguna.
             </p>
+          </div>
+          <div className="mt-6">
+            <CommunityInteraction username={username} />
           </div>
         </div>
       </div>

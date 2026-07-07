@@ -2,9 +2,9 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import ModernRetroCard from '@/components/ModernRetroCard';
-import PaginationButton from '@/components/PaginationButton';
 import HumanFeedbackToast from '@/components/HumanFeedbackToast';
+import PaginationButton from '@/components/PaginationButton';
+import SiteDirectoryGrid from '@/components/SiteDirectoryGrid';
 // End: Imports
 
 // Start: Type Definitions
@@ -109,41 +109,15 @@ export default function BrowsePage({ className }: BrowsePageProps) {
   };
   // End: Handle Item Click
 
-  // Start: Get Item Icon
-  const getItemIcon = (type: BrowseItem['type']): string => {
-    const icons: Record<BrowseItem['type'], string> = {
-      tutorial: '📚',
-      asset: '📦',
-      project: '🎮',
-      template: '📄',
-    };
-    return icons[type] || '🔧';
-  };
-  // End: Get Item Icon
-
-  // Start: Get Item Badge
-  const getItemBadge = (item: BrowseItem): string => {
-    if (item.rating >= 4.5) return 'Terbaik';
-    if (item.downloads >= 1000) return 'Popular';
-    return '';
-  };
-  // End: Get Item Badge
-
-  // Start: Render Browse Item
-  const renderBrowseItem = (item: BrowseItem) => {
-    return (
-      <ModernRetroCard
-        key={item.id}
-        title={item.title}
-        description={item.description}
-        icon={getItemIcon(item.type)}
-        href={item.url}
-        badge={getItemBadge(item)}
-        className="w-full"
-      />
-    );
-  };
-  // End: Render Browse Item
+  // Start: Map Browse Items
+  const directorySites = items.map((item) => ({
+    id: item.id,
+    title: item.title,
+    description: `${item.description} · ${item.author}`,
+    tags: item.tags.slice(0, 3),
+    href: item.url,
+  }));
+  // End: Map Browse Items
 
   // Start: Render Browse Page
   return (
@@ -215,20 +189,14 @@ export default function BrowsePage({ className }: BrowsePageProps) {
             <p className="text-sm text-gray-500 dark:text-gray-400">Tiada sumber ditemui</p>
           </div>
         ) : (
-          <div className="space-y-3">
-            {items.map(renderBrowseItem)}
-          </div>
+          <SiteDirectoryGrid sites={directorySites} />
         )}
       </div>
       {/* End: Window Content */}
 
       {/* Start: Window Footer */}
-      <div className="retro-window-footer bg-gray-200 dark:bg-gray-700 px-3 py-2 border-t border-gray-300 dark:border-gray-600">
-        <PaginationButton
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-        />
+      <div className="retro-window-footer border-t border-gray-300 bg-gray-200 px-3 py-2 dark:border-gray-600 dark:bg-gray-700">
+        <PaginationButton currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
       </div>
       {/* End: Window Footer */}
     </div>
