@@ -6,7 +6,6 @@ import { enDictionary, msDictionary } from '@/i18n/dictionaries';
 import DashboardProfileBanner from '@/components/DashboardProfileBanner';
 import FileManagerActions from '@/components/FileManagerActions';
 import FileManagerGrid from '@/components/FileManagerGrid';
-import FileManagerList from '@/components/FileManagerList';
 import CodeMirrorEditor from '@/components/CodeMirrorEditor';
 import SandboxedPreview from '@/components/SandboxedPreview';
 import RetroToolbar from '@/components/RetroToolbar';
@@ -46,7 +45,6 @@ export default function SiteFilesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedFiles, setSelectedFiles] = useState<SiteFile[]>([]);
-  const [showEditor, setShowEditor] = useState(false);
   // End: State Management
 
   // Start: Fetch Files
@@ -185,8 +183,8 @@ export default function SiteFilesPage() {
       )}
 
       {!loading && !error && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-4">
             <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
               {t.myFiles}
             </h2>
@@ -210,7 +208,7 @@ export default function SiteFilesPage() {
                 </button>
               ))}
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-96">
               <div className="border-2 border-gray-300 dark:border-gray-600 rounded-md overflow-hidden">
                 <CodeMirrorEditor />
               </div>

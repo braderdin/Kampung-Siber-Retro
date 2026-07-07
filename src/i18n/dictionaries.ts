@@ -38,6 +38,7 @@ export const enDictionary = {
   directoryGaleri: 'Galeri',
   directoryAssets: 'Assets',
   directoryDocuments: 'Documents',
+  signOut: 'Sign Out',
 };
 
 export const msDictionary = {
@@ -80,4 +81,5 @@ export const msDictionary = {
   directoryGaleri: 'Galeri',
   directoryAssets: 'Aset',
   directoryDocuments: 'Dokumen',
+  signOut: 'Log Keluar',
 };
