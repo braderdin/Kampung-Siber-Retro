@@ -344,3 +344,69 @@ body.dark {
   strokeLinecap: round;
 }
 /* End: Cozy Traditional Malay House SVG Styles */
+/* Start: Cyberpunk CodeMirror Editor Styles */
+.cyber-editor-glow {
+  --cm-border: #ff007f;
+  --cm-glow: rgba(255, 0, 127, 0.3);
+  box-shadow: 0 0 15px var(--cm-glow);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.cyber-editor-glow .cm-editor {
+  background: transparent;
+}
+
+.cyber-editor-glow .cm-view {
+  background: transparent;
+}
+
+.cyber-editor-glow .cm-gutter {
+  background: rgba(10, 10, 10, 0.6);
+  border-right: 1px solid var(--cm-border);
+}
+
+.cyber-editor-glow .cm-gutteratom {
+  color: #888;
+}
+
+.cyber-editor-glow .cm-activeLine {
+  background: rgba(255, 0, 127, 0.08);
+}
+
+.cyber-editor-glow .cm-line {
+  color: #e0e0e0;
+}
+
+.cyber-editor-glow .cm-cursor {
+  border-left: 2px solid #ff007f;
+  animation: blink 1s step-end infinite;
+}
+
+.cyber-editor-glow .cm-selectionBackground {
+  background: rgba(255, 0, 127, 0.25);
+}
+
+.cyber-editor-glow:focus-within {
+  box-shadow: 0 0 25px var(--cm-glow), 0 0 40px rgba(0, 255, 255, 0.2);
+  transform: translateY(-1px);
+  transition: all 0.3s ease;
+}
+
+.cyber-editor-glow:hover {
+  box-shadow: 0 0 20px rgba(255, 0, 127, 0.4), 0 0 30px rgba(0, 255, 255, 0.3);
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+@keyframes cyber-pulse {
+  0%, 100% { box-shadow: 0 0 15px var(--cm-glow); }
+  50% { box-shadow: 0 0 25px rgba(255, 0, 127, 0.5), 0 0 30px rgba(0, 255, 255, 0.4); }
+}
+
+.cyber-editor-glow.crt-enabled {
+  animation: cyber-pulse 3s ease-in-out infinite;
+}
+/* End: Cyberpunk CodeMirror Editor Styles */
