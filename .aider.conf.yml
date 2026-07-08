@@ -2,7 +2,7 @@
 # Place this file in your project root directory sebaris dengan package-lock.json
 
 # 1. Tetapan Model Utama & Model Lemah (Memaksa penggunaan model Laguna XS.2)
-model: openrouter/openai/poolside/laguna-xs-2.1:free
+model: openrouter/qwen/qwen3-coder:free
 weak-model: openrouter/openai/poolside/laguna-xs-2.1:free
 
 # 2. Kawalan Kestabilan & Penjimatan Kos API (Anti-429 Rate Limit)

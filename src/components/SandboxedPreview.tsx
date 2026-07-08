@@ -1,7 +1,6 @@
 "use client";
 
 import { useEditorStore } from "@/store/useEditorStore";
-import useDebounce from "@/hooks/useDebounce";
 
 interface SandboxedPreviewProps {
   className?: string;
@@ -10,13 +9,9 @@ interface SandboxedPreviewProps {
 export default function SandboxedPreview({ className }: SandboxedPreviewProps) {
   const { htmlCode, cssCode, jsCode } = useEditorStore();
   
-  // Start: Debounce All Code Values
-  const debouncedHtml = useDebounce(htmlCode, { delay: 100 });
-  const debouncedCss = useDebounce(cssCode, { delay: 100 });
-  const debouncedJs = useDebounce(jsCode, { delay: 100 });
-  // End: Debounce All Code Values
-
   // Start: Generate Preview Content
+  // Note: Code values are already debounced at 500ms in CodeMirrorEditor.tsx
+  // to prevent browser freezes during continuous typing
   const generatePreviewContent = () => {
     const fullHtml = `
       <!DOCTYPE html>
@@ -26,21 +21,13 @@ export default function SandboxedPreview({ className }: SandboxedPreviewProps) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Live Preview</title>
         <style>
-          ${debouncedCss}
-          * { box-sizing: border-box; }
-          body { 
-            margin: 0; 
-            padding: 20px; 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: #fff;
-            color: #333;
-          }
+          ${cssCode}
         </style>
       </head>
       <body>
-        ${debouncedHtml}
+        ${htmlCode}
         <script>
-          ${debouncedJs}
+          ${jsCode}
         </script>
       </body>
       </html>

@@ -410,3 +410,214 @@ body.dark {
   animation: cyber-pulse 3s ease-in-out infinite;
 }
 /* End: Cyberpunk CodeMirror Editor Styles */
+/* Start: 90s-Style Retro Error Screen Styles */
+.error-screen {
+  background: linear-gradient(135deg, #0a0a1a 0%, #1a0a2a 50%, #0a0a1a 100%);
+  border: 4px solid #ff007f;
+  border-radius: 8px;
+  box-shadow: 0 0 30px rgba(255, 0, 127, 0.5), 
+              inset 0 0 20px rgba(0, 255, 255, 0.2),
+              0 0 50px rgba(255, 0, 127, 0.3);
+  position: relative;
+  overflow: hidden;
+  font-family: var(--font-pixel, 'VT323', monospace);
+}
+
+.error-screen::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    linear-gradient(45deg, transparent 25%, rgba(255, 0, 127, 0.1) 25%, rgba(255, 0, 127, 0.1) 50%, transparent 50%, transparent 75%, rgba(255, 0, 127, 0.1) 75%, rgba(255, 0, 127, 0.1)),
+    linear-gradient(135deg, transparent 25%, rgba(0, 255, 255, 0.1) 25%, rgba(0, 255, 255, 0.1) 50%, transparent 50%, transparent 75%, rgba(0, 255, 255, 0.1) 75%, rgba(0, 255, 255, 0.1));
+  background-size: 20px 20px;
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.error-title-bar {
+  background: linear-gradient(90deg, #ff007f 0%, #ff007f 30%, #00ffff 30%, #00ffff 100%);
+  color: #ffffff;
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 3px solid #ff007f;
+  font-family: var(--font-pixel, 'VT323', monospace);
+  font-size: 0.875rem;
+  font-weight: bold;
+  box-shadow: 0 0 15px rgba(255, 0, 127, 0.5);
+  position: relative;
+  z-index: 2;
+}
+
+.error-title-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 2px,
+    rgba(255, 255, 255, 0.1) 2px,
+    rgba(255, 255, 255, 0.1) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.window-controls {
+  display: flex;
+  gap: 4px;
+}
+
+.window-btn {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: none;
+  background: #999999;
+  cursor: default;
+  transition: all 0.2s;
+}
+
+.window-btn:hover {
+  background: #ff007f;
+}
+
+.window-btn.minimize {
+  background: #999999;
+}
+
+.window-btn.maximize {
+  background: #999999;
+}
+
+.window-btn.close {
+  background: #ff5f5f;
+}
+
+.error-content {
+  position: relative;
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+.neon-error {
+  text-shadow: 
+    0 0 5px #ff007f,
+    0 0 10px #ff007f,
+    0 0 15px #ff007f,
+    0 0 20px #00ffff,
+    0 0 25px #00ffff,
+    0 0 30px #ff007f;
+  animation: neon-flicker 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes neon-flicker {
+  0%, 100% {
+    text-shadow: 
+      0 0 5px #ff007f,
+      0 0 10px #ff007f,
+      0 0 15px #ff007f,
+      0 0 20px #00ffff,
+      0 0 25px #00ffff,
+      0 0 30px #ff007f;
+  }
+  25% {
+    text-shadow: 
+      0 0 3px #ff007f,
+      0 0 8px #ff007f,
+      0 0 12px #00ffff,
+      0 0 18px #00ffff,
+      0 0 25px #ff007f;
+  }
+  50% {
+    text-shadow: 
+      0 0 8px #ff007f,
+      0 0 15px #ff007f,
+      0 0 22px #00ffff,
+      0 0 30px #00ffff,
+      0 0 40px #ff007f;
+  }
+  75% {
+    text-shadow: 
+      0 0 10px #ff007f,
+      0 0 20px #ff007f,
+      0 0 25px #00ffff,
+      0 0 35px #00ffff;
+  }
+}
+
+.retro-heading {
+  font-family: var(--font-pixel, 'VT323', monospace);
+  text-transform: none;
+  letter-spacing: 2px;
+  text-shadow: 
+    0 0 5px #ff007f,
+    0 0 10px #ff007f,
+    0 0 15px #ff007f;
+}
+
+.retro-btn-error {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #ffffff;
+  background: linear-gradient(45deg, #ff007f 0%, #ff007f 50%, #00ffff 50%, #00ffff 100%);
+  border: 2px solid #ffffff;
+  border-radius: 4px;
+  box-shadow: 
+    4px 4px 0 #888888,
+    0 0 10px rgba(255, 0, 127, 0.5);
+  transition: none;
+  font-family: var(--font-pixel, 'VT323', monospace);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+  overflow: hidden;
+}
+
+.retro-btn-error::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.retro-btn-error:hover::before {
+  opacity: 1;
+}
+
+.retro-btn-error:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0 0 5px rgba(255, 0, 127, 0.3);
+}
+
+.error-title {
+  font-family: var(--font-pixel, 'VT323', monospace);
+  text-shadow: 
+    0 0 10px rgba(255, 0, 127, 0.8),
+    0 0 20px rgba(0, 255, 255, 0.5);
+  background: linear-gradient(45deg, #ff007f, #00ffff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+/* End: 90s-Style Retro Error Screen Styles */

@@ -6,6 +6,7 @@ import { html } from "@codemirror/lang-html";
 import { css } from "@codemirror/lang-css";
 import { javascript } from "@codemirror/lang-javascript";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
+import useDebounce from "@/hooks/useDebounce";
 import { useRef, useState, useEffect } from "react";
 
 interface CodeMirrorEditorProps {
@@ -48,17 +49,25 @@ export default function CodeMirrorEditor({
   const editorRef = useRef<any>(null);
   const { isDark } = useDarkMode();
 
-  // Start: Determine Current Code
-  const getCurrentCode = () => {
-    if (value !== undefined) {
-      return value;
-    }
+  // Start: Local State for Raw Input Value
+  const [rawInputValue, setRawInputValue] = useState<string>(() => {
+    if (value !== undefined) return value;
     switch (activeTab) {
       case "html": return htmlCode;
       case "css": return cssCode;
       case "js": return jsCode;
       default: return htmlCode;
     }
+  });
+  // End: Local State for Raw Input Value
+
+  // Start: Debounced Value for State Synchronization
+  const debouncedValue = useDebounce(rawInputValue, { delay: 500 });
+  // End: Debounced Value for State Synchronization
+
+  // Start: Determine Current Code
+  const getCurrentCode = () => {
+    return rawInputValue;
   };
   // End: Determine Current Code
 
@@ -95,11 +104,35 @@ export default function CodeMirrorEditor({
   };
   // End: Get Language Extension
 
-  // Start: Handle Code Changes
-  const handleCodeChange = (value: string) => {
-    setCurrentCode(value);
+  // Start: Handle Code Changes with Debounce
+  const handleCodeChange = (newValue: string) => {
+    setRawInputValue(newValue);
   };
-  // End: Handle Code Changes
+  // End: Handle Code Changes with Debounce
+
+  // Start: Sync Raw Input Value with External Changes
+  useEffect(() => {
+    if (value !== undefined) {
+      setRawInputValue(value);
+    }
+  }, [value]);
+
+  // Start: Sync Raw Input Value with Active Tab Changes
+  useEffect(() => {
+    switch (activeTab) {
+      case "html": setRawInputValue(htmlCode); break;
+      case "css": setRawInputValue(cssCode); break;
+      case "js": setRawInputValue(jsCode); break;
+      default: setRawInputValue(htmlCode);
+    }
+  }, [activeTab, htmlCode, cssCode, jsCode]);
+  // End: Sync Raw Input Value with Active Tab Changes
+
+  // Start: Sync Debounced Value to Store
+  useEffect(() => {
+    setCurrentCode(debouncedValue);
+  }, [debouncedValue, activeTab, onChange, setHtmlCode, setCssCode, setJsCode]);
+  // End: Sync Debounced Value to Store
 
   // Start: Cyberpunk Theme Configuration
   const theme = vscodeDark;

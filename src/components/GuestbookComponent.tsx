@@ -28,6 +28,8 @@ export default function GuestbookComponent({ className }: GuestbookComponentProp
   const [entries, setEntries] = useState<GuestbookEntry[]>([]);
   const [username, setUsername] = useState('');
   const [message, setMessage] = useState('');
+  const [honeypot, setHoneypot] = useState('');
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [subscription, setSubscription] = useState<any>(null);
