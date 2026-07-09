@@ -286,6 +286,7 @@ body.dark {
   background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
   overflow: hidden;
 }
+
 /* Start: Rigid Overflow Hidden Container for Marquee Ticker */
 .marquee-rigid-container {
   position: relative;
@@ -315,6 +316,40 @@ body.dark {
   }
 }
 /* End: Responsive Marquee Fix */
+
+/* Start: Hardware Acceleration for Smooth Animations */
+.animate-marquee,
+.crt-flicker {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.animate-marquee:hover {
+  will-change: transform;
+}
+
+.crt-flicker:hover {
+  will-change: transform;
+}
+
+/* Start: Smooth Tabbing Optimization */
+.retro-tab-navigation button {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.retro-tab-button {
+  will-change: transform;
+}
+
+.retro-btn-secondary,
+.retro-btn-primary {
+  will-change: transform;
+}
+/* End: Smooth Tabbing Optimization */
+/* End: Hardware Acceleration for Smooth Animations */
 
 /* Start: Cozy Traditional Malay House SVG Styles */
 .cozy-house-emblem {
@@ -620,4 +655,145 @@ body.dark {
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
 /* End: 90s-Style Retro Error Screen Styles */
+
+/* Start: Retro Error Window Styles */
+.retro-error-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 5000;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.retro-error-window {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border: 2px solid #ff007f;
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(255, 0, 127, 0.5);
+  overflow: hidden;
+  min-width: 300px;
+  max-width: 400px;
+}
+
+.retro-error-title-bar {
+  background: linear-gradient(90deg, #ff007f 0%, #ff6b6b 100%);
+  color: #ffffff;
+  padding: 8px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-pixel, 'VT323', monospace);
+  font-size: 0.875rem;
+  font-weight: bold;
+  border-bottom: 2px solid #ff007f;
+}
+
+.retro-error-close {
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.retro-error-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.retro-error-content {
+  padding: 16px 20px;
+  font-family: var(--font-pixel, 'VT323', monospace);
+}
+
+.retro-error-icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.retro-error-message {
+  color: #ffccd5;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.retro-error-instructions {
+  font-size: 12px;
+  color: #a0a0a0;
+}
+
+.retro-error-instruction {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.retro-error-step {
+  color: #ff6b6b;
+  font-weight: bold;
+}
+
+.retro-blinking {
+  animation: blink-yellow 1.5s infinite;
+}
+
+@keyframes blink-yellow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* End: Retro Error Window Styles */
+
+/* Start: Password Strength Indicator Styles */
+.retro-password-strength-indicator {
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05) dark:bg rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.retro-password-strength-indicator .text-green-500 {
+  color: #22c55e;
+}
+
+.retro-password-strength-indicator .text-emerald-500 {
+  color: #10b981;
+}
+
+.retro-password-strength-indicator .text-yellow-500 {
+  color: #eab308;
+}
+
+.retro-password-strength-indicator .text-orange-500 {
+  color: #f97316;
+}
+
+.retro-password-strength-indicator .text-red-500 {
+  color: #ef4444;
+}
+/* End: Password Strength Indicator Styles */

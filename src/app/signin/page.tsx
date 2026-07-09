@@ -24,6 +24,50 @@ interface SignInResponse {
 }
 // End: Type Definitions
 
+// Start: Retro Error Notification Component
+interface RetroErrorNotificationProps {
+  message: string;
+  onClose: () => void;
+}
+
+function RetroErrorNotification({ message, onClose }: RetroErrorNotificationProps) {
+  return (
+    <div className="retro-error-notification animate-fade-in">
+      <div className="retro-error-window">
+        <div className="retro-error-title-bar">
+          <span className="retro-error-title">⚠️ Notifikasi Ralat</span>
+          <button
+            onClick={onClose}
+            className="retro-error-close"
+            title="Tutup"
+          >
+            ×
+          </button>
+        </div>
+        <div className="retro-error-content">
+          <div className="retro-error-icon">⚠️</div>
+          <div className="retro-error-message">{message}</div>
+          <div className="retro-error-instructions">
+            <div className="retro-error-instruction">
+              <span className="retro-error-step">1.</span>
+              <span>Sila semak emel anda untuk pautan verifikasi</span>
+            </div>
+            <div className="retro-error-instruction">
+              <span className="retro-error-step">2.</span>
+              <span>Tekan "Set Semula Kata Laluan" di bawah</span>
+            </div>
+            <div className="retro-error-instruction">
+              <span className="retro-error-step">3.</span>
+              <span>Atau hubungi sokongan jika masih ada masalah</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+// End: Retro Error Notification Component
+
 // Start: SignInPage Component
 export default function SignInPage() {
   // Start: State Management
@@ -31,6 +75,8 @@ export default function SignInPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [needsVerification, setNeedsVerification] = useState(false);
+  const [showErrorNotification, setShowErrorNotification] = useState(false);
+  const [errorNotificationMessage, setErrorNotificationMessage] = useState('');
   const router = useRouter();
   // End: State Management
 
@@ -49,6 +95,7 @@ export default function SignInPage() {
     setLoading(true);
     setError(null);
     setNeedsVerification(false);
+    setShowErrorNotification(false);
 
     try {
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
@@ -58,24 +105,29 @@ export default function SignInPage() {
 
       if (signInError) {
         if (signInError.message === 'User not found' || signInError.message === 'Invalid login credentials') {
-          throw new Error('Emasukan tidak sah');
-        }
-        if (signInError.message === 'User not confirmed') {
+          const errorMsg = 'Emasukan tidak sah';
+          setError(errorMsg);
+          setErrorNotificationMessage('Emel atau kata laluan tidak tepat. Sila semak dan cuba semula.');
+          setShowErrorNotification(true);
+        } else if (signInError.message === 'User not confirmed') {
           setNeedsVerification(true);
-          return;
+        } else {
+          throw signInError;
         }
-        throw signInError;
       }
 
       if (data?.user && !data.user.email_confirmed_at) {
         setNeedsVerification(true);
-        return;
       }
 
-      router.push('/dashboard');
+      if (!needsVerification && !error) {
+        router.push('/dashboard');
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Log masuk gagal';
       setError(errorMessage);
+      setErrorNotificationMessage(errorMessage);
+      setShowErrorNotification(true);
     } finally {
       setLoading(false);
     }
@@ -87,6 +139,7 @@ export default function SignInPage() {
     setLoading(true);
     setError(null);
     setNeedsVerification(false);
+    setShowErrorNotification(false);
 
     try {
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
@@ -102,14 +155,30 @@ export default function SignInPage() {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Log masuk Google gagal';
       setError(errorMessage);
+      setErrorNotificationMessage(errorMessage);
+      setShowErrorNotification(true);
       setLoading(false);
     }
   };
   // End: Handle Google Sign In
 
+  // Start: Handle Error Notification Close
+  const handleCloseErrorNotification = () => {
+    setShowErrorNotification(false);
+    setError(null);
+  };
+  // End: Handle Error Notification Close
+
   // Start: Render SignInPage Component
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 py-12 px-4 sm:px-6">
+      {showErrorNotification && (
+        <RetroErrorNotification
+          message={errorNotificationMessage}
+          onClose={handleCloseErrorNotification}
+        />
+      )}
+      
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-gray-100">
@@ -118,7 +187,7 @@ export default function SignInPage() {
         </div>
         
         {needsVerification && (
-          <div className="rounded-md bg-yellow-100 dark:bg-yellow-900 p-4">
+          <div className="rounded-md bg-yellow-100 dark:bg-yellow-900 p-4 retro-blinking">
             <p className="text-sm text-yellow-800 dark:text-yellow-200">
               akaun anda belum diverifikasi. Sila semak emel anda untuk pautan verifikasi.
             </p>
@@ -161,7 +230,7 @@ export default function SignInPage() {
             </div>
           </div>
 
-          {error && (
+          {error && !showErrorNotification && (
             <div className="text-sm text-red-600 dark:text-red-400 text-center">
               {error}
             </div>

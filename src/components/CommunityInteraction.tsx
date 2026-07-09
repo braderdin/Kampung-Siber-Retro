@@ -23,6 +23,14 @@ interface Interaction {
   content?: string;
   created_at: string;
 }
+
+interface Reply {
+  id: number;
+  parent_id: number;
+  username: string;
+  content: string;
+  created_at: string;
+}
 // End: Type Definitions
 
 // Start: CommunityInteraction Component
@@ -30,9 +38,11 @@ export default function CommunityInteraction({ username, className }: CommunityI
   // Start: State Management
   const [liked, setLiked] = useState(false);
   const [following, setFollowing] = useState(false);
-  const [comments, setComments] = useState<string[]>([]);
+  const [comments, setComments] = useState<Interaction[]>([]);
   const [newComment, setNewComment] = useState('');
   const [loading, setLoading] = useState(false);
+  const [expandedReplies, setExpandedReplies] = useState<Record<number, boolean>>({});
+  const [replyContent, setReplyContent] = useState<Record<number, string>>({});
   // End: State Management
 
   // Start: Fetch Initial Interactions
@@ -51,7 +61,7 @@ export default function CommunityInteraction({ username, className }: CommunityI
         
         setLiked(likes > 0);
         setFollowing(follows > 0);
-        setComments(userComments.map((item: Interaction) => item.content || ''));
+        setComments(userComments);
       }
     };
 
@@ -119,13 +129,14 @@ export default function CommunityInteraction({ username, className }: CommunityI
     if (newComment.trim()) {
       setLoading(true);
       try {
-        await supabase.from('interactions').insert({
+        const { data: insertedComment } = await supabase.from('interactions').insert({
           username,
           type: 'comment',
           content: newComment.trim(),
           created_at: new Date().toISOString(),
-        });
-        setComments([...comments, newComment.trim()]);
+        }).select();
+        
+        setComments([...comments, ...(insertedComment || [])]);
         setNewComment('');
       } catch (err) {
         console.error('Error adding comment:', err);
@@ -135,6 +146,56 @@ export default function CommunityInteraction({ username, className }: CommunityI
     }
   };
   // End: Handle Comment Submission
+
+  // Start: Handle Reply Submission
+  const handleSubmitReply = async (parentId: number, e: React.FormEvent) => {
+    e.preventDefault();
+    if (!replyContent[parentId]) return;
+    
+    setLoading(true);
+    try {
+      await supabase.from('replies').insert({
+        parent_id: parentId,
+        username,
+        content: replyContent[parentId].trim(),
+        created_at: new Date().toISOString(),
+      });
+      
+      setExpandedReplies(prev => ({ ...prev, [parentId]: false }));
+      setReplyContent(prev => ({ ...prev, [parentId]: '' }));
+    } catch (err) {
+      console.error('Error adding reply:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  // End: Handle Reply Submission
+
+  // Start: Toggle Replies
+  const toggleReplies = (commentId: number) => {
+    setExpandedReplies(prev => ({
+      ...prev,
+      [commentId]: !prev[commentId],
+    }));
+  };
+  // End: Toggle Replies
+
+  // Start: Mock Replies Data
+  const mockReplies: Record<number, Reply[]> = {
+    1: [
+      { id: 101, parent_id: 1, username: 'pixel_lover', content: 'Saya setuju! Perisian ini sangat menarik.', created_at: new Date().toISOString() },
+      { id: 102, parent_id: 1, username: 'code_master', content: 'Terima kasih! Saya juga sedang mengembangkan fungsi baru.', created_at: new Date().toISOString() },
+    ],
+    2: [
+      { id: 103, parent_id: 2, username: 'retro_fan', content: 'Saya ingin menambah sumbangan juga!', created_at: new Date().toISOString() },
+    ],
+    3: [
+      { id: 104, parent_id: 3, username: 'dev_guru', content: 'Saya boleh bantu dengan dokumentasi!', created_at: new Date().toISOString() },
+      { id: 105, parent_id: 3, username: 'doc_wizard', content: 'Saya juga bersedia membantu.', created_at: new Date().toISOString() },
+      { id: 106, parent_id: 3, username: 'help_hero', content: 'Saya ada banyak pengalaman dengan React.', created_at: new Date().toISOString() },
+    ],
+  };
+  // End: Mock Replies Data
 
   // Start: Render CommunityInteraction Component
   return (
@@ -177,10 +238,82 @@ export default function CommunityInteraction({ username, className }: CommunityI
           </div>
         </div>
         
-        <div className="mt-2 space-y-2">
+        <div className="mt-2 space-y-3">
           {comments.map((comment, index) => (
-            <div key={index} className="p-2 bg-gray-100 dark:bg-gray-800 rounded border border-gray-300 dark:border-gray-600">
-              <p className="text-sm text-gray-700 dark:text-gray-300">{comment}</p>
+            <div key={comment.id} className="comment-block">
+              <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded border border-gray-300 dark:border-gray-600">
+                <div className="flex justify-between items-start mb-2">
+                  <span className="font-bold text-gray-800 dark:text-gray-200">
+                    @{comment.username}
+                  </span>
+                  <button
+                    onClick={() => toggleReplies(comment.id)}
+                    className="text-xs text-gray-500 hover:text-blue-500"
+                  >
+                    {expandedReplies[comment.id] ? '🔼' : '🔽'}
+                  </button>
+                </div>
+                <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                  {comment.content}
+                </p>
+                <div className="text-xs text-gray-500 dark:text-gray-400">
+                  {new Date(comment.created_at).toLocaleString()}
+                </div>
+              </div>
+
+              {/* Start: Nested Replies Drawer */}
+              {expandedReplies[comment.id] && (
+                <div className="nested-replies-container mt-2 ml-4 border-l-2 border-purple-500 pl-3">
+                  <div className="retro-nested-comments">
+                    {(mockReplies[comment.id] || []).map((reply) => (
+                      <div key={reply.id} className="nested-reply p-2 bg-gray-50 dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-700 mb-2">
+                        <div className="flex justify-between items-start">
+                          <span className="font-bold text-xs text-gray-700 dark:text-gray-300">
+                            @{reply.username}
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                          {reply.content}
+                        </p>
+                        <div className="text-xs text-gray-400 mt-1">
+                          {new Date(reply.created_at).toLocaleString()}
+                        </div>
+                      </div>
+                    ))}
+                    
+                    {/* Reply Input */}
+                    <form onSubmit={(e) => handleSubmitReply(comment.id)} className="mt-2">
+                      <textarea
+                        value={replyContent[comment.id] || ''}
+                        onChange={(e) => setReplyContent(prev => ({
+                          ...prev,
+                          [comment.id]: e.target.value
+                        }))}
+                        placeholder="Balas komen ini..."
+                        className="w-full retro-input text-xs mb-2"
+                        rows={2}
+                        placeholder="Tulis balasan anda..."
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          type="submit"
+                          disabled={loading}
+                          className="retro-btn-primary text-xs px-2 py-1"
+                        >
+                          Hantar
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setExpandedReplies(prev => ({ ...prev, [comment.id]: false }))}
+                          className="retro-btn-secondary text-xs px-2 py-1"
+                        >
+                          Batal
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>

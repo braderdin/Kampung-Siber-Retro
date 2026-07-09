@@ -22,14 +22,71 @@ interface ToastContextType {
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 // End: Type Definitions
 
+// Start: Audio Notification Hook
+function useSuccessSound() {
+  const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      setAudioContext(ctx);
+    }
+
+    return () => {
+      if (audioContext) {
+        audioContext.close();
+      }
+    };
+  }, []);
+
+  const playSuccessSound = () => {
+    if (!audioContext) return;
+
+    try {
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      const distortion = audioContext.createWaveShaper();
+      
+      const curve = [];
+      for (let i = 0; i < 100; i++) {
+        curve[i] = (i < 50) ? 0 : 1;
+      }
+      distortion.curve = new Float32Array(curve);
+
+      oscillator.type = 'square';
+      oscillator.frequency.setValueAtTime(880, audioContext.currentTime);
+      
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+
+      oscillator.connect(distortion);
+      distortion.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      oscillator.start();
+      oscillator.stop(audioContext.currentTime + 0.3);
+    } catch (err) {
+      console.error('Audio error:', err);
+    }
+  };
+
+  return playSuccessSound;
+}
+// End: Audio Notification Hook
+
 // Start: Toast Provider Component
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const playSuccessSound = useSuccessSound();
 
   // Start: Show Toast Function
   const showToast = (message: string, type: 'success' | 'error' | 'info' | 'warning' = 'info') => {
     const id = Date.now();
     setToasts(prev => [...prev, { id, message, type }]);
+    
+    if (type === 'success') {
+      playSuccessSound();
+    }
     
     setTimeout(() => {
       setToasts(prev => prev.filter((toast) => toast.id !== id));
@@ -96,14 +153,19 @@ export default function RetroToast({
   duration = 3000,
 }: RetroToastProps) {
   const [isVisible, setIsVisible] = useState(true);
+  const playSuccessSound = useSuccessSound();
 
   // Start: Auto Hide Effect
   useEffect(() => {
+    if (type === 'success') {
+      playSuccessSound();
+    }
+    
     const timer = setTimeout(() => {
       setIsVisible(false);
     }, duration);
     return () => clearTimeout(timer);
-  }, [duration]);
+  }, [duration, type, playSuccessSound]);
   // End: Auto Hide Effect
 
   if (!isVisible) return null;

@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useRef, useEffect } from 'react';
 
 interface Track {
@@ -9,6 +10,8 @@ interface Track {
   url: string;
   cover: string;
 }
+
+const CHIPTUNE_URL = 'https://cdn.jsdelivr.net/gh/robbie-clement/retro-music@main/lofi-chiptune-loop.mp3';
 
 export default function WinampPlayer() {
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
@@ -26,8 +29,8 @@ export default function WinampPlayer() {
       title: 'Digital Dreams',
       artist: 'Cyber Wave',
       duration: '3:45',
-      url: '/audio/sample1.mp3',
-      cover: 'https://via.placeholder.com/64',
+      url: CHIPTUNE_URL,
+      cover: 'https://cdn.jsdelivr.net/gh/robbie-clement/retro-music@main/chip-cover.png',
     },
     {
       id: 2,
@@ -35,7 +38,7 @@ export default function WinampPlayer() {
       artist: '80s Synth',
       duration: '4:12',
       url: '/audio/sample2.mp3',
-      cover: 'https://via.placeholder.com/64',
+      cover: 'https://via.placeholder.com/64/00ff7f/ffffff?text=🎵',
     },
     {
       id: 3,
@@ -43,15 +46,20 @@ export default function WinampPlayer() {
       artist: 'Pixel Beats',
       duration: '2:58',
       url: '/audio/sample3.mp3',
-      cover: 'https://via.placeholder.com/64',
+      cover: 'https://via.placeholder.com/64/ff007f/ffffff?text=🎶',
     },
   ];
 
   useEffect(() => {
     if (playlist.length > 0) {
       setCurrentTrack(playlist[0]);
+      setCurrentTime(0);
+      setDuration(0);
+      setIsPlaying(false);
+    } else {
+      loadPlaylist();
     }
-  }, [playlist]);
+  }, []);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -80,6 +88,19 @@ export default function WinampPlayer() {
     };
   }, [playlist]);
 
+  useEffect(() => {
+    if (currentTrack && isPlaying) {
+      const audio = audioRef.current;
+      if (audio && audio.src !== currentTrack.url) {
+        audio.src = currentTrack.url;
+        audio.load();
+        audio.play().catch((err) => {
+          console.error('Playback failed:', err);
+        });
+      }
+    }
+  }, [currentTrack]);
+
   const loadPlaylist = () => {
     setPlaylist(sampleTracks);
     setCurrentTrack(sampleTracks[0]);
@@ -104,7 +125,7 @@ export default function WinampPlayer() {
   };
 
   const playNext = () => {
-    if (!currentTrack) return;
+    if (!currentTrack || !playlist.length) return;
 
     const currentIndex = playlist.findIndex((t) => t.id === currentTrack.id);
     const nextIndex = (currentIndex + 1) % playlist.length;
@@ -125,7 +146,7 @@ export default function WinampPlayer() {
   };
 
   const playPrevious = () => {
-    if (!currentTrack) return;
+    if (!currentTrack || !playlist.length) return;
 
     const currentIndex = playlist.findIndex((t) => t.id === currentTrack.id);
     const prevIndex = (currentIndex - 1 + playlist.length) % playlist.length;
@@ -207,9 +228,39 @@ export default function WinampPlayer() {
     setCurrentTime(seekTime);
   };
 
+  useEffect(() => {
+    if (currentTrack && !isPlaying) {
+      const audio = audioRef.current;
+      if (audio && audio.src === currentTrack.url) {
+        audio.pause();
+      }
+    }
+  }, [isPlaying, currentTrack]);
+
+  useEffect(() => {
+    if (!isPlaying && currentTrack) {
+      const audio = audioRef.current;
+      if (audio && audio.src === currentTrack.url) {
+        audio.play().catch((err) => {
+          console.error('Auto-play failed (may be blocked):', err);
+        });
+        setIsPlaying(true);
+      }
+    }
+  }, [currentTrack]);
+
+  useEffect(() => {
+    if (currentTrack) {
+      const audio = audioRef.current;
+      if (audio) {
+        audio.volume = volume / 100;
+      }
+    }
+  }, [volume]);
+
   return (
     <div className="fixed bottom-4 right-4 z-50">
-      <audio ref={audioRef} preload="none" />
+      <audio ref={audioRef} preload="auto" />
 
       <div className="bg-gradient-to-b from-gray-900 to-gray-800 border-4 border-yellow-400 rounded-none shadow-[8px_8px_0_0_rgba(255,255,0,0.5)] w-[400px] sm:w-[320px] xs:w-[280px] max-w-full">
         <div className="bg-yellow-300 h-4 flex">
@@ -224,7 +275,7 @@ export default function WinampPlayer() {
               {currentTrack?.cover ? (
                 <img src={currentTrack.cover} alt={currentTrack.title} className="w-full h-full object-cover rounded-sm" />
               ) : (
-                <span className="text-xs text-yellow-300">🎵</span>
+                <span className="text-xs text-yellow-300 flex items-center justify-center">🎵</span>
               )}
             </div>
 
