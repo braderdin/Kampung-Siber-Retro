@@ -9,6 +9,7 @@ import HeroSignUpCard from '@/components/HeroSignUpCard';
 import FeaturedSitesGrid from '@/components/FeaturedSitesGrid';
 import FollowActivityFeed from '@/components/FollowActivityFeed';
 import TutorialCard from '@/components/TutorialCard';
+import Shoutbox from '@/components/Shoutbox';
 
 interface DashboardProps {
   className?: string;
@@ -220,6 +221,40 @@ function DashboardContent({ className }: DashboardProps) {
                 Buku Pelawat Retro
               </button>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Start: Shoutbox Component */}
+      <div className="mb-6">
+        <Shoutbox />
+      </div>
+      {/* End: Shoutbox Component */}
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <div className="lg:col-span-1">
+          <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 border border-cyan-500/30 dark:border-pink-500/30">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">
+              {t.tutorials}
+            </h3>
+            <div className="space-y-3">
+              <button
+                onClick={() => alert('Buka senarai tutorial lengkap')}
+                className="w-full retro-btn-secondary text-sm"
+              >
+                📚 Lihat Semua Tutorial
+              </button>
+            </div>
+          </div>
+        </div>
+        <div className="lg:col-span-2">
+          <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6 border border-cyan-500/30 dark:border-pink-500/30">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-3">
+              Shoutbox Komuniti
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
+              Sembang dengan rakan pengguna lain di sini.
+            </p>
           </div>
         </div>
       </div>

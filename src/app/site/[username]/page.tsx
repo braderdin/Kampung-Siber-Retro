@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation';
 import { useState } from 'react';
 import CommunityInteraction from '@/components/CommunityInteraction';
 import CrtThemeController from '@/components/CrtThemeController';
+import WinampPlayer from '@/components/WinampPlayer';
+import CyberBadges from '@/components/CyberBadges';
 
 interface UserSitePageProps {
   params: {
@@ -11,7 +13,6 @@ interface UserSitePageProps {
   };
 }
 
-// Start: UserSitePage Component
 export default function UserSitePage({ params }: UserSitePageProps) {
   const { username } = params;
   const [liked, setLiked] = useState(false);
@@ -21,21 +22,18 @@ export default function UserSitePage({ params }: UserSitePageProps) {
     notFound();
   }
 
-  // Start: Handle Like
   const handleLike = () => {
     setLiked(!liked);
   };
-  // End: Handle Like
 
-  // Start: Handle Follow
   const handleFollow = () => {
     setFollowing(!following);
   };
-  // End: Handle Follow
 
-  // Start: Render UserSitePage Component
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100 p-4">
+      <WinampPlayer />
+
       <div className="retro-window w-full max-w-4xl">
         <div className="retro-window-title-bar">
           <div className="retro-window-title">Laman {username}</div>
@@ -69,17 +67,22 @@ export default function UserSitePage({ params }: UserSitePageProps) {
               <span className="retro-control-name">Siri Tutorial</span>
             </div>
           </div>
+
           <div className="mt-6 rounded border-2 border-gray-300 bg-white p-4 retro-border">
             <p className="text-gray-600">
               Inilah ruang canvas portfolio awam untuk laman web HTML, CSS, dan JS yang dibina oleh warga resident. Kandungan akan dimuatkan secara dinamik berdasarkan pilihan pengguna.
             </p>
           </div>
+
           <div className="mt-6">
             <CommunityInteraction username={username} />
+          </div>
+
+          <div className="mt-6">
+            <CyberBadges />
           </div>
         </div>
       </div>
     </div>
   );
 }
-// End: UserSitePage Component
