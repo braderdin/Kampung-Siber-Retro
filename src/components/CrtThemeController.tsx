@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 const LOCAL_STORAGE_KEY = "crtThemeEnabled";
 
@@ -8,9 +8,43 @@ interface CrtThemeControllerProps {
   className?: string;
 }
 
+// 8-bit mechanical click sound generator using Web Audio API
+function createClickSound(): void {
+  if (typeof window === 'undefined') return;
+  
+  const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+  
+  // Create an oscillator for the click sound
+  const oscillator = audioContext.createOscillator();
+  const gainNode = audioContext.createGain();
+  
+  // Configure for a short, nostalgic mechanical click
+  oscillator.type = 'sine';
+  oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+  
+  // Quick decay for the click effect
+  gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+  gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.05);
+  
+  // Connect and play
+  oscillator.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+  
+  oscillator.start();
+  oscillator.stop(audioContext.currentTime + 0.05);
+}
+
 export default function CrtThemeController({ className }: CrtThemeControllerProps) {
   // Hydration guard – start as null so the first render is skipped on the server
   const [isCrtEnabled, setIsCrtEnabled] = useState<boolean | null>(null);
+  const audioRef = useRef<AudioContext | null>(null);
+
+  // Initialize Web Audio API context on client side only
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !audioRef.current) {
+      audioRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+    }
+  }, []);
 
   // Load persisted value from localStorage on the client
   useEffect(() => {
@@ -20,12 +54,15 @@ export default function CrtThemeController({ className }: CrtThemeControllerProp
     document.documentElement.classList.toggle("crt-theme", enabled);
   }, []);
 
-  // Toggle handler – persist & toggle class on <html>
+  // Toggle handler – persist & toggle class on <html> with click sound effect
   const toggleTheme = () => {
     const newVal = !(isCrtEnabled ?? false);
     setIsCrtEnabled(newVal);
     localStorage.setItem(LOCAL_STORAGE_KEY, String(newVal));
     document.documentElement.classList.toggle("crt-theme", newVal);
+    
+    // Play 8-bit click sound on toggle
+    createClickSound();
   };
 
   // While waiting for hydration, render nothing → avoids SSR mismatch

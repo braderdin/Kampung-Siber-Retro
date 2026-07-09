@@ -40,11 +40,16 @@ function GlitchText({ children, className = '' }: { children: React.ReactNode; c
     </span>
   );
 }
+
 export default function Error404({ error, reset }: ErrorProps) {
   const router = useRouter();
   const [glitchActive, setGlitchActive] = useState(false);
   const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; opacity: number }>>([]);
   const [isClient, setIsClient] = useState(false);
+  const [recoveryUsername, setRecoveryUsername] = useState('');
+
+  // Self-healing recovery state
+  const [recoveryMode, setRecoveryMode] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -64,6 +69,21 @@ export default function Error404({ error, reset }: ErrorProps) {
 
   const handleReset = () => reset();
   const handleGoHome = () => router.push('/');
+
+  // Self-healing recovery handler
+  const handleRecoverySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (recoveryUsername.trim()) {
+      // Client-side route hot-swap recovery without full page reload
+      router.push(`/site/${recoveryUsername.trim()}`);
+    }
+  };
+
+  // Toggle recovery mode
+  const toggleRecoveryMode = () => {
+    setRecoveryMode(!recoveryMode);
+    setRecoveryUsername('');
+  };
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-black relative overflow-hidden">
@@ -157,6 +177,34 @@ export default function Error404({ error, reset }: ErrorProps) {
             </div>
           </div>
 
+          {/* Self-Healing Recovery Input Field */}
+          {recoveryMode && isClient && (
+            <div className="mb-6">
+              <form onSubmit={handleRecoverySubmit} className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2 pixel-font">
+                    Masukkan Nama Pengguna Baru:
+                  </label>
+                  <input
+                    type="text"
+                    value={recoveryUsername}
+                    onChange={(e) => setRecoveryUsername(e.target.value)}
+                    placeholder="contoh: pengguna123"
+                    className="w-full retro-input px-3 py-2 pixel-font text-sm"
+                    maxLength={50}
+                    autoFocus
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="w-full retro-btn-primary text-sm pixel-font py-2 px-4"
+                >
+                  PUNCHI 🔫 (Hot-Swap Recovery)
+                </button>
+              </form>
+            </div>
+          )}
+
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3">
             <button onClick={handleReset} className="retro-btn-primary text-sm pixel-font flex-1 py-2 px-4">
@@ -165,6 +213,22 @@ export default function Error404({ error, reset }: ErrorProps) {
             <button onClick={handleGoHome} className="retro-btn-secondary text-sm pixel-font flex-1 py-2 px-4 border-pink-500 text-pink-400">
               🏠 Halaman Utama
             </button>
+            {!recoveryMode && isClient && (
+              <button
+                onClick={toggleRecoveryMode}
+                className="retro-btn-secondary text-sm pixel-font flex-1 py-2 px-4 border-cyan-500 text-cyan-400"
+              >
+                🩹 PULIHKAN (Self-Healing)
+              </button>
+            )}
+            {recoveryMode && isClient && (
+              <button
+                onClick={toggleRecoveryMode}
+                className="retro-btn-secondary text-sm pixel-font flex-1 py-2 px-4 border-gray-500 text-gray-400"
+              >
+                ✖️ BATAL
+              </button>
+            )}
           </div>
 
           {/* Footer */}

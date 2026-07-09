@@ -22,6 +22,35 @@ interface GuestbookComponentProps {
 }
 // End: Type Definitions
 
+// Start: Input Sanitization Guardrail - XSS Protection
+function sanitizeInput(input: string): string {
+  // Remove any HTML tags using regex
+  let sanitized = input.replace(/<[^>]*>/g, '');
+  
+  // Remove any script tag content specifically
+  sanitized = sanitized.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+  
+  // Remove javascript: protocol URLs
+  sanitized = sanitized.replace(/javascript:/gi, '');
+  
+  // Remove on* event handlers
+  sanitized = sanitized.replace(/\non\w+\s*=/gi, '');
+  
+  // Remove data: URLs that could contain malicious content
+  sanitized = sanitized.replace(/data:\s*[^;]+;base64[^"]*/gi, '');
+  
+  // Remove any remaining potentially dangerous characters
+  sanitized = sanitized.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+  
+  return sanitized.trim();
+}
+
+function sanitizeUsername(username: string): string {
+  // Only allow alphanumeric characters, underscores, and hyphens
+  return username.replace(/[^a-zA-Z0-9_-]/g, '').substring(0, 30);
+}
+// End: Input Sanitization Guardrail - XSS Protection
+
 // Start: GuestbookComponent
 export default function GuestbookComponent({ className }: GuestbookComponentProps) {
   // Start: State Management
@@ -105,7 +134,7 @@ export default function GuestbookComponent({ className }: GuestbookComponentProp
   };
   // End: Format Timestamp
 
-  // Start: Handle Form Submission
+  // Start: Handle Form Submission with XSS Sanitization
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -114,13 +143,21 @@ export default function GuestbookComponent({ className }: GuestbookComponentProp
       return;
     }
     
+    // Apply XSS sanitization to both username and message
+    const sanitizedUsername = sanitizeUsername(username);
+    const sanitizedMessage = sanitizeInput(message);
+    
+    if (sanitizedUsername !== username || sanitizedMessage !== message) {
+      console.warn('Input was sanitized for security');
+    }
+    
     setLoading(true);
     setError(null);
     
     const newEntry: GuestbookEntry = {
       id: Date.now(),
-      username: username.trim(),
-      message: message.trim(),
+      username: sanitizedUsername,
+      message: sanitizedMessage,
       timestamp: new Date().toISOString(),
     };
     
@@ -138,7 +175,7 @@ export default function GuestbookComponent({ className }: GuestbookComponentProp
     
     setLoading(false);
   };
-  // End: Handle Form Submission
+  // End: Handle Form Submission with XSS Sanitization
 
   // Start: Render Guestbook Card
   return (

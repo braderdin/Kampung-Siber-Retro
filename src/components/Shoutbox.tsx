@@ -18,12 +18,22 @@ type AnyChannel = {
   send: (...args: unknown[]) => AnyChannel;
 };
 
+// Rate limiting constants
+const COOLDOWN_DURATION = 5000; // 5 seconds in milliseconds
+const COOLDOWN_LABEL = 'Tunggu';
+
 export default function Shoutbox() {
   const [messages, setMessages] = useState<ShoutboxMessage[]>([]);
   const [inputValue, setInputValue] = useState<string>('');
   const [username, setUsername] = useState<string>('Anonymous');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const channelRef = useRef<AnyChannel | null>(null);
+  
+  // Start: Rate Limiting State
+  const [isCooldownActive, setIsCooldownActive] = useState(false);
+  const [cooldownTimeLeft, setCooldownTimeLeft] = useState(0);
+  const cooldownTimerRef = useRef<NodeJS.Timeout | null>(null);
+  // End: Rate Limiting State
 
   useEffect(() => {
     const storedUsername = localStorage.getItem('username') || 'Anonymous';
@@ -60,16 +70,74 @@ export default function Shoutbox() {
         supabase.removeChannel(channel);
         channelRef.current = null;
       }
+      // Clear cooldown timer on unmount
+      if (cooldownTimerRef.current) {
+        clearInterval(cooldownTimerRef.current);
+      }
     };
   }, []);
+
+  // Start: Cooldown Timer Effect
+  useEffect(() => {
+    if (!isCooldownActive) return;
+
+    const timer = setInterval(() => {
+      setCooldownTimeLeft(prev => {
+        if (prev <= 1000) {
+          setIsCooldownActive(false);
+          return 0;
+        }
+        return prev - 1000;
+      });
+    }, 1000);
+
+    cooldownTimerRef.current = timer;
+
+    return () => {
+      if (cooldownTimerRef.current) {
+        clearInterval(cooldownTimerRef.current);
+      }
+    };
+  }, [isCooldownActive]);
+  // End: Cooldown Timer Effect
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
   };
 
+  const startCooldown = () => {
+    setIsCooldownActive(true);
+    setCooldownTimeLeft(COOLDOWN_DURATION);
+  };
+
+  const handleBroadcast = (message: ShoutboxMessage) => {
+    setMessages(prev => [...prev, message]);
+    setInputValue('');
+
+    if (channelRef.current) {
+      channelRef.current.send({
+        type: 'broadcast',
+        event: 'new_message',
+        payload: {
+          new_message_id: message.id,
+          username: message.username,
+          message: message.message,
+          timestamp: message.timestamp,
+          avatar: message.avatar,
+        },
+      });
+    }
+  };
+
+  // Start: Handle Form Submission with Rate Limiting
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (inputValue.trim() === '') return;
+
+    // Check if cooldown is active
+    if (isCooldownActive) {
+      return;
+    }
 
     const newMessage: ShoutboxMessage = {
       id: Date.now().toString(),
@@ -79,24 +147,22 @@ export default function Shoutbox() {
       avatar: undefined,
     };
 
-    setMessages(prev => [...prev, newMessage]);
-    setInputValue('');
-
-    if (channelRef.current) {
-      channelRef.current.send({
-        type: 'broadcast',
-        event: 'new_message',
-        payload: {
-          new_message_id: newMessage.id,
-          username: newMessage.username,
-          message: newMessage.message,
-          timestamp: newMessage.timestamp,
-          avatar: newMessage.avatar,
-        },
-      });
-    }
+    handleBroadcast(newMessage);
+    
+    // Start cooldown period
+    startCooldown();
   };
+  // End: Handle Form Submission with Rate Limiting
 
+  // Start: Calculate progress for cooldown bar
+  const cooldownProgress = isCooldownActive 
+    ? ((COOLDOWN_DURATION - cooldownTimeLeft) / COOLDOWN_DURATION) * 100 
+    : 0;
+  
+  const cooldownSeconds = Math.ceil(cooldownTimeLeft / 1000);
+  // End: Calculate progress for cooldown bar
+
+  // Start: Render Shoutbox Component
   return (
     <div className="w-full retro-window retro-border">
       <div className="retro-window-title-bar bg-gray-200 dark:bg-gray-700 px-3 py-2 border-b border-gray-300 dark:border-gray-600">
@@ -129,6 +195,24 @@ export default function Shoutbox() {
           ))}
           <div ref={messagesEndRef} />
         </div>
+        
+        {/* Start: Rate Limit Indicator */}
+        {isCooldownActive && (
+          <div className="mb-2">
+            <div className="text-xs text-gray-500 dark:text-gray-400 text-center mb-1">
+              Tunggu {cooldownSeconds}s... (Spam blocked)
+            </div>
+            <div className="w-full h-1 bg-gray-300 dark:bg-gray-600 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-yellow-500 transition-all duration-1000"
+                style={{ width: `${100 - cooldownProgress}%` }}
+              />
+            </div>
+          </div>
+        )}
+        {/* End: Rate Limit Indicator */}
+        
+        {/* Start: Submission Form */}
         <form onSubmit={handleSubmit} className="flex space-x-2">
           <input
             type="text"
@@ -136,14 +220,18 @@ export default function Shoutbox() {
             onChange={handleInputChange}
             placeholder="Tulis mesej anda di sini..."
             className="flex-1 retro-input text-sm px-3 py-2"
+            maxLength={200}
+            disabled={isCooldownActive}
           />
           <button
             type="submit"
-            className="retro-btn-primary px-4 py-2 text-sm"
+            disabled={isCooldownActive || !inputValue.trim()}
+            className={`retro-btn-primary px-4 py-2 text-sm ${isCooldownActive ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            Hantar
+            {isCooldownActive ? `Tunggu ${cooldownSeconds}s...` : 'Hantar'}
           </button>
         </form>
+        {/* End: Submission Form */}
       </div>
     </div>
   );

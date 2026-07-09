@@ -5,6 +5,7 @@ import { useLanguageStore } from '@/store/useLanguageStore';
 import { enDictionary, msDictionary } from '@/i18n/dictionaries';
 import { useEffect, useState } from 'react';
 import UserDropdownMenu from '@/components/UserDropdownMenu';
+import RandomExplorerBtn from '@/components/RandomExplorerBtn';
 
 interface NavItem {
   name: string;
@@ -124,6 +125,15 @@ export default function RetroNavbar() {
             </div>
             {/* End: Language Selector */}
 
+            {/* Start: Random Explorer Button */}
+            <div className="hidden sm:block">
+              <RandomExplorerBtn 
+                label="🌐"
+                className="px-2 py-1 text-xs min-w-[60px]"
+              />
+            </div>
+            {/* End: Random Explorer Button */}
+
             {/* Start: User Dropdown Menu */}
             <UserDropdownMenu />
             {/* End: User Dropdown Menu */}
@@ -160,6 +170,25 @@ export default function RetroNavbar() {
                 <span className="inline-flex items-center gap-1 align-middle">{item.name}</span>
               </button>
             ))}
+            {/* Start: Mobile Random Explorer Button */}
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                const randomIndex = Math.floor(Math.random() * 20);
+                const randomUser = [
+                  'cyber-pioneer', 'pixel-warrior', 'byte-collector', 'retro-hacker', 'glitch-master',
+                  'neon-drifter', 'terminal-wizard', 'code-archaeologist', 'synth-wave', 'digital-trailblazer',
+                  'analog-dreamer', 'floppy-disk', 'modem-rider', ' BBS-legend', 'phreaker-legend',
+                  'telnet-navigator', 'gopher-guru', 'usenet-explorer', 'ftp-finder', 'irc-wanderer'
+                ][randomIndex];
+                router.push('/site/' + randomUser);
+              }}
+              className="flex items-center w-full px-3 py-2 rounded-md text-base font-medium transition-colors text-gray-300 hover:text-white hover:bg-cyan-500/10"
+            >
+              <span className="text-lg mr-2 inline-flex items-center justify-center w-5 h-5">🌐</span>
+              <span className="inline-flex items-center gap-1 align-middle">Jelajah Rawak</span>
+            </button>
+            {/* End: Mobile Random Explorer Button */}
           </div>
         </div>
       )}
