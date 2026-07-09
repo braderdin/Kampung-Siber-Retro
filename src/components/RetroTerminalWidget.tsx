@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 // Start: Type Definitions
 interface RetroTerminalWidgetProps {
@@ -17,6 +17,8 @@ export default function RetroTerminalWidget({ title = 'Coretan Terminal', classN
     'Coretan Terminal aktif.',
     "Taip 'help' untuk melihat arahan.",
   ]);
+  // Ref to the scrollable container for auto‑scroll
+  const containerRef = useRef<HTMLDivElement>(null);
   // End: State Management
 
   // Start: Command Handler
@@ -46,19 +48,43 @@ export default function RetroTerminalWidget({ title = 'Coretan Terminal', classN
   // End: Command Handler
 
   // Start: Render Terminal Widget
+  // Auto‑scroll to bottom whenever history changes
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.scrollTo({ top: containerRef.current.scrollHeight, behavior: 'auto' });
+    }
+  }, [history]);
+
+  // Small typing animation component for each line
+  const TypingLine = ({ text }: { text: string }) => {
+    const [displayed, setDisplayed] = useState('');
+    useEffect(() => {
+      let i = 0;
+      const speed = 20; // ms per character
+      const timer = setInterval(() => {
+        setDisplayed((prev) => prev + text.charAt(i));
+        i++;
+        if (i >= text.length) clearInterval(timer);
+      }, speed);
+      return () => clearInterval(timer);
+    }, [text]);
+    return <div className="whitespace-pre-wrap">{displayed}</div>;
+  };
+
   return (
     <div className={`retro-window border-2 border-pink-500 bg-[#0e1330] p-3 text-sm text-green-200 retro-shadow ${className || ''}`}>
       <div className="mb-2 flex items-center justify-between border-b border-green-800 pb-2">
         <span className="font-bold uppercase tracking-wide text-green-300">{title}</span>
         <span className="rounded bg-green-900/70 px-2 py-1 text-[10px] text-green-100">Live</span>
       </div>
-      <div className="mb-2 h-36 overflow-auto rounded border border-green-900 bg-black/80 p-2 font-mono text-xs leading-5">
-        {history.map((line, index) => (
-          <div key={`${line}-${index}`} className="whitespace-pre-wrap">
-            {line}
-          </div>
-        ))}
-      </div>
+       <div
+         ref={containerRef}
+         className="mb-2 max-h-[70vh] overflow-y-auto rounded border border-green-900 bg-black/80 p-2 font-mono text-xs leading-5"
+       >
+         {history.map((line, index) => (
+           <TypingLine key={`${line}-${index}`} text={line} />
+         ))}
+       </div>
       <div className="flex items-center gap-2 font-mono text-xs">
         <span className="text-green-300">retro@kampung:~$</span>
         <input

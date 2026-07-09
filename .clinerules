@@ -1,1 +1,2 @@
 Respond concisely. Write code directly without long explanations.
+STRICT BACKGROUND RULE: You are strictly forbidden from running the 'code' command or invoking any shell commands that open graphic user interfaces (GUI) or text editors. Read and write all files silently using file system system-calls only.
