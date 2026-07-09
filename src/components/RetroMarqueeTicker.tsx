@@ -1,36 +1,38 @@
 "use client";
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface RetroMarqueeTickerProps {
   messages?: string[];
+  speed?: number;
   className?: string;
 }
 
 export default function RetroMarqueeTicker({ 
   messages = [
-    '🚀 Update Sistem: Server utama dinaik taraf ke v3.2.1 - Prestasi ditingkatkan 40%!',
-    '🎮 Permainan baru: Retro Pong Challenge now live - Try your high score!',
-    '💾 10GB ruang simpan tambahan diberikan kepada semua pengguna!',
-    '🛡️ Keamanan: SSL certificate dipermahukuhkan - koneksi lebih selamat!',
-    '✨ Efek visual baru: CRT flicker mode now available in settings!',
+    '🚀 System Update: New features coming soon!',
+    '🌟 Spotlight: Welcome our newest resident warga!',
+    '🔧 Maintenance: Scheduled downtime tomorrow 2AM',
+    '🎉 Celebration: 1000th resident milestone achieved!',
+    '💡 Tip: Try the new retro terminal command "matrix"'
   ],
-  className 
+  speed = 30,
+  className
 }: RetroMarqueeTickerProps) {
-  const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const marqueeRef = useRef<HTMLDivElement>(null);
-  const messageIndexRef = useRef(0);
+  const [isTouching, setIsTouching] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (!isPaused) {
-        setCurrentMessageIndex(prev => (prev + 1) % messages.length);
+      if (!isPaused && !isTouching) {
+        setCurrentIndex(prev => (prev + 1) % messages.length);
       }
-    }, 8000);
+    }, speed * 1000);
 
     return () => clearInterval(interval);
-  }, [isPaused, messages.length]);
+  }, [isPaused, isTouching, messages.length, speed]);
 
   const handleMouseEnter = () => {
     setIsPaused(true);
@@ -40,13 +42,16 @@ export default function RetroMarqueeTicker({
     setIsPaused(false);
   };
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    e.preventDefault();
-    setIsPaused(true);
+  const handleTouchStart = () => {
+    setIsTouching(true);
   };
 
   const handleTouchEnd = () => {
-    setIsPaused(false);
+    setIsTouching(false);
+  };
+
+  const handleTouchCancel = () => {
+    setIsTouching(false);
   };
 
   return (
@@ -57,12 +62,32 @@ export default function RetroMarqueeTicker({
       onMouseLeave={handleMouseLeave}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchCancel}
     >
-      <div className="retro-marquee-content">
-        <div className="retro-marquee-text">
-          {messages[currentMessageIndex]}
+      {/* Start: Marquee Container */}
+      <div className="marquee-rigid-container">
+        <div className="marquee-content flex items-center justify-center">
+          <span className="pixel-font text-sm md:text-base font-medium text-gray-200 dark:text-gray-100">
+            {messages[currentIndex]}
+          </span>
         </div>
       </div>
+      {/* End: Marquee Container */}
+
+      {/* Start: Status Indicator */}
+      <div className="absolute top-0 right-0 flex items-center gap-2 px-2 py-1 bg-black/50 rounded-l">
+        {isPaused && (
+          <span className="text-xs text-yellow-400 pixel-font animate-pulse">
+            ⏸ Paused
+          </span>
+        )}
+        {isTouching && (
+          <span className="text-xs text-blue-400 pixel-font">
+            📱 Touch
+          </span>
+        )}
+      </div>
+      {/* End: Status Indicator */}
     </div>
   );
 }

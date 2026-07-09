@@ -1,39 +1,36 @@
 "use client";
 import { useState, useEffect, useRef } from 'react';
-import { ShoutboxMessage } from '@/types/shoutbox';
-import { supabase } from '@/lib/supabase';
-import type { RealtimeChannel } from '@supabase/supabase-js';
+import { useLanguageStore } from '@/store/useLanguageStore';
+import { enDictionary, msDictionary } from '@/i18n/dictionaries';
 
-interface BroadcastPayload {
-  new_message_id?: string;
-  username?: string;
-  message?: string;
-  timestamp?: string;
-  avatar?: string;
+interface ShoutboxMessage {
+  id: string;
+  sender: string;
+  content: string;
+  timestamp: string;
+  isRead: boolean;
 }
 
-type AnyChannel = {
-  on: (...args: unknown[]) => AnyChannel;
-  subscribe: () => AnyChannel;
-  send: (...args: unknown[]) => AnyChannel;
-};
+interface ShoutboxProps {
+  className?: string;
+  maxMessages?: number;
+}
 
-// Rate limiting constants
-const COOLDOWN_DURATION = 5000; // 5 seconds in milliseconds
-const COOLDOWN_LABEL = 'Tunggu';
-
-export default function Shoutbox() {
+export default function Shoutbox({ 
+  className,
+  maxMessages = 10 
+}: ShoutboxProps) {
   const [messages, setMessages] = useState<ShoutboxMessage[]>([]);
-  const [inputValue, setInputValue] = useState<string>('');
-  const [username, setUsername] = useState<string>('Anonymous');
+  const [isLoading, setIsLoading] = useState(true);
+  const [inputValue, setInputValue] = useState('');
+  const [username, setUsername] = useState('Anonymous');
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const channelRef = useRef<AnyChannel | null>(null);
-  
-  // Start: Rate Limiting State
+
+  // Rate limiting constants
+  const COOLDOWN_DURATION = 3000;
   const [isCooldownActive, setIsCooldownActive] = useState(false);
   const [cooldownTimeLeft, setCooldownTimeLeft] = useState(0);
   const cooldownTimerRef = useRef<NodeJS.Timeout | null>(null);
-  // End: Rate Limiting State
 
   useEffect(() => {
     const storedUsername = localStorage.getItem('username') || 'Anonymous';
@@ -41,43 +38,36 @@ export default function Shoutbox() {
   }, []);
 
   useEffect(() => {
+    const loadMessages = async () => {
+      setIsLoading(true);
+      try {
+        const storedMessages = localStorage.getItem('shoutbox_messages');
+        if (storedMessages) {
+          const parsedMessages = JSON.parse(storedMessages) as ShoutboxMessage[];
+          const sortedMessages = parsedMessages
+            .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+            .slice(0, maxMessages);
+          setMessages(sortedMessages);
+        } else {
+          setMessages([]);
+        }
+      } catch (error) {
+        console.error('Error loading messages:', error);
+        setMessages([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadMessages();
+  }, [maxMessages]);
+
+  useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages]);
 
-  useEffect(() => {
-    const channel = supabase.channel('shoutbox');
-    channelRef.current = channel as unknown as AnyChannel;
-
-    (channel as unknown as { on: (event: string, opts: Record<string, string>, cb: (payload: BroadcastPayload) => void) => RealtimeChannel })
-      .on('broadcast', { event: 'new_message' }, (payload: BroadcastPayload) => {
-        const receivedMessage: ShoutboxMessage = {
-          id: payload.new_message_id || Date.now().toString(),
-          username: payload.username || 'Anonymous',
-          message: payload.message || '',
-          timestamp: payload.timestamp || new Date().toISOString(),
-          avatar: payload.avatar,
-        };
-
-        setMessages(prev => [...prev, receivedMessage]);
-      });
-
-    channel.subscribe();
-
-    return () => {
-      if (channelRef.current) {
-        supabase.removeChannel(channel);
-        channelRef.current = null;
-      }
-      // Clear cooldown timer on unmount
-      if (cooldownTimerRef.current) {
-        clearInterval(cooldownTimerRef.current);
-      }
-    };
-  }, []);
-
-  // Start: Cooldown Timer Effect
   useEffect(() => {
     if (!isCooldownActive) return;
 
@@ -99,140 +89,164 @@ export default function Shoutbox() {
       }
     };
   }, [isCooldownActive]);
-  // End: Cooldown Timer Effect
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
+  const formatTimeAgo = (timestamp: string): string => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffMinutes = Math.floor((now.getTime() - date.getTime()) / 60000);
+    
+    if (diffMinutes < 1) return 'Just now';
+    if (diffMinutes < 60) return `${diffMinutes}m ago`;
+    if (diffMinutes < 1440) return `${Math.floor(diffMinutes / 60)}h ago`;
+    return date.toLocaleDateString();
   };
 
-  const startCooldown = () => {
-    setIsCooldownActive(true);
-    setCooldownTimeLeft(COOLDOWN_DURATION);
-  };
-
-  const handleBroadcast = (message: ShoutboxMessage) => {
-    setMessages(prev => [...prev, message]);
-    setInputValue('');
-
-    if (channelRef.current) {
-      channelRef.current.send({
-        type: 'broadcast',
-        event: 'new_message',
-        payload: {
-          new_message_id: message.id,
-          username: message.username,
-          message: message.message,
-          timestamp: message.timestamp,
-          avatar: message.avatar,
-        },
-      });
-    }
-  };
-
-  // Start: Handle Form Submission with Rate Limiting
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (inputValue.trim() === '') return;
-
-    // Check if cooldown is active
-    if (isCooldownActive) {
-      return;
-    }
+    if (inputValue.trim() === '' || isCooldownActive) return;
 
     const newMessage: ShoutboxMessage = {
       id: Date.now().toString(),
-      username: username,
-      message: inputValue.trim(),
+      sender: username,
+      content: inputValue.trim(),
       timestamp: new Date().toISOString(),
-      avatar: undefined,
+      isRead: false,
     };
 
-    handleBroadcast(newMessage);
-    
-    // Start cooldown period
-    startCooldown();
-  };
-  // End: Handle Form Submission with Rate Limiting
+    const updatedMessages = [newMessage, ...messages];
+    setMessages(updatedMessages.slice(0, maxMessages));
+    setInputValue('');
+    setIsCooldownActive(true);
+    setCooldownTimeLeft(COOLDOWN_DURATION);
 
-  // Start: Calculate progress for cooldown bar
+    // Save to localStorage
+    localStorage.setItem('shoutbox_messages', JSON.stringify(updatedMessages.slice(0, maxMessages)));
+  };
+
+  const markAsRead = (id: string) => {
+    setMessages(prev => 
+      prev.map(msg => 
+        msg.id === id ? { ...msg, isRead: true } : msg
+      )
+    );
+  };
+
+  if (isLoading) {
+    return (
+      <div className={`shoutbox ${className || ''}`}>
+        <div className="text-center py-4 text-gray-500 dark:text-gray-400 pixel-font">
+          Loading messages...
+        </div>
+      </div>
+    );
+  }
+
   const cooldownProgress = isCooldownActive 
     ? ((COOLDOWN_DURATION - cooldownTimeLeft) / COOLDOWN_DURATION) * 100 
     : 0;
   
   const cooldownSeconds = Math.ceil(cooldownTimeLeft / 1000);
-  // End: Calculate progress for cooldown bar
 
-  // Start: Render Shoutbox Component
   return (
-    <div className="w-full retro-window retro-border">
-      <div className="retro-window-title-bar bg-gray-200 dark:bg-gray-700 px-3 py-2 border-b border-gray-300 dark:border-gray-600">
-        <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200">
-          <span className="mr-2">💬</span>
-          Shoutbox Komuniti
+    <div className={`shoutbox ${className || ''}`}>
+      {/* Start: Box Header */}
+      <div className="shoutbox-header bg-gray-800 dark:bg-gray-700 px-3 py-2 border-b border-gray-600 dark:border-gray-500 flex justify-between items-center">
+        <h3 className="text-sm font-bold text-gray-100 dark:text-gray-200 pixel-font flex items-center gap-2">
+          <span className="text-lg">💬</span>
+          <span>Shoutbox Komuniti</span>
         </h3>
       </div>
-      <div className="retro-window-client p-4">
-        <div className="mb-4 max-h-[350px] overflow-y-auto space-y-2">
-          {messages.map((msg) => (
-            <div key={msg.id} className="p-3 bg-gray-50 dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
-              <div className="flex items-start space-x-2">
-                {msg.avatar ? (
-                  <img src={msg.avatar} alt={msg.username} className="w-8 h-8 rounded-full" />
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-xs font-bold text-gray-700 dark:text-gray-300">
-                    {msg.username.charAt(0)}
-                  </div>
-                )}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center space-x-2">
-                    <span className="font-semibold text-sm text-gray-900 dark:text-gray-100">{msg.username}</span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">{new Date(msg.timestamp).toLocaleTimeString()}</span>
-                  </div>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">{msg.message}</p>
+      {/* End: Box Header */}
+
+      {/* Start: Message List */}
+      <div className="shoutbox-messages max-h-60 overflow-y-auto">
+        {messages.length === 0 ? (
+          <div className="shoutbox-empty p-4 text-center">
+            <div className="text-3xl mb-2">📭</div>
+            <p className="text-gray-500 dark:text-gray-400 text-sm pixel-font">
+              No messages yet
+            </p>
+          </div>
+        ) : (
+          <div className="divide-y divide-gray-700 dark:divide-gray-600">
+            {messages.map((msg) => (
+              <div
+                key={msg.id}
+                onClick={() => markAsRead(msg.id)}
+                className={`shoutbox-item p-3 hover:bg-gray-700 dark:hover:bg-gray-600 cursor-pointer transition-colors ${
+                  !msg.isRead ? 'bg-gray-750 dark:bg-gray-650' : ''
+                }`}
+              >
+                <div className="flex justify-between items-start mb-1">
+                  <span className="text-xs font-medium text-purple-300 pixel-font">
+                    {msg.sender}
+                  </span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400 pixel-font">
+                    {formatTimeAgo(msg.timestamp)}
+                  </span>
                 </div>
+                <p className="text-sm text-gray-200 dark:text-gray-300 pixel-font break-words">
+                  {msg.content.length > 100 
+                    ? `${msg.content.substring(0, 100)}...` 
+                    : msg.content
+                  }
+                </p>
+                {!msg.isRead && (
+                  <div className="mt-2 w-2 h-2 bg-purple-400 rounded-full"></div>
+                )}
               </div>
-            </div>
-          ))}
-          <div ref={messagesEndRef} />
-        </div>
-        
-        {/* Start: Rate Limit Indicator */}
-        {isCooldownActive && (
-          <div className="mb-2">
-            <div className="text-xs text-gray-500 dark:text-gray-400 text-center mb-1">
-              Tunggu {cooldownSeconds}s... (Spam blocked)
-            </div>
-            <div className="w-full h-1 bg-gray-300 dark:bg-gray-600 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-yellow-500 transition-all duration-1000"
-                style={{ width: `${100 - cooldownProgress}%` }}
-              />
-            </div>
+            ))}
           </div>
         )}
-        {/* End: Rate Limit Indicator */}
-        
-        {/* Start: Submission Form */}
-        <form onSubmit={handleSubmit} className="flex space-x-2">
-          <input
-            type="text"
-            value={inputValue}
-            onChange={handleInputChange}
-            placeholder="Tulis mesej anda di sini..."
-            className="flex-1 retro-input text-sm px-3 py-2"
-            maxLength={200}
-            disabled={isCooldownActive}
-          />
-          <button
-            type="submit"
-            disabled={isCooldownActive || !inputValue.trim()}
-            className={`retro-btn-primary px-4 py-2 text-sm ${isCooldownActive ? 'opacity-50 cursor-not-allowed' : ''}`}
-          >
-            {isCooldownActive ? `Tunggu ${cooldownSeconds}s...` : 'Hantar'}
-          </button>
-        </form>
-        {/* End: Submission Form */}
       </div>
+      {/* End: Message List */}
+
+      {/* Start: Rate Limit Indicator */}
+      {isCooldownActive && (
+        <div className="mb-2">
+          <div className="text-xs text-gray-500 dark:text-gray-400 text-center mb-1">
+            Wait {cooldownSeconds}s... (Spam blocked)
+          </div>
+          <div className="w-full h-1 bg-gray-300 dark:bg-gray-600 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-yellow-500 transition-all duration-1000"
+              style={{ width: `${100 - cooldownProgress}%` }}
+            />
+          </div>
+        </div>
+      )}
+      {/* End: Rate Limit Indicator */}
+
+      {/* Start: Message Form */}
+      <form onSubmit={handleSendMessage} className="flex space-x-2">
+        <input
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          placeholder="Type your message..."
+          className="flex-1 retro-input text-sm px-3 py-2"
+          maxLength={200}
+          disabled={isCooldownActive}
+        />
+        <button
+          type="submit"
+          disabled={isCooldownActive || !inputValue.trim()}
+          className={`retro-btn-primary px-4 py-2 text-sm ${isCooldownActive ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
+          {isCooldownActive ? `Wait ${cooldownSeconds}s...` : 'Send'}
+        </button>
+      </form>
+      {/* End: Message Form */}
+
+      {/* Start: Footer */}
+      {messages.length > 0 && (
+        <div className="shoutbox-footer bg-gray-800 dark:bg-gray-700 px-3 py-2 border-t border-gray-600 dark:border-gray-500 text-center">
+          <span className="text-xs text-gray-400 dark:text-gray-300 pixel-font">
+            {messages.length} messages
+          </span>
+        </div>
+      )}
+      {/* End: Footer */}
     </div>
   );
 }

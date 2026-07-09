@@ -4,7 +4,6 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { enDictionary, msDictionary } from '@/i18n/dictionaries';
 import { useEffect, useState } from 'react';
-import UserDropdownMenu from '@/components/UserDropdownMenu';
 import RandomExplorerBtn from '@/components/RandomExplorerBtn';
 
 interface NavItem {
@@ -26,7 +25,7 @@ export default function RetroNavbar() {
     { name: t.dashboardTitle, href: '/dashboard', icon: '🏠' },
     { name: t.fileEditor, href: '/site_files', icon: '📝' },
     { name: t.guestbookTitle, href: '/browse', icon: '📘' },
-    { name: t.settings, href: '/search', icon: '⚙️' },
+    { name: t.settings, href: '/settings', icon: '⚙️' },
   ];
 
   useEffect(() => {
@@ -134,17 +133,13 @@ export default function RetroNavbar() {
             </div>
             {/* End: Random Explorer Button */}
 
-            {/* Start: User Dropdown Menu */}
-            <UserDropdownMenu />
-            {/* End: User Dropdown Menu */}
-
             {/* Start: Dark Mode Toggle */}
             <button
               onClick={handleDarkModeToggle}
               className="retro-btn-secondary text-xs px-2 py-1 flex items-center space-x-1 border-pink-400 hover:border-pink-300 min-w-[80px] justify-center"
             >
-              <span className="inline-flex items-center justify-center w-5 h-5">{isDarkMode ? '🌙' : '☀️'}</span>
-              <span className="hidden sm:inline inline-flex items-center gap-1 align-middle">{isDarkMode ? t.greetings.hello : 'Penapis CRT'}</span>
+              <span className="inline-flex items-center justify-center w-5 h-5">{isDarkMode ? '☀️' : '🌙'}</span>
+              <span className="hidden sm:inline inline-flex items-center gap-1 align-middle">{isDarkMode ? t.modernTheme : t.crtTheme}</span>
             </button>
             {/* End: Dark Mode Toggle */}
           </div>
@@ -178,7 +173,7 @@ export default function RetroNavbar() {
                 const randomUser = [
                   'cyber-pioneer', 'pixel-warrior', 'byte-collector', 'retro-hacker', 'glitch-master',
                   'neon-drifter', 'terminal-wizard', 'code-archaeologist', 'synth-wave', 'digital-trailblazer',
-                  'analog-dreamer', 'floppy-disk', 'modem-rider', ' BBS-legend', 'phreaker-legend',
+                  'analog-dreamer', 'floppy-disk', 'modem-rider', 'BBS-legend', 'phreaker-legend',
                   'telnet-navigator', 'gopher-guru', 'usenet-explorer', 'ftp-finder', 'irc-wanderer'
                 ][randomIndex];
                 router.push('/site/' + randomUser);

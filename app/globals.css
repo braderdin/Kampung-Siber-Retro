@@ -410,6 +410,62 @@ body.dark {
   animation: cyber-pulse 3s ease-in-out infinite;
 }
 /* End: Cyberpunk CodeMirror Editor Styles */
+
+/* Start: Hardware Acceleration for Animated Elements */
+.animate-marquee {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.crt-flicker {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.neon-pulse {
+  will-change: box-shadow, transform;
+  transform: translateZ(0);
+}
+
+.retro-btn-primary:hover {
+  will-change: transform, box-shadow;
+  transform: translateZ(0);
+}
+
+.retro-window {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.retro-card {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.retro-alert-banner {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+.retro-toast-item {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+.pixel-cursor-canvas {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.marquee-content {
+  will-change: transform;
+  transform: translateZ(0);
+}
+/* End: Hardware Acceleration for Animated Elements */
+
 /* Start: 90s-Style Retro Error Screen Styles */
 .error-screen {
   background: linear-gradient(135deg, #0a0a1a 0%, #1a0a2a 50%, #0a0a1a 100%);

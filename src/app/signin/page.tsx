@@ -1,17 +1,13 @@
-// Start: Imports
-'use client';
-import { useState } from 'react';
+"use client";
+
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
-// End: Imports
 
-// Start: Supabase Client Configuration
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_KEY || 'placeholder-key';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
-// End: Supabase Client Configuration
 
-// Start: Type Definitions
 interface SignInFormData {
   email: string;
   password: string;
@@ -22,17 +18,32 @@ interface SignInResponse {
   error?: string;
   needsVerification?: boolean;
 }
-// End: Type Definitions
 
-// Start: Retro Error Notification Component
 interface RetroErrorNotificationProps {
   message: string;
   onClose: () => void;
+  isBlinking?: boolean;
 }
 
-function RetroErrorNotification({ message, onClose }: RetroErrorNotificationProps) {
+function RetroErrorNotification({ message, onClose, isBlinking = false }: RetroErrorNotificationProps) {
+  const notificationRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isBlinking && notificationRef.current) {
+      const interval = setInterval(() => {
+        if (notificationRef.current) {
+          notificationRef.current.classList.toggle('retro-blink-animation');
+        }
+      }, 500);
+      return () => clearInterval(interval);
+    }
+  }, [isBlinking]);
+
   return (
-    <div className="retro-error-notification animate-fade-in">
+    <div 
+      ref={notificationRef}
+      className="retro-error-notification animate-fade-in retro-blinking"
+    >
       <div className="retro-error-window">
         <div className="retro-error-title-bar">
           <span className="retro-error-title">⚠️ Notifikasi Ralat</span>
@@ -66,36 +77,31 @@ function RetroErrorNotification({ message, onClose }: RetroErrorNotificationProp
     </div>
   );
 }
-// End: Retro Error Notification Component
 
-// Start: SignInPage Component
 export default function SignInPage() {
-  // Start: State Management
   const [formData, setFormData] = useState<SignInFormData>({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [needsVerification, setNeedsVerification] = useState(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [errorNotificationMessage, setErrorNotificationMessage] = useState('');
+  const [isBlinking, setIsBlinking] = useState(false);
   const router = useRouter();
-  // End: State Management
 
-  // Start: Handle Input Changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
   };
-  // End: Handle Input Changes
 
-  // Start: Handle Form Submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     setNeedsVerification(false);
     setShowErrorNotification(false);
+    setIsBlinking(false);
 
     try {
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
@@ -109,6 +115,7 @@ export default function SignInPage() {
           setError(errorMsg);
           setErrorNotificationMessage('Emel atau kata laluan tidak tepat. Sila semak dan cuba semula.');
           setShowErrorNotification(true);
+          setIsBlinking(true);
         } else if (signInError.message === 'User not confirmed') {
           setNeedsVerification(true);
         } else {
@@ -128,18 +135,18 @@ export default function SignInPage() {
       setError(errorMessage);
       setErrorNotificationMessage(errorMessage);
       setShowErrorNotification(true);
+      setIsBlinking(true);
     } finally {
       setLoading(false);
     }
   };
-  // End: Handle Form Submission
 
-  // Start: Handle Google Sign In
   const handleGoogleSignIn = async () => {
     setLoading(true);
     setError(null);
     setNeedsVerification(false);
     setShowErrorNotification(false);
+    setIsBlinking(false);
 
     try {
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
@@ -157,31 +164,30 @@ export default function SignInPage() {
       setError(errorMessage);
       setErrorNotificationMessage(errorMessage);
       setShowErrorNotification(true);
+      setIsBlinking(true);
       setLoading(false);
     }
   };
-  // End: Handle Google Sign In
 
-  // Start: Handle Error Notification Close
   const handleCloseErrorNotification = () => {
     setShowErrorNotification(false);
     setError(null);
+    setIsBlinking(false);
   };
-  // End: Handle Error Notification Close
 
-  // Start: Render SignInPage Component
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 py-12 px-4 sm:px-6">
+    <main className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 py-12 px-4 sm:px-6">
       {showErrorNotification && (
         <RetroErrorNotification
           message={errorNotificationMessage}
           onClose={handleCloseErrorNotification}
+          isBlinking={isBlinking}
         />
       )}
       
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-gray-100">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-gray-100 pixel-font">
             Hey there! Log Masuk ke akaun anda
           </h2>
         </div>
@@ -282,7 +288,6 @@ export default function SignInPage() {
           {/* End: Password Recovery Links */}
         </form>
       </div>
-    </div>
+    </main>
   );
 }
-// End: SignInPage Component

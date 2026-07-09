@@ -1,226 +1,315 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-interface WebringSite {
-  id: number;
-  name: string;
-  url: string;
-  description: string;
+interface ResidentProfile {
+  username: string;
+  displayName: string;
+  status: string;
+  lastActive: string;
   avatar: string;
-  tagline: string;
-  visits: number;
 }
 
 interface WebringFooterProps {
   className?: string;
 }
 
-const webringSites: WebringSite[] = [
+// Comprehensive mock catalog of resident village usernames
+const RESIDENT_CATALOG: ResidentProfile[] = [
   {
-    id: 1,
-    name: 'Retro Code Haven',
-    url: 'https://retrocode.haven',
-    description: 'A sanctuary for retro coding enthusiasts building pixel-perfect websites',
-    avatar: '🖥️',
-    tagline: 'Code in 8-bit',
-    visits: 1245,
+    username: 'cyber_pioneer',
+    displayName: 'Cyber Pioneer',
+    status: 'online',
+    lastActive: 'Just now',
+    avatar: '🚀'
   },
   {
-    id: 2,
-    name: 'Pixel Paradise',
-    url: 'https://pixel.paradise',
-    description: 'Where pixels meet purpose - crafting digital dreams one frame at a time',
-    avatar: '🎨',
-    tagline: 'Art in pixels',
-    visits: 987,
+    username: 'pixel_warrior',
+    displayName: 'Pixel Warrior',
+    status: 'coding',
+    lastActive: '5 min ago',
+    avatar: '⚔️'
   },
   {
-    id: 3,
-    name: 'Neon Nexus',
-    url: 'https://neon.nexus',
-    description: 'Connect the neon dots - bridging retro aesthetics with modern functionality',
-    avatar: '⚡',
-    tagline: 'Neon vibes',
-    visits: 876,
+    username: 'byte_collector',
+    displayName: 'Byte Collector',
+    status: 'online',
+    lastActive: '2 min ago',
+    avatar: '💎'
   },
   {
-    id: 4,
-    name: 'Byte Bazaar',
-    url: 'https://byte.bazaar',
-    description: 'Trading bytes since forever - a marketplace of code and creativity',
-    avatar: '🛒',
-    tagline: 'Trade in bytes',
-    visits: 754,
+    username: 'retro_hacker',
+    displayName: 'Retro Hacker',
+    status: 'coding',
+    lastActive: '1 hour ago',
+    avatar: '🔧'
   },
   {
-    id: 5,
-    name: 'Glitch Garden',
-    url: 'https://glitch.garden',
-    description: 'Cultivating digital anomalies - where bugs become features',
-    avatar: '🌿',
-    tagline: 'Grow glitches',
-    visits: 642,
+    username: 'neon_drifter',
+    displayName: 'Neon Drifter',
+    status: 'makan',
+    lastActive: '30 min ago',
+    avatar: '🌙'
   },
   {
-    id: 6,
-    name: 'Synthwave Station',
-    url: 'https://synth.station',
-    description: 'Streaming retro waves and coding to the beat of 80s synth',
-    avatar: '🎹',
-    tagline: 'Wave after wave',
-    visits: 543,
+    username: 'terminal_wizard',
+    displayName: 'Terminal Wizard',
+    status: 'online',
+    lastActive: 'Just now',
+    avatar: '🧙'
   },
   {
-    id: 7,
-    name: 'Terminal Tavern',
-    url: 'https://terminal.tavern',
-    description: 'Pull up a chair at the digital bar - where CLI commands flow like drinks',
-    avatar: '🍺',
-    tagline: 'CLI & Chill',
-    visits: 432,
+    username: 'code_archaeologist',
+    displayName: 'Code Archaeologist',
+    status: 'online',
+    lastActive: '10 min ago',
+    avatar: '🏺'
   },
   {
-    id: 8,
-    name: 'Vintage Vibes',
-    url: 'https://vintage.vibes',
-    description: 'Capturing the essence of digital nostalgia with modern flair',
-    avatar: '📻',
-    tagline: 'Old school new cool',
-    visits: 389,
+    username: 'synth_wave',
+    displayName: 'Synth Wave',
+    status: 'coding',
+    lastActive: '3 hours ago',
+    avatar: '🎹'
   },
   {
-    id: 9,
-    name: 'Circuit Circus',
-    url: 'https://circuit.circus',
-    description: 'A electrifying showcase of hardware-inspired web design',
-    avatar: '⚙️',
-    tagline: 'Electric webs',
-    visits: 321,
+    username: 'digital_trailblazer',
+    displayName: 'Digital Trailblazer',
+    status: 'online',
+    lastActive: 'Just now',
+    avatar: '🧭'
   },
   {
-    id: 10,
-    name: 'DOS Domain',
-    url: 'https://dos.domain',
-    description: 'Pure command-line experience with a retro interface twist',
-    avatar: '💿',
-    tagline: 'Dust to digital',
-    visits: 287,
+    username: 'analog_dreamer',
+    displayName: 'Analog Dreamer',
+    status: 'makan',
+    lastActive: '45 min ago',
+    avatar: '🌅'
   },
+  {
+    username: 'floppy_disk',
+    displayName: 'Floppy Disk',
+    status: 'online',
+    lastActive: '15 min ago',
+    avatar: '💾'
+  },
+  {
+    username: 'modem_rider',
+    displayName: 'Modem Rider',
+    status: 'coding',
+    lastActive: '2 hours ago',
+    avatar: '📡'
+  },
+  {
+    username: 'BBS_legend',
+    displayName: 'BBS Legend',
+    status: 'online',
+    lastActive: 'Just now',
+    avatar: '📞'
+  },
+  {
+    username: 'phreaker_legend',
+    displayName: 'Phreaker Legend',
+    status: 'online',
+    lastActive: '5 min ago',
+    avatar: '📱'
+  },
+  {
+    username: 'telnet_navigator',
+    displayName: 'Telnet Navigator',
+    status: 'coding',
+    lastActive: '1 hour ago',
+    avatar: '🔗'
+  },
+  {
+    username: 'gopher_guru',
+    displayName: 'Gopher Guru',
+    status: 'online',
+    lastActive: '10 min ago',
+    avatar: '🐹'
+  },
+  {
+    username: 'usenet_explorer',
+    displayName: 'Usenet Explorer',
+    status: 'online',
+    lastActive: 'Just now',
+    avatar: '📰'
+  },
+  {
+    username: 'ftp_finder',
+    displayName: 'FTP Finder',
+    status: 'makan',
+    lastActive: '20 min ago',
+    avatar: '📁'
+  },
+  {
+    username: 'irc_wanderer',
+    displayName: 'IRC Wanderer',
+    status: 'online',
+    lastActive: '30 min ago',
+    avatar: '💬'
+  },
+  {
+    username: 'glitch_master',
+    displayName: 'Glitch Master',
+    status: 'coding',
+    lastActive: '4 hours ago',
+    avatar: '⚡'
+  }
 ];
 
 export default function WebringFooter({ className }: WebringFooterProps) {
-  const [currentSiteIndex, setCurrentSiteIndex] = useState(0);
-  const [isNavigating, setIsNavigating] = useState(false);
+  const [residents, setResidents] = useState<ResidentProfile[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-  const navigateToPrevious = () => {
-    setIsNavigating(true);
-    const newIndex = currentSiteIndex === 0 
-      ? webringSites.length - 1 
-      : currentSiteIndex - 1;
-    setCurrentSiteIndex(newIndex);
-    setTimeout(() => setIsNavigating(false), 500);
-  };
+  useEffect(() => {
+    // Load residents from localStorage or use mock data
+    const storedResidents = localStorage.getItem('resident_profiles');
+    if (storedResidents) {
+      try {
+        const parsed = JSON.parse(storedResidents);
+        setResidents(parsed);
+      } catch (err) {
+        setResidents(RESIDENT_CATALOG);
+      }
+    } else {
+      setResidents(RESIDENT_CATALOG);
+    }
+  }, []);
 
-  const navigateToRandom = () => {
-    setIsNavigating(true);
-    const randomIndex = Math.floor(Math.random() * webringSites.length);
-    setCurrentSiteIndex(randomIndex);
-    setTimeout(() => setIsNavigating(false), 500);
-  };
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex(prev => (prev + 1) % residents.length);
+    }, 5000);
 
-  const navigateToNext = () => {
-    setIsNavigating(true);
-    const newIndex = currentSiteIndex === webringSites.length - 1 
-      ? 0 
-      : currentSiteIndex + 1;
-    setCurrentSiteIndex(newIndex);
-    setTimeout(() => setIsNavigating(false), 500);
-  };
+    return () => clearInterval(interval);
+  }, [residents.length]);
 
-  const currentSite = webringSites[currentSiteIndex];
-
-  const handleSiteClick = (url: string) => {
-    if (url.startsWith('https://') || url.startsWith('http://')) {
-      window.open(url, '_blank');
+  const getStatusColor = (status: string): string => {
+    switch (status) {
+      case 'online':
+        return 'text-green-500';
+      case 'coding':
+        return 'text-blue-500';
+      case 'makan':
+        return 'text-amber-500';
+      default:
+        return 'text-gray-500';
     }
   };
 
-  return (
-    <div className={`retro-webring-footer ${className || ''}`}>
-      <div className="retro-footer-grid">
-        <div className="retro-nav-buttons flex flex-col sm:flex-row gap-2">
-          <button
-            onClick={navigateToPrevious}
-            disabled={isNavigating}
-            className="retro-btn-secondary text-xs px-3 py-1"
-          >
-            ⏪ Sebelum
-          </button>
-          
-          <button
-            onClick={navigateToRandom}
-            disabled={isNavigating}
-            className="retro-btn-secondary text-xs px-3 py-1"
-          >
-            🎲 Rawak
-          </button>
-          
-          <button
-            onClick={navigateToNext}
-            disabled={isNavigating}
-            className="retro-btn-secondary text-xs px-3 py-1"
-          >
-            Seterus ⏩
-          </button>
-        </div>
+  const getStatusIcon = (status: string): string => {
+    switch (status) {
+      case 'online':
+        return '●';
+      case 'coding':
+        return '⌨️';
+      case 'makan':
+        return '☕';
+      default:
+        return '○';
+    }
+  };
 
-        <div className="retro-site-info text-center sm:text-right">
-          <div className="font-mono text-sm text-gray-700 dark:text-gray-300">
-            <span className="text-gray-500 dark:text-gray-400">Situs Semasa: </span>
-            <span className="font-bold text-purple-400 dark:text-purple-300">
-              {currentSite.name}
+  const displayResidents = residents.slice(currentIndex, currentIndex + 5);
+  if (displayResidents.length < 5) {
+    displayResidents.push(...residents.slice(0, 5 - displayResidents.length));
+  }
+
+  return (
+    <footer className={`webring-footer ${className || ''}`}>
+      {/* Start: Webring Header */}
+      <div className="retro-window mb-4">
+        <div className="retro-window-header bg-gradient-to-r from-purple-900 to-pink-900 px-4 py-2 border-b border-pink-500">
+          <h3 className="text-sm font-bold text-white pixel-font flex items-center gap-2">
+            <span className="text-xl">🕸️</span>
+            <span>Webring - Resident Village Loop</span>
+          </h3>
+        </div>
+        <div className="p-4">
+          {/* Start: Resident Profiles */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+            {displayResidents.map((resident, index) => (
+              <div
+                key={`${resident.username}-${index}`}
+                className="retro-card retro-window-sm p-3"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">{resident.avatar}</span>
+                  <div className="min-w-0">
+                    <div className="font-bold text-sm text-gray-800 dark:text-gray-200 truncate">
+                      @{resident.username}
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                      <span className={getStatusColor(resident.status)}>
+                        {getStatusIcon(resident.status)}
+                      </span>
+                      <span className="truncate">
+                        {resident.status === 'online' ? 'Online' : resident.status === 'coding' ? 'Koding' : 'Makan'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          {/* End: Resident Profiles */}
+
+          {/* Start: Navigation Controls */}
+          <div className="mt-3 flex justify-center gap-2">
+            <button
+              onClick={() => setCurrentIndex(prev => prev > 0 ? prev - 1 : residents.length - 1)}
+              className="retro-btn-secondary text-xs px-2 py-1"
+              aria-label="Previous residents"
+            >
+              ← Prev
+            </button>
+            <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+              <span>{currentIndex + 1}</span>
+              <span>/</span>
+              <span>{residents.length}</span>
+            </div>
+            <button
+              onClick={() => setCurrentIndex(prev => (prev + 1) % residents.length)}
+              className="retro-btn-secondary text-xs px-2 py-1"
+              aria-label="Next residents"
+            >
+              Next →
+            </button>
+          </div>
+          {/* End: Navigation Controls */}
+        </div>
+      </div>
+      {/* End: Webring Header */}
+
+      {/* Start: Webring Footer */}
+      <div className="retro-window-footer bg-gray-800/50 dark:bg-gray-900/50 px-4 py-3 border-t border-gray-300 dark:border-gray-600">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-gray-400 dark:text-gray-300">
+          <div className="flex items-center gap-4">
+            <span className="pixel-font">
+              🏠 Kampung Siber Retro Webring
+            </span>
+            <span className="hidden sm:inline">
+              • 
+            </span>
+            <span className="pixel-font">
+              {residents.length} Warga Aktif
             </span>
           </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            {currentSite.description}
-          </div>
-          <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-            <span className="mr-1">👁️:</span> {currentSite.visits.toLocaleString()} kunjungan
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => window.location.reload()}
+              className="retro-btn-secondary text-xs px-2 py-1 hover:text-white"
+            >
+              🔄 Refresh
+            </button>
+            <span className="pixel-font">
+              © 2024 Kampung Siber Retro
+            </span>
           </div>
         </div>
-
-        <div className="retro-site-list hidden sm:block">
-          <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-            Rangkaian Wargalaya:
-          </div>
-          <ul className="space-y-1">
-            {webringSites.map((site, index) => (
-              <li
-                key={site.id}
-                onClick={() => handleSiteClick(site.url)}
-                className={`text-xs cursor-pointer hover:text-purple-400 dark:hover:text-purple-300 transition-colors ${
-                  index === currentSiteIndex 
-                    ? 'font-bold text-purple-400 dark:text-purple-300' 
-                    : 'text-gray-500 dark:text-gray-400'
-                }`}
-              >
-                <span className="mr-1">{site.avatar}</span>
-                {site.name}
-              </li>
-            ))}
-          </ul>
-        </div>
       </div>
-
-      <div className="retro-footer-bar mt-2 pt-2 border-t border-gray-300 dark:border-gray-600 flex justify-between items-center text-xs text-gray-500 dark:text-gray-400">
-        <span>
-          {isNavigating ? '🔄 Menavigasi...' : '🕹️ Lawan webring'}
-        </span>
-        <span>
-          {currentSiteIndex + 1} / {webringSites.length}
-        </span>
-      </div>
-    </div>
+      {/* End: Webring Footer */}
+    </footer>
   );
 }

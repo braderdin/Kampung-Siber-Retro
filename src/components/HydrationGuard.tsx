@@ -5,23 +5,71 @@ import { useState, useEffect } from 'react';
 interface HydrationGuardProps {
   children: React.ReactNode;
   fallback?: React.ReactNode;
-  className?: string;
+  delay?: number;
 }
 
 export default function HydrationGuard({ 
   children, 
   fallback = null, 
-  className 
+  delay = 0 
 }: HydrationGuardProps) {
   const [isMounted, setIsMounted] = useState(false);
+  const [shouldRender, setShouldRender] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
-  }, []);
+    
+    if (delay > 0) {
+      const timer = setTimeout(() => {
+        setShouldRender(true);
+      }, delay);
+      
+      return () => clearTimeout(timer);
+    } else {
+      setShouldRender(true);
+    }
+  }, [delay]);
 
   if (!isMounted) {
     return <>{fallback}</>;
   }
 
-  return <div className={className}>{children}</div>;
+  if (!shouldRender) {
+    return <>{fallback}</>;
+  }
+
+  return <>{children}</>;
+}
+
+// Higher-order component version
+export function withHydrationGuard<P>(Component: React.ComponentType<P>) {
+  return function HydrationGuardedComponent(props: P) {
+    return (
+      <HydrationGuard>
+        <Component {...props} />
+      </HydrationGuard>
+    );
+  };
+}
+
+// Hook version for custom usage
+export function useHydrationGuard(delay: number = 0) {
+  const [isMounted, setIsMounted] = useState(false);
+  const [shouldRender, setShouldRender] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+    
+    if (delay > 0) {
+      const timer = setTimeout(() => {
+        setShouldRender(true);
+      }, delay);
+      
+      return () => clearTimeout(timer);
+    } else {
+      setShouldRender(true);
+    }
+  }, [delay]);
+
+  return { isMounted, shouldRender };
 }

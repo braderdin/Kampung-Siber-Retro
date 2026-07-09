@@ -1,16 +1,12 @@
-// Start: Imports
-'use client';
+"use client";
+
 import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
-// End: Imports
 
-// Start: Supabase Client Configuration
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_KEY || 'placeholder-key';
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
-// End: Supabase Client Configuration
 
-// Start: Type Definitions
 interface CommunityInteractionProps {
   username: string;
   className?: string;
@@ -31,11 +27,8 @@ interface Reply {
   content: string;
   created_at: string;
 }
-// End: Type Definitions
 
-// Start: CommunityInteraction Component
 export default function CommunityInteraction({ username, className }: CommunityInteractionProps) {
-  // Start: State Management
   const [liked, setLiked] = useState(false);
   const [following, setFollowing] = useState(false);
   const [comments, setComments] = useState<Interaction[]>([]);
@@ -43,9 +36,7 @@ export default function CommunityInteraction({ username, className }: CommunityI
   const [loading, setLoading] = useState(false);
   const [expandedReplies, setExpandedReplies] = useState<Record<number, boolean>>({});
   const [replyContent, setReplyContent] = useState<Record<number, string>>({});
-  // End: State Management
 
-  // Start: Fetch Initial Interactions
   useEffect(() => {
     const fetchInteractions = async () => {
       const { data, error } = await supabase
@@ -67,9 +58,7 @@ export default function CommunityInteraction({ username, className }: CommunityI
 
     fetchInteractions();
   }, [username]);
-  // End: Fetch Initial Interactions
 
-  // Start: Handle Like
   const handleLike = async () => {
     setLoading(true);
     try {
@@ -94,9 +83,7 @@ export default function CommunityInteraction({ username, className }: CommunityI
       setLoading(false);
     }
   };
-  // End: Handle Like
 
-  // Start: Handle Follow
   const handleFollow = async () => {
     setLoading(true);
     try {
@@ -121,9 +108,7 @@ export default function CommunityInteraction({ username, className }: CommunityI
       setLoading(false);
     }
   };
-  // End: Handle Follow
 
-  // Start: Handle Comment Submission
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newComment.trim()) {
@@ -145,9 +130,7 @@ export default function CommunityInteraction({ username, className }: CommunityI
       }
     }
   };
-  // End: Handle Comment Submission
 
-  // Start: Handle Reply Submission
   const handleSubmitReply = async (parentId: number, e: React.FormEvent) => {
     e.preventDefault();
     if (!replyContent[parentId]) return;
@@ -169,42 +152,36 @@ export default function CommunityInteraction({ username, className }: CommunityI
       setLoading(false);
     }
   };
-  // End: Handle Reply Submission
 
-  // Start: Toggle Replies
   const toggleReplies = (commentId: number) => {
     setExpandedReplies(prev => ({
       ...prev,
       [commentId]: !prev[commentId],
     }));
   };
-  // End: Toggle Replies
 
-  // Start: Mock Replies Data
   const mockReplies: Record<number, Reply[]> = {
     1: [
-      { id: 101, parent_id: 1, username: 'pixel_lover', content: 'Saya setuju! Perisian ini sangat menarik.', created_at: new Date().toISOString() },
-      { id: 102, parent_id: 1, username: 'code_master', content: 'Terima kasih! Saya juga sedang mengembangkan fungsi baru.', created_at: new Date().toISOString() },
+      { id: 101, parent_id: 1, username: 'pixel_lover', content: 'I agree! This software is really interesting.', created_at: new Date().toISOString() },
+      { id: 102, parent_id: 1, username: 'code_master', content: 'Thanks! I am also working on a new feature.', created_at: new Date().toISOString() },
     ],
     2: [
-      { id: 103, parent_id: 2, username: 'retro_fan', content: 'Saya ingin menambah sumbangan juga!', created_at: new Date().toISOString() },
+      { id: 103, parent_id: 2, username: 'retro_fan', content: 'I would like to contribute too!', created_at: new Date().toISOString() },
     ],
     3: [
-      { id: 104, parent_id: 3, username: 'dev_guru', content: 'Saya boleh bantu dengan dokumentasi!', created_at: new Date().toISOString() },
-      { id: 105, parent_id: 3, username: 'doc_wizard', content: 'Saya juga bersedia membantu.', created_at: new Date().toISOString() },
-      { id: 106, parent_id: 3, username: 'help_hero', content: 'Saya ada banyak pengalaman dengan React.', created_at: new Date().toISOString() },
+      { id: 104, parent_id: 3, username: 'dev_guru', content: 'I can help with documentation!', created_at: new Date().toISOString() },
+      { id: 105, parent_id: 3, username: 'doc_wizard', content: 'I am also happy to help.', created_at: new Date().toISOString() },
+      { id: 106, parent_id: 3, username: 'help_hero', content: 'I have lots of experience with React.', created_at: new Date().toISOString() },
     ],
   };
-  // End: Mock Replies Data
 
-  // Start: Render CommunityInteraction Component
   return (
     <div className={`retro-window ${className || ''}`}>
       {/* Start: Window Header */}
       <div className="retro-window-header bg-gray-200 dark:bg-gray-700 px-3 py-2 border-b border-gray-300 dark:border-gray-600">
         <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200">
           <span className="mr-2">👥</span>
-          Interaksi Komuniti
+          Community Interaction
         </h3>
       </div>
       {/* End: Window Header */}
@@ -218,14 +195,14 @@ export default function CommunityInteraction({ username, className }: CommunityI
             disabled={loading}
             className={`retro-btn-secondary text-xs ${liked ? 'bg-green-500 text-white' : ''}`}
           >
-            ❤️ Suka
+            ❤️ Like
           </button>
           <button
             onClick={handleFollow}
             disabled={loading}
             className={`retro-btn-secondary text-xs ${following ? 'bg-blue-500 text-white' : ''}`}
           >
-            👤 Ikut
+            👤 Follow
           </button>
         </div>
         {/* End: Action Buttons */}
@@ -234,7 +211,7 @@ export default function CommunityInteraction({ username, className }: CommunityI
         <div className="retro-controls-grid">
           <div className="retro-control-item">
             <span className="retro-control-label">💬</span>
-            <span className="retro-control-name">Komen</span>
+            <span className="retro-control-name">Comments</span>
           </div>
         </div>
         
@@ -289,10 +266,9 @@ export default function CommunityInteraction({ username, className }: CommunityI
                           ...prev,
                           [comment.id]: e.target.value
                         }))}
-                        placeholder="Balas komen ini..."
+                        placeholder="Reply to this comment..."
                         className="w-full retro-input text-xs mb-2"
                         rows={2}
-                        placeholder="Tulis balasan anda..."
                       />
                       <div className="flex gap-2">
                         <button
@@ -300,14 +276,14 @@ export default function CommunityInteraction({ username, className }: CommunityI
                           disabled={loading}
                           className="retro-btn-primary text-xs px-2 py-1"
                         >
-                          Hantar
+                          Send
                         </button>
                         <button
                           type="button"
                           onClick={() => setExpandedReplies(prev => ({ ...prev, [comment.id]: false }))}
                           className="retro-btn-secondary text-xs px-2 py-1"
                         >
-                          Batal
+                          Cancel
                         </button>
                       </div>
                     </form>
@@ -324,7 +300,7 @@ export default function CommunityInteraction({ username, className }: CommunityI
               type="text"
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Tulis komen anda..."
+              placeholder="Write your comment..."
               className="flex-1 retro-input text-xs"
               disabled={loading}
             />
@@ -333,7 +309,7 @@ export default function CommunityInteraction({ username, className }: CommunityI
               disabled={loading}
               className="retro-btn-primary text-xs"
             >
-              Hantar
+              Send
             </button>
           </div>
         </form>
@@ -343,4 +319,3 @@ export default function CommunityInteraction({ username, className }: CommunityI
     </div>
   );
 }
-// End: CommunityInteraction Component

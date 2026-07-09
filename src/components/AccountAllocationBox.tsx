@@ -1,142 +1,161 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useLanguageStore } from '@/store/useLanguageStore';
-import { enDictionary, msDictionary } from '@/i18n/dictionaries';
 
-interface StorageStats {
-  total: number;
-  used: number;
-  available: number;
-  quota: number;
+interface AccountAllocationBoxProps {
+  allocatedBytes?: number;
+  usedBytes?: number;
+  className?: string;
 }
 
-const FREE_TIER_LIMIT = 4.5 * 1024 * 1024;
-
-export default function AccountAllocationBox() {
-  const { language } = useLanguageStore();
-  const t = language === 'ms' ? msDictionary : enDictionary;
-  
-  const [storage, setStorage] = useState<StorageStats>({
-    total: FREE_TIER_LIMIT,
-    used: 0,
-    available: FREE_TIER_LIMIT,
-    quota: FREE_TIER_LIMIT,
-  });
-  
-  const [isWarning, setIsWarning] = useState(false);
+export default function AccountAllocationBox({ 
+  allocatedBytes = 10737418240, // 10GB default
+  usedBytes = 8589934592, // 8GB default
+  className
+}: AccountAllocationBoxProps) {
+  const [usagePercent, setUsagePercent] = useState(0);
   const [showAlert, setShowAlert] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
-    const mockUsed = Math.random() * FREE_TIER_LIMIT * 0.85;
-    
-    setStorage({
-      total: FREE_TIER_LIMIT,
-      used: mockUsed,
-      available: FREE_TIER_LIMIT - mockUsed,
-      quota: FREE_TIER_LIMIT,
-    });
-    
-    const usagePercentage = (mockUsed / FREE_TIER_LIMIT) * 100;
-    if (usagePercentage > 80) {
-      setIsWarning(true);
+    const percent = ((usedBytes || 0) / (allocatedBytes || 1)) * 100;
+    setUsagePercent(percent);
+
+    // Check if usage exceeds 80% threshold
+    if (percent > 80) {
       setShowAlert(true);
-      setTimeout(() => setShowAlert(false), 5000);
+      setIsAnimating(true);
+      
+      // Stop animation after 3 seconds
+      const timer = setTimeout(() => {
+        setIsAnimating(false);
+      }, 3000);
+      
+      return () => clearTimeout(timer);
     } else {
-      setIsWarning(false);
       setShowAlert(false);
+      setIsAnimating(false);
     }
-  }, []);
+  }, [allocatedBytes, usedBytes]);
 
   const formatBytes = (bytes: number): string => {
     if (bytes === 0) return '0 B';
+    
     const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
   };
 
-  const usagePercentage = (storage.used / storage.quota) * 100;
-  const availablePercentage = (storage.available / storage.quota) * 100;
+  const getProgressColor = (percent: number): string => {
+    if (percent >= 90) return 'bg-red-500';
+    if (percent >= 80) return 'bg-amber-500';
+    return 'bg-green-500';
+  };
+
+  const getAlertColor = (percent: number): string => {
+    if (percent >= 90) return 'border-red-500 bg-red-50 dark:bg-red-900/20';
+    return 'border-amber-500 bg-amber-50 dark:bg-amber-900/20';
+  };
 
   return (
-    <div className="mb-6 retro-card">
+    <div className={`account-allocation-box ${className || ''}`}>
+      {/* Start: Alert Banner */}
       {showAlert && (
-        <div className="retro-alert-pulse mb-4 p-3 bg-red-900/20 border border-red-500 rounded-lg animate-pulse">
+        <div className={`
+          retro-alert-banner p-3 mb-4 border rounded
+          ${getAlertColor(usagePercent)}
+          ${isAnimating ? 'neon-pulse' : ''}
+        `}>
           <div className="flex items-center gap-2">
-            <span className="text-red-500 text-xl">⚠️</span>
-            <span className="text-red-300 font-medium">
-              Amanah saiz mendekati had percuma 4.5MB!
+            <span className="text-xl">⚠️</span>
+            <span className="font-bold text-gray-800 dark:text-gray-200 pixel-font text-sm">
+              PERINGATAN: Penggunaan R2 Storage mendekati hadapan!
             </span>
           </div>
         </div>
       )}
-      
-      <div className="retro-card-header">
-        <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
-          <span>📦</span>
-          Penggunaan Akaun
-        </h3>
-      </div>
-      
-      <div className="retro-window-client p-4">
-        {/* Start: Storage Progress Bar */}
-        <div className="mb-4">
+      {/* End: Alert Banner */}
+
+      {/* Start: Allocation Card */}
+      <div className="retro-card">
+        <div className="retro-card-header bg-gray-200 dark:bg-gray-700 px-4 py-2 border-b border-gray-300 dark:border-gray-600">
+          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 pixel-font flex items-center gap-2">
+            <span className="text-xl">💾</span>
+            <span>R2 Storage Allocation</span>
+          </h3>
+        </div>
+        <div className="p-4">
+          {/* Start: Usage Summary */}
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm text-gray-600 dark:text-gray-400">Isyaddah Digunakan</span>
-            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-              {formatBytes(storage.used)} / {formatBytes(storage.quota)}
-            </span>
-          </div>
-          
-          <div className="w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden retro-border">
-            <div 
-              className={`h-full transition-all duration-500 ${isWarning ? 'bg-red-500 animate-pulse' : 'bg-gradient-to-r from-cyan-500 to-purple-500'}`}
-              style={{ width: `${Math.min(usagePercentage, 100)}%` }}
-            />
-          </div>
-          
-          {isWarning && (
-            <div className="mt-2 text-xs text-red-500 dark:text-red-400 flex items-center gap-1 animate-pulse">
-              <span>⚠️</span>
-              <span>Amanah saiz mendekati had percuma 4.5MB!</span>
+            <div>
+              <span className="text-xs text-gray-500 dark:text-gray-400 pixel-font">
+                Digunakan
+              </span>
+              <div className="font-bold text-gray-800 dark:text-gray-200 text-sm">
+                {formatBytes(usedBytes)}
+              </div>
             </div>
-          )}
+            <div className="text-right">
+              <span className="text-xs text-gray-500 dark:text-gray-400 pixel-font">
+                dari
+              </span>
+              <div className="font-bold text-gray-800 dark:text-gray-200 text-sm">
+                {formatBytes(allocatedBytes)}
+              </div>
+            </div>
+          </div>
+          {/* End: Usage Summary */}
+
+          {/* Start: Progress Bar */}
+          <div className="mb-2">
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-xs text-gray-500 dark:text-gray-400 pixel-font">
+                Penggunaan
+              </span>
+              <span className="text-xs font-bold text-gray-700 dark:text-gray-300">
+                {usagePercent.toFixed(1)}%
+              </span>
+            </div>
+            <div className="w-full h-3 bg-gray-300 dark:bg-gray-600 rounded-full overflow-hidden">
+              <div 
+                className={`
+                  h-full transition-all duration-500
+                  ${getProgressColor(usagePercent)}
+                `}
+                style={{ width: `${Math.min(usagePercent, 100)}%` }}
+              />
+            </div>
+          </div>
+          {/* End: Progress Bar */}
+
+          {/* Start: Threshold Indicator */}
+          <div className="flex gap-4 text-xs text-gray-500 dark:text-gray-400 pixel-font">
+            <span>0%  25%  50%  75%  100%</span>
+          </div>
+          {/* End: Threshold Indicator */}
+
+          {/* Start: Status Message */}
+          <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
+            {usagePercent >= 90 ? (
+              <div className="text-red-600 dark:text-red-400 font-bold pixel-font text-sm">
+                ⚠️ RUANG STORAGE HAMBAR! Segera bersihkan data lama.
+              </div>
+            ) : usagePercent >= 80 ? (
+              <div className="text-amber-600 dark:text-amber-400 font-bold pixel-font text-sm">
+                ⚡ Penggunaan storage mendekati hadapan. Pertimbangkan untuk mengarsir.
+              </div>
+            ) : (
+              <div className="text-green-600 dark:text-green-400 font-bold pixel-font text-sm">
+                ✅ Ruang storage cukup untuk digunakan
+              </div>
+            )}
+          </div>
+          {/* End: Status Message */}
         </div>
-        {/* End: Storage Progress Bar */}
-        
-        {/* Start: Storage Stats Grid */}
-        <div className="grid grid-cols-3 gap-3 text-center">
-          <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-cyan-500/20">
-            <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Digunakan</div>
-            <div className="text-lg font-bold text-gray-900 dark:text-gray-100">
-              {formatBytes(storage.used)}
-            </div>
-          </div>
-                    
-          <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-cyan-500/20">
-            <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Tersisa</div>
-            <div className="text-lg font-bold text-gray-900 dark:text-gray-100">
-              {formatBytes(storage.available)}
-            </div>
-          </div>
-                  
-          <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-cyan-500/20">
-            <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Was Penuh</div>
-            <div className="text-lg font-bold text-gray-900 dark:text-gray-100">
-              {formatBytes(storage.quota)}
-            </div>
-          </div>
-        </div>
-        {/* End: Storage Stats Grid */}
-        
-        {/* Start: Free Tier Notice */}
-        <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400 text-center">
-          <span>Free Tier Limit:</span>
-          <span className="ml-1 text-yellow-500 font-medium">4.5 MB</span>
-        </div>
-        {/* End: Free Tier Notice */}
       </div>
+      {/* End: Allocation Card */}
     </div>
   );
 }

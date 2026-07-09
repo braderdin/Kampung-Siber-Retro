@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useLanguageStore } from '@/store/useLanguageStore';
-import { enDictionary, msDictionary } from '@/i18n/dictionaries';
 
 interface ProfileBioEditorProps {
   initialBio?: string;
@@ -10,128 +8,138 @@ interface ProfileBioEditorProps {
   className?: string;
 }
 
-const TERMINAL_COLORS = {
-  background: 'bg-black',
-  text: 'text-green-400',
-  cursor: 'bg-green-400',
-  prompt: 'text-cyan-400',
-};
-
 export default function ProfileBioEditor({ 
-  initialBio = 'Saya pengguna kampung siber retro yang antara. Menyukai HTML, CSS, dan JavaScript.',
+  initialBio = 'Saya warga kampung siber retro yang antara.',
   onBioChange,
-  className 
+  className
 }: ProfileBioEditorProps) {
-  const { language } = useLanguageStore();
-  const t = language === 'ms' ? msDictionary : enDictionary;
-  
-  const [bio, setBio] = useState<string>(initialBio);
-  const [preview, setPreview] = useState<string>(initialBio);
-  const [charCount, setCharCount] = useState<number>(bio.length);
-  const MAX_CHARS = 200;
+  const [bio, setBio] = useState(initialBio);
+  const [previewBio, setPreviewBio] = useState(initialBio);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    const sanitized = bio
-      .replace(/</g, '<')
-      .replace(/>/g, '>')
-      .replace(/&/g, '&')
-      .replace(/"/g, '"')
-      .replace(/'/g, '&#039;');
-    setPreview(sanitized);
-  }, [bio]);
-
-  useEffect(() => {
-    setCharCount(bio.length);
-    if (onBioChange) {
-      onBioChange(bio);
-    }
-  }, [bio, onBioChange]);
+    setBio(initialBio);
+    setPreviewBio(initialBio);
+  }, [initialBio]);
 
   const handleBioChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newBio = e.target.value;
-    if (newBio.length <= MAX_CHARS) {
-      setBio(newBio);
+    setBio(newBio);
+    setPreviewBio(newBio);
+    
+    if (onBioChange) {
+      onBioChange(newBio);
     }
   };
 
-  const handleClear = () => {
-    setBio('');
+  const handleSave = () => {
+    setIsEditing(false);
+    if (onBioChange) {
+      onBioChange(bio);
+    }
   };
 
-  const handleLoadSample = () => {
-    const samples = [
-      '🎮 Penggemar permainan retro 90-an',
-      '💻 Coder, artist, dan penyelidik siber',
-      '☕ Hobi makan kopi dan dengar chiptune',
-      '🌐 Penyerta aktif komuniti kampung siber',
-      '⭐ Pembangun perisian siber retro',
-    ];
-    const random = samples[Math.floor(Math.random() * samples.length)];
-    setBio(random);
+  const handleCancel = () => {
+    setBio(previewBio);
+    setIsEditing(false);
+  };
+
+  const handlePreviewChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setPreviewBio(e.target.value);
+  };
+
+  const toggleEdit = () => {
+    setIsEditing(!isEditing);
+  };
+
+  const formatBioForDisplay = (text: string): string => {
+    return text
+      .replace(/\n/g, '<br/>')
+      .replace(/@/g, '<span class="text-cyan-400 font-bold">@</span>')
+      .replace(/\b(Halo|Hello|Hi)\b/gi, '<span class="text-yellow-400 font-bold">$1</span>')
+      .replace(/\b(kampung|siber|retro)\b/gi, '<span class="text-purple-400 font-bold">$1</span>');
   };
 
   return (
     <div className={`profile-bio-editor ${className || ''}`}>
-      <div className="retro-window retro-border">
-        <div className="retro-window-header bg-gray-200 dark:bg-gray-700 px-3 py-2 border-b border-gray-300 dark:border-gray-600">
-          <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200">
-            <span className="mr-2">📝</span>
-            Penulis Bio Peribadi
-          </h3>
-        </div>
-        <div className="retro-window-client p-4">
-          <div className="mb-4">
-            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
-              Tulis bio anda di bawah:
-            </label>
-            <textarea
-              value={bio}
-              onChange={handleBioChange}
-              placeholder="Apa yang boleh saya kongsikan tentang diri saya?"
-              className="retro-textarea w-full min-h-[100px] font-mono text-sm resize-none"
-              maxLength={MAX_CHARS}
-              rows={5}
-            />
-            <div className="flex justify-between items-center mt-2">
-              <span className={`text-xs ${charCount >= MAX_CHARS ? 'text-red-500' : 'text-gray-500 dark:text-gray-400'}`}>
-                {charCount} / {MAX_CHARS} aksara
-              </span>
-              <div className="flex gap-2">
-                <button
-                  onClick={handleLoadSample}
-                  className="retro-btn-secondary text-xs px-2 py-1"
-                >
-                  Contoh
-                </button>
-                <button
-                  onClick={handleClear}
-                  className="retro-btn-secondary text-xs px-2 py-1"
-                >
-                  Bersihkan
-                </button>
-              </div>
-            </div>
+      {/* Start: Editor Header */}
+      <div className="retro-window-header bg-gray-200 dark:bg-gray-700 px-3 py-2 border-b border-gray-300 dark:border-gray-600 flex justify-between items-center">
+        <h4 className="text-sm font-bold text-gray-800 dark:text-gray-200 pixel-font">
+          <span className="mr-2">📝</span>
+          Bio Editor
+        </h4>
+        {!isEditing ? (
+          <button
+            onClick={toggleEdit}
+            className="retro-btn-secondary text-xs px-2 py-1"
+          >
+            Edit
+          </button>
+        ) : (
+          <div className="flex gap-1">
+            <button
+              onClick={handleCancel}
+              className="retro-btn-secondary text-xs px-2 py-1"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSave}
+              className="retro-btn-primary text-xs px-2 py-1"
+            >
+              Save
+            </button>
           </div>
-
-          <div className="retro-terminal-preview">
-            <div className="retro-terminal-header bg-gray-800 px-3 py-2 border-b border-gray-700">
-              <span className="text-xs text-gray-400 font-mono">preview.png</span>
-            </div>
-            <div className="retro-terminal-body p-3 font-mono text-sm">
-              <div className="flex items-start gap-2">
-                <span className="text-cyan-400">retro@kampung-siber:~$</span>
-                <span className="break-words">
-                  <span className="text-green-400">{preview || 'Bio anda akan dipaparkan di sini...'}</span>
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-4 text-xs text-gray-500 dark:text-gray-400">
-            <span className="font-mono">💡 Tips:</span> Gunakan HTML sederhana seperti <span className="text-blue-400"><b></b></span> untuk bool, <span className="text-blue-400"><i></i></span> untuk miring
-          </div>
-        </div>
+        )}
       </div>
+      {/* End: Editor Header */}
+
+      {/* Start: Editor Content */}
+      <div className="p-3">
+        {/* Start: Live Preview Terminal */}
+        <div className="retro-terminal mb-3">
+          <div className="retro-terminal-header bg-gray-800 px-3 py-2 border-b border-gray-700 flex justify-between items-center">
+            <div className="flex gap-2">
+              <span className="text-xs text-gray-400">🔴</span>
+              <span className="text-xs text-gray-400">🟡</span>
+              <span className="text-xs text-gray-400">🟢</span>
+            </div>
+            <span className="text-xs text-gray-500 pixel-font">bio_preview.txt</span>
+          </div>
+          <div 
+            className="retro-terminal-body p-3 font-mono text-xs leading-5 text-green-400"
+            dangerouslySetInnerHTML={{ __html: formatBioForDisplay(previewBio) }}
+          />
+        </div>
+        {/* End: Live Preview Terminal */}
+
+        {/* Start: Textarea Input */}
+        <div className="retro-window-sm">
+          <label className="retro-window-header bg-gray-100 dark:bg-gray-800 px-3 py-2 border-b border-gray-300 dark:border-gray-600">
+            <span className="text-xs font-bold text-gray-700 dark:text-gray-300 pixel-font">
+              Edit Bio
+            </span>
+          </label>
+          <textarea
+            value={bio}
+            onChange={handleBioChange}
+            className="w-full p-3 bg-black/20 border border-gray-300 dark:border-gray-600 rounded-b retro-textarea text-green-400 font-mono resize-vertical"
+            rows={4}
+            maxLength={500}
+            placeholder="Type your bio here..."
+          />
+          <div className="retro-window-footer bg-gray-100 dark:bg-gray-800 px-3 py-2 border-t border-gray-300 dark:border-gray-600 flex justify-between items-center">
+            <span className="text-xs text-gray-500 dark:text-gray-400 pixel-font">
+              {bio.length}/500
+            </span>
+            <span className="text-xs text-gray-500 dark:text-gray-400 pixel-font">
+              Ctrl+S to save
+            </span>
+          </div>
+        </div>
+        {/* End: Textarea Input */}
+      </div>
+      {/* End: Editor Content */}
     </div>
   );
 }

@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useLanguageStore } from '@/store/useLanguageStore';
-import { enDictionary, msDictionary } from '@/i18n/dictionaries';
 
 interface ProfileStatusBadgeProps {
   initialStatus?: 'online' | 'coding' | 'makan';
@@ -10,49 +8,52 @@ interface ProfileStatusBadgeProps {
   className?: string;
 }
 
-type StatusOption = {
-  value: 'online' | 'coding' | 'makan';
+type UserStatus = 'online' | 'coding' | 'makan';
+
+interface StatusOption {
+  id: UserStatus;
   label: string;
-  color: string;
   icon: string;
-};
+  color: string;
+  bgColor: string;
+}
 
 const STATUS_OPTIONS: StatusOption[] = [
   {
-    value: 'online',
-    label: '🟢 Online',
-    color: 'bg-green-500',
-    icon: '🟢'
+    id: 'online',
+    label: 'Online',
+    icon: '🟢',
+    color: 'text-green-500',
+    bgColor: 'bg-green-500'
   },
   {
-    value: 'coding',
-    label: '💻 Koding',
-    color: 'bg-blue-500',
-    icon: '💻'
+    id: 'coding',
+    label: 'Koding',
+    icon: '💻',
+    color: 'text-blue-500',
+    bgColor: 'bg-blue-500'
   },
   {
-    value: 'makan',
-    label: '☕ Makan',
-    color: 'bg-amber-500',
-    icon: '☕'
+    id: 'makan',
+    label: 'Makan',
+    icon: '☕',
+    color: 'text-amber-500',
+    bgColor: 'bg-amber-500'
   }
 ];
 
 export default function ProfileStatusBadge({ 
   initialStatus = 'online',
   onStatusChange,
-  className 
+  className
 }: ProfileStatusBadgeProps) {
-  const { language } = useLanguageStore();
-  const t = language === 'ms' ? msDictionary : enDictionary;
-  
-  const [selectedStatus, setSelectedStatus] = useState<'online' | 'coding' | 'makan'>(initialStatus);
+  const [selectedStatus, setSelectedStatus] = useState<UserStatus>(initialStatus);
   const [showOptions, setShowOptions] = useState(false);
 
   useEffect(() => {
-    const storedStatus = localStorage.getItem('user_status');
-    if (storedStatus && STATUS_OPTIONS.some(opt => opt.value === storedStatus)) {
-      setSelectedStatus(storedStatus as 'online' | 'coding' | 'makan');
+    const savedStatus = localStorage.getItem('user_status') as UserStatus;
+    if (savedStatus && STATUS_OPTIONS.some(s => s.id === savedStatus)) {
+      setSelectedStatus(savedStatus);
     }
   }, []);
 
@@ -63,60 +64,85 @@ export default function ProfileStatusBadge({
     }
   }, [selectedStatus, onStatusChange]);
 
-  const handleStatusSelect = (status: 'online' | 'coding' | 'makan') => {
+  const handleStatusSelect = (status: UserStatus) => {
     setSelectedStatus(status);
     setShowOptions(false);
   };
 
-  const getCurrentStatus = () => STATUS_OPTIONS.find(opt => opt.value === selectedStatus);
+  const getStatusEmoji = (status: UserStatus): string => {
+    const option = STATUS_OPTIONS.find(s => s.id === status);
+    return option?.icon || '🟢';
+  };
+
+  const getStatusLabel = (status: UserStatus): string => {
+    const option = STATUS_OPTIONS.find(s => s.id === status);
+    return option?.label || 'Online';
+  };
+
+  const getCurrentStatus = () => STATUS_OPTIONS.find(s => s.id === selectedStatus);
 
   return (
     <div className={`profile-status-badge ${className || ''}`}>
-      <div className="retro-window retro-border">
-        <div className="retro-window-header bg-gray-200 dark:bg-gray-700 px-3 py-2 border-b border-gray-300 dark:border-gray-600">
-          <h3 className="text-sm font-bold text-gray-800 dark:text-gray-200">
-            <span className="mr-2">🎯</span>
-            Status Hidup
-          </h3>
+      {/* Start: Status Display */}
+      <div className="retro-window retro-window-sm">
+        <div className="retro-window-header bg-gray-100 dark:bg-gray-800 px-3 py-2 border-b border-gray-300 dark:border-gray-600">
+          <span className="text-xs font-bold text-gray-700 dark:text-gray-300 pixel-font">
+            Live Status
+          </span>
         </div>
-        <div className="retro-window-client p-4">
-          <div 
-            className="retro-status-display flex items-center gap-3 cursor-pointer"
-            onClick={() => setShowOptions(!showOptions)}
-          >
-            <span className={`retro-status-dot ${getCurrentStatus()?.color || 'bg-green-500'} animate-pulse`}></span>
-            <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-              {getCurrentStatus()?.label || '🟢 Online'}
-            </span>
-            <span className="text-xs text-gray-500 dark:text-gray-400">
-              {showOptions ? '▼' : '▶'}
-            </span>
+        <div className="p-3">
+          {/* Start: Radio Selector Buttons */}
+          <div className="space-y-2">
+            {STATUS_OPTIONS.map((option) => (
+              <label 
+                key={option.id}
+                className="flex items-center cursor-pointer transition-all duration-200 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
+                <input
+                  type="radio"
+                  name="status"
+                  checked={selectedStatus === option.id}
+                  onChange={() => handleStatusSelect(option.id)}
+                  className="sr-only peer"
+                />
+                <div className={`
+                  flex items-center gap-2 w-full
+                  ${selectedStatus === option.id ? 'ring-2 ring-purple-500' : ''}
+                `}>
+                  <span className={`
+                    text-xl
+                    ${selectedStatus === option.id ? 'scale-110' : ''}
+                  `}>
+                    {option.icon}
+                  </span>
+                  <span className={`
+                    text-sm font-medium
+                    ${selectedStatus === option.id ? 'text-purple-600 dark:text-purple-400' : 'text-gray-600 dark:text-gray-300'}
+                  `}>
+                    {option.label}
+                  </span>
+                </div>
+              </label>
+            ))}
           </div>
+          {/* End: Radio Selector Buttons */}
 
-          {showOptions && (
-            <div className="retro-status-options mt-3 p-2 bg-gray-50 dark:bg-gray-800 rounded border border-gray-300 dark:border-gray-600">
-              {STATUS_OPTIONS.map((option) => (
-                <button
-                  key={option.value}
-                  onClick={() => handleStatusSelect(option.value)}
-                  className={`w-full text-left px-3 py-2 mb-1 rounded transition-all ${
-                    selectedStatus === option.value
-                      ? 'bg-blue-500 text-white font-bold'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  <span className="text-xl mr-2">{option.icon}</span>
-                  <span className="font-mono">{option.label}</span>
-                </button>
-              ))}
+          {/* Start: Current Status Indicator */}
+          <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600 flex items-center gap-2">
+            <span className="text-2xl">{getStatusEmoji(selectedStatus)}</span>
+            <div>
+              <div className="text-xs text-gray-500 dark:text-gray-400 pixel-font">
+                Status Anda
+              </div>
+              <div className="text-sm font-bold text-gray-800 dark:text-gray-200">
+                {getStatusLabel(selectedStatus)}
+              </div>
             </div>
-          )}
-
-          <div className="mt-3 text-xs text-gray-500 dark:text-gray-400">
-            Status disimpan secara tempatan
           </div>
+          {/* End: Current Status Indicator */}
         </div>
       </div>
+      {/* End: Status Display */}
     </div>
   );
 }

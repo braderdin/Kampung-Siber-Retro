@@ -1,301 +1,244 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { enDictionary, msDictionary } from '@/i18n/dictionaries';
-import SettingsTipping from '@/components/SettingsTipping';
-import SettingsApiKey from '@/components/SettingsApiKey';
-import SettingsNsfw from '@/components/SettingsNsfw';
-import SettingsGithub from '@/components/SettingsGithub';
-import SettingsDeleteAccount from '@/components/SettingsDeleteAccount';
 import ProfileStatusBadge from '@/components/ProfileStatusBadge';
 import ProfileBioEditor from '@/components/ProfileBioEditor';
+import SettingsTipping from '@/components/SettingsTipping';
+import RetroToast from '@/components/RetroToast';
 
-// Start: Type Definitions
-type SettingsPageProps = {
-  params: Promise<{ username: string }>;
-};
+type BackgroundTheme = 'space_neon' | 'windows_gray' | 'retro_matrix' | 'neon_cyan' | 'retro_orange';
 
-type ActiveSection = 'tipping' | 'api_key' | 'nsfw' | 'github' | 'delete' | 'profile' | null;
-
-type BackgroundTheme = 'space_neon' | 'windows_gray' | 'retro_matrix';
-
-interface ThemeOption {
+interface ThemeConfig {
   id: BackgroundTheme;
   name: string;
   description: string;
-  preview: string;
-  colors: string[];
+  previewClass: string;
+  primaryColor: string;
+  secondaryColor: string;
+  icon: string;
 }
-// End: Type Definitions
 
-// Start: Theme Options
-const THEME_OPTIONS: ThemeOption[] = [
+const THEME_OPTIONS: ThemeConfig[] = [
   {
     id: 'space_neon',
     name: 'Space Neon',
-    description: 'Lantakan latar belakang neon di antara malang kosmos dengan cahaya biru dan purple.',
-    preview: 'bg-gradient-to-b from-indigo-900 via-purple-900 to-cyan-900',
-    colors: ['#1e3a8a', '#5b21b6', '#06b6d4', '#a855f7'],
+    description: 'Cosmic glow with vibrant neon accents',
+    previewClass: 'bg-gradient-to-br from-indigo-900 via-purple-900 to-black',
+    primaryColor: 'from-indigo-600 via-purple-600 to-pink-600',
+    secondaryColor: 'text-cyan-400',
+    icon: '🌌'
   },
   {
     id: 'windows_gray',
     name: 'Windows Gray',
-    description: 'Tema abu-abu bersih yang mengingatkan pada antara muka Windows 95 klasik.',
-    preview: 'bg-gradient-to-b from-gray-200 via-gray-300 to-gray-400',
-    colors: ['#c0c0c0', '#a0a0a0', '#808080', '#606060'],
+    description: 'Classic Windows 95 style with muted tones',
+    previewClass: 'bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300',
+    primaryColor: 'from-blue-600 to-blue-700',
+    secondaryColor: 'text-blue-600',
+    icon: '🪟'
   },
   {
     id: 'retro_matrix',
     name: 'Retro Matrix',
-    description: 'Aliran kod hijau bergerak di latar belakang hitam gaya Matrix.',
-    preview: 'bg-gradient-to-b from-black via-green-900 to-black',
-    colors: ['#00ff00', '#00aa00', '#005500', '#000000'],
+    description: 'Classic green code rain aesthetic',
+    previewClass: 'bg-gradient-to-br from-black via-green-900 to-black',
+    primaryColor: 'from-green-400 to-emerald-500',
+    secondaryColor: 'text-green-400',
+    icon: '💚'
   },
+  {
+    id: 'neon_cyan',
+    name: 'Neon Cyan',
+    description: 'Bright cyan with electric accents',
+    previewClass: 'bg-gradient-to-br from-cyan-900 via-teal-900 to-black',
+    primaryColor: 'from-cyan-400 to-teal-500',
+    secondaryColor: 'text-cyan-400',
+    icon: '🔵'
+  },
+  {
+    id: 'retro_orange',
+    name: 'Retro Orange',
+    description: 'Warm orange with vintage vibes',
+    previewClass: 'bg-gradient-to-br from-orange-900 via-amber-900 to-black',
+    primaryColor: 'from-orange-400 to-amber-500',
+    secondaryColor: 'text-amber-400',
+    icon: '🧡'
+  }
 ];
-// End: Theme Options
 
-// Start: Main Component
-export default function SettingsPage({ params }: SettingsPageProps) {
-  // Start: State Management
-  const [username, setUsername] = useState('');
-  const [activeSection, setActiveSection] = useState<ActiveSection>(null);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [selectedTheme, setSelectedTheme] = useState<BackgroundTheme>('space_neon');
-  const [bio, setBio] = useState('Saya warga kampung siber retro yang antara.');
-  const [userStatus, setUserStatus] = useState<'online' | 'coding' | 'makan'>('online');
+export default function SettingsPage({ params }: { params: { username: string } }) {
+  const { username } = params;
+  const router = useRouter();
   const { language } = useLanguageStore();
   const t = language === 'ms' ? msDictionary : enDictionary;
-  // End: State Management
+  
+  const [selectedTheme, setSelectedTheme] = useState<BackgroundTheme>('space_neon');
+  const [customBio, setCustomBio] = useState('');
+  const [liveStatus, setLiveStatus] = useState<'online' | 'coding' | 'makan'>('online');
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
 
-  // Start: Load Username
   useEffect(() => {
-    params.then((resolvedParams) => {
-      setUsername(resolvedParams.username);
-    });
-  }, [params]);
-  // End: Load Username
-
-  // Start: Initialize Theme from Storage
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('background_theme');
+    // Load saved preferences from localStorage
+    const savedTheme = localStorage.getItem('background_theme') as BackgroundTheme;
     if (savedTheme && THEME_OPTIONS.some(t => t.id === savedTheme)) {
-      setSelectedTheme(savedTheme as BackgroundTheme);
+      setSelectedTheme(savedTheme);
+    }
+
+    const savedBio = localStorage.getItem('user_bio');
+    if (savedBio) {
+      setCustomBio(savedBio);
+    }
+
+    const savedStatus = localStorage.getItem('user_status') as 'online' | 'coding' | 'makan';
+    if (savedStatus && ['online', 'coding', 'makan'].includes(savedStatus)) {
+      setLiveStatus(savedStatus);
     }
   }, []);
-  // End: Initialize Theme from Storage
 
-  // Start: Apply Theme Styles
   useEffect(() => {
-    const applyThemeStyles = () => {
-      const root = document.documentElement;
-      const theme = THEME_OPTIONS.find(t => t.id === selectedTheme);
-      if (theme) {
-        root.style.setProperty('--theme-primary', theme.colors[0]);
-        root.style.setProperty('--theme-secondary', theme.colors[1]);
-        root.style.setProperty('--theme-accent', theme.colors[2]);
-        root.style.setProperty('--theme-background', theme.colors[3]);
-      }
-    };
-    applyThemeStyles();
     localStorage.setItem('background_theme', selectedTheme);
   }, [selectedTheme]);
-  // End: Apply Theme Styles
 
-  // Start: Handle Hash Navigation
   useEffect(() => {
-    const handleHashChange = () => {
-      const hash = window.location.hash.slice(1);
-      if (['tipping', 'api_key', 'nsfw', 'github', 'delete', 'profile'].includes(hash)) {
-        setActiveSection(hash as ActiveSection);
-      } else {
-        setActiveSection(null);
-      }
-    };
+    localStorage.setItem('user_bio', customBio);
+  }, [customBio]);
 
-    handleHashChange();
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
-  }, []);
-  // End: Handle Hash Navigation
-
-  // Start: Dark Mode Toggle
-  const toggleDarkMode = () => {
-    if (isDarkMode) {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    } else {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    }
-    setIsDarkMode((current) => !current);
-  };
-  // End: Dark Mode Toggle
-
-  // Start: Initialize Dark Mode
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    const applyTheme = () => {
-      if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-        setIsDarkMode(true);
-      } else if (savedTheme === 'light') {
-        document.documentElement.classList.remove('dark');
-        setIsDarkMode(false);
-      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.documentElement.classList.add('dark');
-        setIsDarkMode(true);
-      }
-    };
+    localStorage.setItem('user_status', liveStatus);
+  }, [liveStatus]);
 
-    const timer = window.setTimeout(applyTheme, 0);
-    return () => window.clearTimeout(timer);
-  }, []);
-  // End: Initialize Dark Mode
-
-  // Start: Section Navigation
-  const navigateToSection = (section: ActiveSection) => {
-    setActiveSection(section);
-    window.history.replaceState({}, '', `${window.location.pathname}${section ? `#${section}` : ''}`);
+  const handleThemeChange = (themeId: BackgroundTheme) => {
+    setSelectedTheme(themeId);
+    
+    // Show success toast
+    const toast = RetroToast.showSuccess(`Tema latar ${THEME_OPTIONS.find(t => t.id === themeId)?.name} telah disemak!`, 3000);
+    setCustomBio(prev => prev); // Trigger re-render
   };
-  // End: Section Navigation
 
-  // Start: Handle Theme Change
-  const handleThemeChange = (theme: BackgroundTheme) => {
-    setSelectedTheme(theme);
-  };
-  // End: Handle Theme Change
-
-  // Start: Handle Bio Change
-  const handleBioChange = (newBio: string) => {
-    setBio(newBio);
-  };
-  // End: Handle Bio Change
-
-  // Start: Handle Status Change
   const handleStatusChange = (status: string) => {
-    setUserStatus(status as 'online' | 'coding' | 'makan');
+    setLiveStatus(status as 'online' | 'coding' | 'makan');
   };
-  // End: Handle Status Change
 
-  // Start: Render Settings Page
+  const handleBioChange = (bio: string) => {
+    setCustomBio(bio);
+  };
+
+  const getCurrentTheme = () => THEME_OPTIONS.find(t => t.id === selectedTheme);
+
   return (
-    <main className="min-h-screen bg-gray-50 p-6 text-gray-900 transition-colors duration-300 dark:bg-gray-950 dark:text-gray-100">
-      <div className="mx-auto max-w-4xl">
-        <div className="mb-8">
-          <h1 className="mb-2 text-3xl font-bold text-gray-900 dark:text-gray-100">
-            {t.settings} - {username}
+    <main className={`
+      min-h-screen transition-all duration-500
+      ${getCurrentTheme()?.previewClass || THEME_OPTIONS[0].previewClass}
+    `}>
+      {/* Start: Success Toast */}
+      {showSuccessToast && (
+        <RetroToast />
+      )}
+      {/* End: Success Toast */}
+
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Start: Page Header */}
+        <div className="mb-6 text-center">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 pixel-font mb-2">
+            {t.settingsTitle || 'Settings'}
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">Tetapan akaun dan keutamaan anda.</p>
+          <p className="text-gray-600 dark:text-gray-400">
+            {t.manageProfile || `Kelola profil ${username}`}
+          </p>
         </div>
+        {/* End: Page Header */}
 
-        <div className="mb-6">
-          <button onClick={toggleDarkMode} className="retro-btn-secondary flex items-center space-x-2 px-4 py-2 text-sm font-medium">
-            <span>{isDarkMode ? '☀️' : '🌙'}</span>
-            <span>{isDarkMode ? t.modernTheme : t.crtTheme}</span>
-          </button>
+        {/* Start: Theme Picker Section */}
+        <div className="retro-card mb-6">
+          <div className="retro-card-header bg-gray-200 dark:bg-gray-700 px-4 py-2 border-b border-gray-300 dark:border-gray-600">
+            <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200 pixel-font flex items-center gap-2">
+              <span className="text-xl">🎨</span>
+              <span>{t.themeSettings || 'Latar Belakang Tema'}</span>
+            </h2>
+          </div>
+          <div className="p-4">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              {THEME_OPTIONS.map((theme) => (
+                <button
+                  key={theme.id}
+                  onClick={() => handleThemeChange(theme.id)}
+                  className={`
+                    retro-card retro-window-sm p-3 text-center transition-all duration-200
+                    ${selectedTheme === theme.id 
+                      ? 'ring-2 ring-purple-500 transform scale-105' 
+                      : 'hover:transform hover:scale-105'
+                    }
+                  `}
+                >
+                  <div className="text-3xl mb-2">{theme.icon}</div>
+                  <div className={`font-bold text-sm text-gray-800 dark:text-gray-200 mb-1`}>
+                    {theme.name}
+                  </div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 pixel-font">
+                    {theme.description}
+                  </div>
+                  <div className={`
+                    mt-2 h-2 rounded-full
+                    ${selectedTheme === theme.id ? 'opacity-100' : 'opacity-30'}
+                  `}
+                    style={{
+                      background: `linear-gradient(90deg, var(--tw-gradient-stops))`
+                    }}
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
+        {/* End: Theme Picker Section */}
 
-        {/* Start: Profile Customization Section */}
-        {activeSection === 'profile' && (
-          <div className="retro-card mb-6">
+        {/* Start: Status and Bio Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Start: Live Status */}
+          <div className="retro-card">
             <div className="retro-card-header bg-gray-200 dark:bg-gray-700 px-4 py-2 border-b border-gray-300 dark:border-gray-600">
-              <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200">
-                🎨 Pilihan Profil
+              <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200 pixel-font flex items-center gap-2">
+                <span className="text-xl">🟢</span>
+                <span>{t.liveStatus || 'Status Langsung'}</span>
               </h2>
             </div>
-            <div className="p-4 retro-window-client">
-              {/* Start: Live Status Indicator */}
-              <div className="mb-6">
-                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Status Hidup</h3>
-                <ProfileStatusBadge 
-                  initialStatus={userStatus}
-                  onStatusChange={handleStatusChange}
-                />
-              </div>
-              {/* End: Live Status Indicator */}
-
-              {/* Start: Bio Editor */}
-              <div className="mb-6">
-                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Bio Peribadi</h3>
-                <ProfileBioEditor 
-                  initialBio={bio}
-                  onBioChange={handleBioChange}
-                />
-              </div>
-              {/* End: Bio Editor */}
-
-              {/* Start: Background Theme Picker */}
-              <div>
-                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Tema Latar Belakang</h3>
-                <div className="grid gap-3 sm:grid-cols-3">
-                  {THEME_OPTIONS.map((theme) => (
-                    <button
-                      key={theme.id}
-                      onClick={() => handleThemeChange(theme.id)}
-                      className={`p-3 rounded-lg border transition-all ${
-                        selectedTheme === theme.id
-                          ? 'border-purple-500 ring-2 ring-purple-200 dark:ring-purple-800'
-                          : 'border-gray-300 dark:border-gray-600 hover:shadow-md'
-                      }`}
-                    >
-                      <div className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {theme.name}
-                      </div>
-                      <div className={`h-12 rounded ${theme.preview} flex items-center justify-center`}>
-                        <span className="text-xs text-gray-800 dark:text-gray-200 font-mono">
-                          {theme.description.split(' ')[0]}
-                        </span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-                <div className="mt-3 text-xs text-gray-500 dark:text-gray-400">
-                  Tema semasa: <span className="font-bold text-purple-400">{THEME_OPTIONS.find(t => t.id === selectedTheme)?.name}</span>
-                </div>
-              </div>
-              {/* End: Background Theme Picker */}
+            <div className="p-4">
+              <ProfileStatusBadge 
+                initialStatus={liveStatus}
+                onStatusChange={handleStatusChange}
+              />
             </div>
           </div>
-        )}
-        {/* End: Profile Customization Section */}
+          {/* End: Live Status */}
 
-        <nav className="mb-8">
-          <div className="flex flex-wrap gap-2">
-            {[
-              ['profile', 'Profil'],
-              ['tipping', 'Pemindahan'],
-              ['api_key', 'Kunci API'],
-              ['nsfw', 'Kandungan NSFW'],
-              ['github', 'GitHub'],
-              ['delete', 'Padam Akaun'],
-            ].map(([value, label]) => (
-              <button
-                key={value}
-                onClick={() => navigateToSection(value as ActiveSection)}
-                className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${activeSection === value ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'}`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </nav>
-
-        <div className="retro-card">
-          {activeSection === 'tipping' && <SettingsTipping />}
-          {activeSection === 'api_key' && <SettingsApiKey />}
-          {activeSection === 'nsfw' && <SettingsNsfw />}
-          {activeSection === 'github' && <SettingsGithub username={username} />}
-          {activeSection === 'delete' && <SettingsDeleteAccount />}
-          {activeSection === null && (
-            <div className="p-6">
-              <h2 className="mb-4 text-xl font-semibold">Papan Pemuka Tetapan</h2>
-              <p className="text-gray-600 dark:text-gray-400">Pilih bahagian di atas untuk mengurus Tetapan anda.</p>
+          {/* Start: Bio Editor */}
+          <div className="retro-card">
+            <div className="retro-card-header bg-gray-200 dark:bg-gray-700 px-4 py-2 border-b border-gray-300 dark:border-gray-600">
+              <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200 pixel-font flex items-center gap-2">
+                <span className="text-xl">📝</span>
+                <span>{t.bioEditor || 'Bio Editor'}</span>
+              </h2>
             </div>
-          )}
+            <div className="p-4">
+              <ProfileBioEditor 
+                initialBio={customBio || 'Saya warga kampung siber retro yang antara.'}
+                onBioChange={handleBioChange}
+              />
+            </div>
+          </div>
+          {/* End: Bio Editor */}
         </div>
+        {/* End: Status and Bio Section */}
+
+        {/* Start: Tipping Section */}
+        <div className="mt-6">
+          <SettingsTipping />
+        </div>
+        {/* End: Tipping Section */}
       </div>
     </main>
   );
 }
-// End: Main Component

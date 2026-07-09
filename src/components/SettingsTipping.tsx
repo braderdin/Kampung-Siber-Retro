@@ -1,15 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { useLanguageStore } from '@/store/useLanguageStore';
-import { enDictionary, msDictionary } from '@/i18n/dictionaries';
-
-interface TippingSettings {
-  enabled: boolean;
-  provider: 'paypal' | 'ko-fi' | 'buycoffee';
-  customLink: string;
-  message: string;
-}
+import { useState, useEffect, useRef } from 'react';
 
 interface ConfettiParticle {
   id: number;
@@ -19,234 +10,187 @@ interface ConfettiParticle {
   vy: number;
   size: number;
   color: string;
+  rotation: number;
+  rotationSpeed: number;
   life: number;
   maxLife: number;
 }
 
-export default function SettingsTipping() {
-  const { language } = useLanguageStore();
-  const t = language === 'ms' ? msDictionary : enDictionary;
-  
-  const [settings, setSettings] = useState<TippingSettings>({
-    enabled: false,
-    provider: 'ko-fi',
-    customLink: '',
-    message: 'Support my work!',
-  });
+interface SettingsTippingProps {
+  className?: string;
+}
 
-  const [showConfetti, setShowConfetti] = useState(false);
-  const [confettiParticles, setConfettiParticles] = useState<ConfettiParticle[]>([]);
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
+export default function SettingsTipping({ className }: SettingsTippingProps) {
+  const [isConfettiActive, setIsConfettiActive] = useState(false);
+  const [particles, setParticles] = useState<ConfettiParticle[]>([]);
+  const animationFrameRef = useRef<number | null>(null);
+  const particleIdRef = useRef(0);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    setIsTouchDevice(isTouch);
-  }, []);
+    const colors = [
+      '#ff6b6b', '#4ecdc4', '#ff6e40', '#ffe66d', 
+      '#a855f7', '#f59e0b', '#10b981', '#3b82f6'
+    ];
 
-  const handleToggle = () => {
-    if (settings.enabled) {
-      setSettings(prev => ({
-        ...prev,
-        enabled: !prev.enabled,
-      }));
-    } else {
-      setSettings(prev => ({
-        ...prev,
-        enabled: true,
-      }));
-      triggerConfetti();
-    }
-  };
-
-  const triggerConfetti = () => {
-    if (showConfetti) return;
-    
-    const particles: ConfettiParticle[] = [];
-    const heartChars = ['💖', '💕', '💗', '💓', '💞', '💝'];
-    
-    for (let i = 0; i < 30; i++) {
+    const createHeartParticle = (x: number, y: number): ConfettiParticle => {
+      const size = Math.random() * 8 + 4;
       const angle = Math.random() * Math.PI * 2;
       const speed = Math.random() * 3 + 2;
       
-      particles.push({
-        id: Date.now() + i,
-        x: window.innerWidth / 2,
-        y: window.innerHeight / 2,
-        vx: Math.cos(angle) * speed * (Math.random() > 0.5 ? 1 : -1),
+      return {
+        id: particleIdRef.current++,
+        x,
+        y,
+        vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed - 5,
-        size: Math.random() * 20 + 15,
-        color: `hsl(${Math.random() * 60 + 0}, 100%, 70%)`,
+        size,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        rotation: Math.random() * 360,
+        rotationSpeed: (Math.random() - 0.5) * 10,
         life: 0,
-        maxLife: 60,
+        maxLife: 100 + Math.random() * 50
+      };
+    };
+
+    const animate = () => {
+      if (!isConfettiActive) {
+        setParticles([]);
+        animationFrameRef.current = requestAnimationFrame(animate);
+        return;
+      }
+
+      setParticles(prev => {
+        return prev
+          .map(p => ({
+            ...p,
+            x: p.x + p.vx,
+            y: p.y + p.vy,
+            vy: p.vy + 0.1,
+            rotation: p.rotation + p.rotationSpeed,
+            life: p.life + 1
+          }))
+          .filter(p => p.life < p.maxLife && p.y < window.innerHeight + 100);
+      });
+
+      animationFrameRef.current = requestAnimationFrame(animate);
+    };
+
+    if (isConfettiActive) {
+      animate();
+    }
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [isConfettiActive]);
+
+  const handleTipClick = () => {
+    setIsConfettiActive(true);
+    
+    // Create initial heart particles
+    const initialParticles: ConfettiParticle[] = [];
+    const colors = ['#ff6b6b', '#4ecdc4', '#ff6e40', '#ffe66d', '#a855f7', '#f59e0b', '#10b981', '#3b82f6'];
+    
+    for (let i = 0; i < 20; i++) {
+      const x = Math.random() * window.innerWidth;
+      const y = window.innerHeight * 0.7;
+      const size = Math.random() * 8 + 4;
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 3 + 2;
+      
+      initialParticles.push({
+        id: particleIdRef.current++,
+        x,
+        y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 5,
+        size,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        rotation: Math.random() * 360,
+        rotationSpeed: (Math.random() - 0.5) * 10,
+        life: 0,
+        maxLife: 100 + Math.random() * 50
       });
     }
     
-    setConfettiParticles(particles);
-    setShowConfetti(true);
+    setParticles(initialParticles);
     
-    const interval = setInterval(() => {
-      setConfettiParticles(prev => {
-        const updated = prev.map(p => ({
-          ...p,
-          x: p.x + p.vx,
-          y: p.y + p.vy,
-          vy: p.vy + 0.1,
-          life: p.life + 1,
-        }));
-        
-        const alive = updated.filter(p => p.life < p.maxLife);
-        
-        if (alive.length === 0) {
-          clearInterval(interval);
-          setShowConfetti(false);
-        }
-        
-        return alive;
-      });
-    }, 16);
+    setTimeout(() => {
+      setIsConfettiActive(false);
+      setParticles([]);
+    }, 3000);
   };
 
-  const handleProviderChange = (provider: 'paypal' | 'ko-fi' | 'buycoffee') => {
-    setSettings(prev => ({
-      ...prev,
-      provider,
-    }));
-  };
-
-  const handleLinkChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSettings(prev => ({
-      ...prev,
-      customLink: e.target.value,
-    }));
-  };
-
-  const handleMessageChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setSettings(prev => ({
-      ...prev,
-      message: e.target.value,
-    }));
-  };
-
-  const handleSave = () => {
-    console.log('Tipping settings saved:', settings);
+  const renderHeartShape = (x: number, y: number, size: number, rotation: number, color: string) => {
+    const transform = `translate(${x}px, ${y}px) rotate(${rotation}deg)`;
+    
+    return (
+      <svg
+        key={`heart-${x}-${y}-${rotation}`}
+        className="absolute"
+        style={{ transform }}
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+          fill={color}
+          strokeWidth={0}
+        />
+      </svg>
+    );
   };
 
   return (
-    <div className="p-6">
-      <style>{`
-        .confetti-canvas {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          pointer-events: none;
-          z-index: 9999;
-        }
-      `}</style>
-      
-      {showConfetti && !isTouchDevice && (
-        <canvas
-          className="confetti-canvas"
-          id="confetti-canvas"
-        />
-      )}
-
-      <h2 className="text-xl font-semibold mb-4 flex items-center space-x-2">
-        <span>💖</span>
-        <span>Belanja Kopi / Give a Treat</span>
-      </h2>
-      
-      <div className="retro-btn-secondary flex items-center justify-center gap-2 mb-6" onClick={handleToggle}>
-        <span className="text-2xl">{settings.enabled ? '☕️' : '☕'}</span>
-        <span className="font-bold">
-          {settings.enabled ? 'Berhentikan Tipping' : 'Aktifkan Tipping'}
-        </span>
-      </div>
-      
-      {settings.enabled && (
-        <div className="space-y-4">
-          <div>
-            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-              Penyedia Tipping
-            </h3>
-            <div className="space-y-2">
-              <button
-                onClick={() => handleProviderChange('ko-fi')}
-                className={`w-full p-3 rounded-md border text-sm font-medium transition-colors ${
-                  settings.provider === 'ko-fi'
-                    ? 'border-yellow-400 bg-yellow-50 dark:bg-yellow-900/20'
-                    : 'border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800'
-                }`}
-              >
-                <div className="flex items-center space-x-2">
-                  <span className="text-xl">☕</span>
-                  <span>Ko-fi</span>
-                </div>
-              </button>
-              <button
-                onClick={() => handleProviderChange('paypal')}
-                className={`w-full p-3 rounded-md border text-sm font-medium transition-colors ${
-                  settings.provider === 'paypal'
-                    ? 'border-blue-400 bg-blue-50 dark:bg-blue-900/20'
-                    : 'border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800'
-                }`}
-              >
-                <div className="flex items-center space-x-2">
-                  <span className="text-xl">💳</span>
-                  <span>PayPal</span>
-                </div>
-              </button>
-              <button
-                onClick={() => handleProviderChange('buycoffee')}
-                className={`w-full p-3 rounded-md border text-sm font-medium transition-colors ${
-                  settings.provider === 'buycoffee'
-                    ? 'border-green-400 bg-green-50 dark:bg-green-900/20'
-                    : 'border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800'
-                }`}
-              >
-                <div className="flex items-center space-x-2">
-                  <span className="text-xl">🍪</span>
-                  <span>Buy Me a Coffee</span>
-                </div>
-              </button>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Pautan Tipping Custom
-            </label>
-            <input
-              type="url"
-              value={settings.customLink}
-              onChange={handleLinkChange}
-              placeholder="https://..."
-              className="retro-input w-full"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Mesej
-            </label>
-            <textarea
-              value={settings.message}
-              onChange={handleMessageChange}
-              placeholder="Terima kasih atas sokongan anda!"
-              rows={3}
-              className="retro-textarea w-full"
-            />
-          </div>
-
-          <button
-            onClick={handleSave}
-            className="retro-btn-primary w-full"
-          >
-            Simpan Tetapan
-          </button>
+    <div className={`settings-tipping ${className || ''}`}>
+      {/* Start: Tipping Button */}
+      <div className="retro-card">
+        <div className="retro-card-header bg-gray-200 dark:bg-gray-700 px-4 py-2 border-b border-gray-300 dark:border-gray-600">
+          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 pixel-font">
+            🍵 Belanja Kopi / Give a Treat
+          </h3>
         </div>
-      )}
+        <div className="p-4">
+          <button
+            onClick={handleTipClick}
+            disabled={isConfettiActive}
+            className={`
+              w-full retro-btn-primary text-lg font-bold
+              ${isConfettiActive ? 'opacity-50 cursor-not-allowed' : ''}
+            `}
+          >
+            {isConfettiActive ? 'Sedang Menghantar...' : 'Belanja Kopi ☕'}
+          </button>
+          
+          <div className="mt-4 text-center">
+            <p className="text-sm text-gray-600 dark:text-gray-400 pixel-font">
+              Sentu untuk memberi sedikit semangat kepada warga kami!
+            </p>
+          </div>
+        </div>
+      </div>
+      {/* End: Tipping Button */}
+
+      {/* Start: Confetti Canvas */}
+      <div 
+        ref={containerRef}
+        className="fixed top-0 left-0 w-full h-full pointer-events-none z-40 overflow-hidden"
+      >
+        {particles.map(particle => 
+          renderHeartShape(
+            particle.x, 
+            particle.y, 
+            particle.size, 
+            particle.rotation, 
+            particle.color
+          )
+        )}
+      </div>
+      {/* End: Confetti Canvas */}
     </div>
   );
 }

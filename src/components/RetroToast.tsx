@@ -1,181 +1,209 @@
-// Start: Imports
-import React, { useState, useEffect, createContext, useContext, ReactNode } from 'react';
-// End: Imports
+"use client";
 
-// Start: Type Definitions
+import { useState, useEffect, useRef } from 'react';
+
 interface Toast {
-  id: number;
+  id: string;
   message: string;
-  type: 'success' | 'error' | 'info' | 'warning';
-}
-
-interface RetroToastProps {
-  message: string;
-  type?: 'success' | 'error' | 'info' | 'warning';
+  type: 'success' | 'error' | 'warning' | 'info';
   duration?: number;
 }
 
-interface ToastContextType {
-  showToast: (message: string, type?: 'success' | 'error' | 'info' | 'warning') => void;
+interface RetroToastProps {
+  className?: string;
 }
 
-const ToastContext = createContext<ToastContextType | undefined>(undefined);
-// End: Type Definitions
+let toastId = 0;
+let toastListeners: ((toasts: Toast[]) => void)[] = [];
 
-// Start: Audio Notification Hook
-function useSuccessSound() {
-  const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
+const notify = (message: string, type: Toast['type'], duration: number = 5000) => {
+  const newToast: Toast = {
+    id: `toast-${toastId++}`,
+    message,
+    type,
+    duration
+  };
+  
+  toastListeners.forEach(listener => {
+    // This would be used in a real implementation
+  });
+};
+
+export function showSuccess(message: string, duration?: number) {
+  const newToast: Toast = {
+    id: `toast-${toastId++}`,
+    message,
+    type: 'success',
+    duration: duration || 5000
+  };
+  
+  // Play success sound
+  playSuccessSound();
+  
+  return newToast;
+}
+
+export function showError(message: string, duration?: number) {
+  const newToast: Toast = {
+    id: `toast-${toastId++}`,
+    message,
+    type: 'error',
+    duration: duration || 5000
+  };
+  return newToast;
+}
+
+export function showWarning(message: string, duration?: number) {
+  const newToast: Toast = {
+    id: `toast-${toastId++}`,
+    message,
+    type: 'warning',
+    duration: duration || 5000
+  };
+  return newToast;
+}
+
+export function showInfo(message: string, duration?: number) {
+  const newToast: Toast = {
+    id: `toast-${toastId++}`,
+    message,
+    type: 'info',
+    duration: duration || 5000
+  };
+  return newToast;
+}
+
+export default function RetroToast({ className }: RetroToastProps) {
+  const [toasts, setToasts] = useState<Toast[]>([]);
+  const audioRef = useRef<AudioContext | null>(null);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      setAudioContext(ctx);
-    }
+    // Initialize Web Audio API context
+    const initAudio = () => {
+      if (!audioRef.current) {
+        audioRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+    };
+
+    const handleToast = (event: CustomEvent) => {
+      const toast = event.detail as Toast;
+      setToasts(prev => [...prev, toast]);
+    };
+
+    // Listen for toast events
+    window.addEventListener('retro-toast-success', handleToast as any);
+    window.addEventListener('retro-toast-error', handleToast as any);
+    window.addEventListener('retro-toast-warning', handleToast as any);
+    window.addEventListener('retro-toast-info', handleToast as any);
+
+    initAudio();
 
     return () => {
-      if (audioContext) {
-        audioContext.close();
-      }
+      window.removeEventListener('retro-toast-success', handleToast as any);
+      window.removeEventListener('retro-toast-error', handleToast as any);
+      window.removeEventListener('retro-toast-warning', handleToast as any);
+      window.removeEventListener('retro-toast-info', handleToast as any);
     };
   }, []);
 
+  useEffect(() => {
+    if (toasts.length === 0) return;
+
+    const timers = toasts.map(toast => {
+      return setTimeout(() => {
+        setToasts(prev => prev.filter(t => t.id !== toast.id));
+      }, toast.duration);
+    });
+
+    return () => timers.forEach(timer => clearTimeout(timer));
+  }, [toasts]);
+
   const playSuccessSound = () => {
-    if (!audioContext) return;
+    if (!audioRef.current) return;
 
     try {
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      const distortion = audioContext.createWaveShaper();
+      const ctx = audioRef.current;
       
-      const curve = [];
-      for (let i = 0; i < 100; i++) {
-        curve[i] = (i < 50) ? 0 : 1;
-      }
-      distortion.curve = new Float32Array(curve);
+      // Create dual-tone 8-bit chime melody
+      const playTone = (frequency: number, duration: number) => {
+        const oscillator = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(ctx.destination);
+        
+        oscillator.type = 'square' as const;
+        oscillator.frequency.setValueAtTime(frequency, ctx.currentTime);
+        
+        gainNode.gain.setValueAtTime(0.1, ctx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration / 1000);
+        
+        oscillator.start(ctx.currentTime);
+        oscillator.stop(ctx.currentTime + duration / 1000);
+      };
 
-      oscillator.type = 'square';
-      oscillator.frequency.setValueAtTime(880, audioContext.currentTime);
-      
-      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-
-      oscillator.connect(distortion);
-      distortion.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-
-      oscillator.start();
-      oscillator.stop(audioContext.currentTime + 0.3);
+      // Play dual-tone 8-bit chime
+      playTone(880, 150); // High C
+      ctx.resume();
+      setTimeout(() => playTone(987, 150), 50); // D
     } catch (err) {
       console.error('Audio error:', err);
     }
   };
 
-  return playSuccessSound;
-}
-// End: Audio Notification Hook
-
-// Start: Toast Provider Component
-export function ToastProvider({ children }: { children: ReactNode }) {
-  const [toasts, setToasts] = useState<Toast[]>([]);
-  const playSuccessSound = useSuccessSound();
-
-  // Start: Show Toast Function
-  const showToast = (message: string, type: 'success' | 'error' | 'info' | 'warning' = 'info') => {
-    const id = Date.now();
-    setToasts(prev => [...prev, { id, message, type }]);
-    
-    if (type === 'success') {
-      playSuccessSound();
+  const getToastStyles = (type: Toast['type']) => {
+    switch (type) {
+      case 'success':
+        return 'bg-green-500/90 dark:bg-green-600/90 border-green-600 dark:border-green-500';
+      case 'error':
+        return 'bg-red-500/90 dark:bg-red-600/90 border-red-600 dark:border-red-500';
+      case 'warning':
+        return 'bg-amber-500/90 dark:bg-amber-600/90 border-amber-600 dark:border-amber-500';
+      case 'info':
+        return 'bg-blue-500/90 dark:bg-blue-600/90 border-blue-600 dark:border-blue-500';
+      default:
+        return 'bg-gray-500/90 dark:bg-gray-600/90 border-gray-600 dark:border-gray-500';
     }
-    
-    setTimeout(() => {
-      setToasts(prev => prev.filter((toast) => toast.id !== id));
-    }, 3000);
   };
-  // End: Show Toast Function
 
-  // Start: Remove Toast Function
-  const removeToast = (id: number) => {
-    setToasts(prev => prev.filter(toast => toast.id !== id));
+  const getToastIcon = (type: Toast['type']) => {
+    switch (type) {
+      case 'success':
+        return '✅';
+      case 'error':
+        return '❌';
+      case 'warning':
+        return '⚠️';
+      case 'info':
+        return 'ℹ️';
+      default:
+        return '📢';
+    }
   };
-  // End: Remove Toast Function
+
+  if (toasts.length === 0) {
+    return (
+      <div className={`retro-toast-container ${className || ''}`} />
+    );
+  }
 
   return (
-    <ToastContext.Provider value={{ showToast }}>
-      {children}
-      <div className="fixed top-4 right-4 z-50 flex flex-col space-y-2 p-4">
-        {toasts.map((toast) => (
-          <div
-            key={toast.id}
-            className="retro-toast animate-fade-in"
-          >
-            <div className={`px-3 py-2 rounded text-xs font-mono ${getToastClass(toast.type)}`}>
-              {toast.message}
-            </div>
+    <div className={`retro-toast-container ${className || ''}`}>
+      {toasts.map((toast) => (
+        <div
+          key={toast.id}
+          className={`
+            retro-toast-item
+            ${getToastStyles(toast.type)}
+            animate-slide-in
+          `}
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-xl">{getToastIcon(toast.type)}</span>
+            <span className="pixel-font text-sm">{toast.message}</span>
           </div>
-        ))}
-      </div>
-    </ToastContext.Provider>
-  );
-}
-// End: Toast Provider Component
-
-// Start: Get Toast Class Function
-function getToastClass(type: Toast['type']): string {
-  switch (type) {
-    case 'success':
-      return 'bg-green-500 text-white border-green-600';
-    case 'error':
-      return 'bg-red-500 text-white border-red-600';
-    case 'warning':
-      return 'bg-yellow-500 text-gray-800 border-yellow-600';
-    case 'info':
-    default:
-      return 'bg-blue-500 text-white border-blue-600';
-  }
-}
-// End: Get Toast Class Function
-
-// Start: Use Toast Hook
-export const useToast = () => {
-  const context = useContext(ToastContext);
-  if (!context) {
-    throw new Error('useToast must be used within a ToastProvider');
-  }
-  return context;
-};
-// End: Use Toast Hook
-
-// Start: RetroToast Component
-export default function RetroToast({
-  message,
-  type = 'info',
-  duration = 3000,
-}: RetroToastProps) {
-  const [isVisible, setIsVisible] = useState(true);
-  const playSuccessSound = useSuccessSound();
-
-  // Start: Auto Hide Effect
-  useEffect(() => {
-    if (type === 'success') {
-      playSuccessSound();
-    }
-    
-    const timer = setTimeout(() => {
-      setIsVisible(false);
-    }, duration);
-    return () => clearTimeout(timer);
-  }, [duration, type, playSuccessSound]);
-  // End: Auto Hide Effect
-
-  if (!isVisible) return null;
-
-  return (
-    <div className="retro-toast animate-fade-in">
-      <div className={`px-3 py-2 rounded text-xs font-mono ${getToastClass(type)}`}>
-        {message}
-      </div>
+        </div>
+      ))}
     </div>
   );
 }
-// End: RetroToast Component
