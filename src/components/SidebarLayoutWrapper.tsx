@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import MidiMusicController from './MidiMusicController';
 
 interface SidebarLayoutWrapperProps {
   children: React.ReactNode;
@@ -139,6 +140,12 @@ export default function SidebarLayoutWrapper({
             </ul>
           </nav>
           {/* End: Navigation Items */}
+
+          {/* Start: MIDI Music Controller */}
+          <div className="p-3 border-t-2 border-dashed border-purple-400/30">
+            <MidiMusicController />
+          </div>
+          {/* End: MIDI Music Controller */}
 
           {/* Start: Sidebar Footer */}
           <div className="p-4 border-t-2 border-dashed border-cyan-400/30">

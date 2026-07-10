@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback, useEffect as useEffectClient } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Send, Users, MessageCircle, Smile, Copy, RefreshCw, Loader2, User, MessageSquare, Bell, Volume2, VolumeX } from "lucide-react";
+import { handleChatCommand, ChatCommandResult } from "@/components/chat/chat-command-handler";
 
 interface BbsChatRoomProps {
   roomName?: string;
@@ -217,14 +218,36 @@ export default function BbsChatRoom({
     };
   }, [connectWebSocket]);
 
-  const sendMessage = useCallback(() => {
-    if (!inputValue.trim() || !isConnected) return;
+  const processAndSendMessage = useCallback((content: string) => {
+    const commandResult: ChatCommandResult = handleChatCommand(content);
+    
+    if (commandResult.shouldDeleteMessages) {
+      setMessages([]);
+      localStorage.removeItem(MESSAGE_HISTORY_KEY);
+      return;
+    }
+    
+    if (commandResult.response) {
+      const actionMessage: ChatMessage = {
+        id: `action_${Date.now()}`,
+        userId: "system",
+        userName: "Command",
+        content: commandResult.response,
+        timestamp: new Date().toISOString(),
+        type: "action",
+      };
+      setMessages(prev => [...prev, actionMessage]);
+      setInputValue("");
+      return;
+    }
+
+    if (!content.trim() || !isConnected) return;
 
     const message: ChatMessage = {
       id: Date.now().toString(),
       userId,
       userName,
-      content: inputValue,
+      content,
       timestamp: new Date().toISOString(),
       type: "message",
       isOwn: true,
@@ -240,7 +263,11 @@ export default function BbsChatRoom({
         data: message,
       }));
     }
-  }, [inputValue, isConnected, userId, userName, onMessageSend]);
+  }, [isConnected, userId, userName, onMessageSend]);
+
+  const sendMessage = useCallback(() => {
+    processAndSendMessage(inputValue);
+  }, [inputValue, processAndSendMessage]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -292,6 +319,7 @@ export default function BbsChatRoom({
 
   const renderMessage = (message: ChatMessage, index: number) => {
     const isSystem = message.type === "system";
+    const isAction = message.type === "action";
     const isSameUser = index > 0 && messages[index - 1]?.userId === message.userId;
     const showAvatar = !isSameUser || isSystem;
 
@@ -299,17 +327,17 @@ export default function BbsChatRoom({
       <div 
         key={message.id} 
         className={`flex gap-3 mb-4 ${
-          isSystem ? "justify-center" : ""
+          isSystem || isAction ? "justify-center" : ""
         }`}
       >
         {showAvatar && (
           <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center pixel-font text-sm">
-            {isSystem ? "S" : message.userName.charAt(0).toUpperCase()}
+            {isSystem || isAction ? "C" : message.userName.charAt(0).toUpperCase()}
           </div>
         )}
         
         <div className="flex-1">
-          {!isSystem && (
+          {!isSystem && !isAction && (
             <div className="flex items-center gap-2 mb-1">
               <span className="font-semibold text-sm text-gray-200 pixel-font">
                 {message.userName}
@@ -320,9 +348,9 @@ export default function BbsChatRoom({
             </div>
           )}
           
-          {isSystem ? (
+          {isSystem || isAction ? (
             <div className="px-3 py-2 bg-gray-800/50 rounded border border-gray-700">
-              <p className="text-sm text-gray-400 pixel-font italic">
+              <p className="text-sm text-yellow-400 pixel-font italic">
                 {message.content}
               </p>
             </div>
@@ -427,7 +455,7 @@ export default function BbsChatRoom({
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Taip mesej anda... (Shift+Enter untuk newline)"
+          placeholder="Taip mesej anda... (Shift+Enter untuk newline). /help untuk arahan."
           className="w-full px-3 py-2 rounded-lg bg-gray-800/50 border border-gray-600 
             focus:outline-none focus:border-emerald-500 resize-none text-sm text-gray-200 pixel-font"
           rows={2}

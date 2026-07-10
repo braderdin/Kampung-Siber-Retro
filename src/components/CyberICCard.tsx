@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { CyberICMetadata, formatICNumber } from '@/types/cyberIC';
+import CyberIcPrintFrame from './CyberIcPrintFrame';
 
 interface CyberICCardProps {
   metadata: CyberICMetadata;
@@ -31,63 +32,50 @@ export default function CyberICCard({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Set up retro styling
     ctx.fillStyle = '#d3d3d3';
     ctx.fillRect(0, 0, 400, 200);
 
-    // Draw pixel border
     ctx.strokeStyle = '#808080';
     ctx.lineWidth = 2;
     ctx.strokeRect(2, 2, 396, 196);
 
-    // Fill with inner color
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(4, 4, 392, 192);
 
-    // Draw header bar
     ctx.fillStyle = '#a9a9a9';
     ctx.fillRect(4, 4, 392, 30);
 
-    // Draw title
     ctx.fillStyle = '#000000';
     ctx.font = 'bold 16px monospace';
     ctx.fillText('KAMPUNG SIBER RETRO', 12, 22);
 
-    // Draw citizen name
     ctx.fillStyle = '#000000';
     ctx.font = 'bold 18px monospace';
     ctx.fillText(metadata.citizenName, 12, 70);
 
-    // Draw IC number
     ctx.fillStyle = '#333333';
     ctx.font = '14px monospace';
     ctx.fillText(`IC: ${formatICNumber(metadata.icNumber)}`, 12, 100);
 
-    // Draw title
     ctx.fillStyle = '#666666';
     ctx.font = '12px monospace';
     ctx.fillText(`Jawatan: ${metadata.activeTitle}`, 12, 125);
 
-    // Draw village zone
     ctx.fillStyle = '#666666';
     ctx.font = '12px monospace';
     ctx.fillText(`Zon: ${metadata.villageZone}`, 12, 145);
 
-    // Draw registration date
     ctx.fillStyle = '#999999';
     ctx.font = '11px monospace';
     ctx.fillText(`Tarikh Daftar: ${metadata.registrationDate}`, 12, 165);
 
-    // Draw footer
     ctx.fillStyle = '#a9a9a9';
     ctx.fillRect(4, 170, 392, 26);
 
-    // Draw footer text
     ctx.fillStyle = '#000000';
     ctx.font = '10px monospace';
     ctx.fillText('DICETAK: ' + new Date().toLocaleDateString('ms-MY'), 12, 185);
 
-    // Convert to PNG and trigger download
     const dataURL = canvas.toDataURL('image/png');
     const link = document.createElement('a');
     link.download = `cyber-ic-${metadata.citizenName.replace(/\s+/g, '_').toLowerCase()}.png`;
@@ -98,28 +86,7 @@ export default function CyberICCard({
   const handlePrint = () => {
     if (!isMounted || !cardRef.current) return;
     
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) return;
-
-    const cardContent = cardRef.current.outerHTML;
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>Cyber IC - ${metadata.citizenName}</title>
-        <style>
-          body { margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #f0f0f0; }
-          .card-container { background: #fff; border: 2px solid #808080; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
-        </style>
-      </head>
-      <body>
-        <div class="card-container">${cardContent}</div>
-      </body>
-      </html>
-    `);
-    printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
+    window.print();
   };
 
   return (
@@ -210,12 +177,9 @@ export default function CyberICCard({
             >
               📥 Muat Turun
             </button>
-            <button
-              onClick={handlePrint}
-              className="retro-btn-secondary text-xs px-2 py-1 flex items-center gap-1"
-            >
-              🖨️ Cetak
-            </button>
+            {/* Start: Physical Print Frame */}
+            <CyberIcPrintFrame metadata={metadata} />
+            {/* End: Physical Print Frame */}
           </div>
         )}
       </div>

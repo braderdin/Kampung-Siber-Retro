@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { enDictionary, msDictionary } from '@/i18n/dictionaries';
+import MarketplaceDownloadTracker from './MarketplaceDownloadTracker';
 
 interface ProductCardProps {
   id: string;
@@ -12,6 +13,7 @@ interface ProductCardProps {
   code: string;
   tags: string[];
   downloads: number;
+  downloadUrl?: string;
 }
 
 export default function ProductCard({ 
@@ -21,7 +23,8 @@ export default function ProductCard({
   description, 
   code,
   tags,
-  downloads
+  downloads,
+  downloadUrl,
 }: ProductCardProps) {
   const { language } = useLanguageStore();
   const t = language === 'ms' ? msDictionary : enDictionary;
@@ -124,13 +127,21 @@ export default function ProductCard({
           <span>{copiedId === id ? ' Disalin!' : ' Salin Kod Aset'}</span>
         </button>
         
-        <button
-          onClick={handleDownload}
-          className="retro-btn-secondary text-xs px-2 py-1 flex items-center gap-1"
-        >
-          ⬇️
-          <span>Muat Turun</span>
-        </button>
+        {downloadUrl ? (
+          <MarketplaceDownloadTracker
+            assetId={id}
+            assetName={title}
+            downloadUrl={downloadUrl}
+          />
+        ) : (
+          <button
+            onClick={handleDownload}
+            className="retro-btn-secondary text-xs px-2 py-1 flex items-center gap-1"
+          >
+            ⬇️
+            <span>Muat Turun</span>
+          </button>
+        )}
       </div>
       {/* End: Card Actions */}
 
@@ -171,16 +182,4 @@ export default function ProductCard({
       {/* End: Success Alert */}
     </div>
   );
-}
-
-// Add CSS for alert animation
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-`;
-if (typeof document !== 'undefined') {
-  document.head.appendChild(style);
 }

@@ -1,182 +1,168 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from 'react';
 
-interface PlaylistTrack {
+interface Track {
   id: string;
   title: string;
   artist: string;
-  album?: string;
-  duration?: number;
-  url?: string;
-  isPlaying?: boolean;
+  duration: string;
+  url: string;
 }
 
 interface WinampPlaylistDrawerProps {
-  tracks?: PlaylistTrack[];
-  currentTrack?: PlaylistTrack;
-  onTrackSelect?: (track: PlaylistTrack) => void;
-  onPlayPause?: () => void;
   className?: string;
-  autoCollapse?: boolean;
 }
 
-export const WinampPlaylistDrawer: React.FC<WinampPlaylistDrawerProps> = ({
-  tracks: initialTracks = [],
-  currentTrack,
-  onTrackSelect,
-  onPlayPause,
-  className = "",
-  autoCollapse = false,
-}) => {
-  const [tracks, setTracks] = useState<PlaylistTrack[]>(initialTracks);
-  const [isOpen, setIsOpen] = useState(true);
-  const [hoveredTrack, setHoveredTrack] = useState<string | null>(null);
+const CHIPTUNE_TRACKS: Track[] = [
+  { id: '1', title: 'Pixel Dreams', artist: '8-Bit Collective', duration: '2:45', url: '/music/pixel-dreams.mp3' },
+  { id: '2', title: 'Neon Runner', artist: 'Retro Wave', duration: '3:12', url: '/music/neon-runner.mp3' },
+  { id: '3', title: 'Digital Sunset', artist: 'Synthwave Dreams', duration: '4:01', url: '/music/digital-sunset.mp3' },
+  { id: '4', title: 'Arcade Hero', artist: 'Chiptune Masters', duration: '2:30', url: '/music/arcade-hero.mp3' },
+  { id: '5', title: 'Cyber Night', artist: 'Future Bass', duration: '3:45', url: '/music/cyber-night.mp3' },
+  { id: '6', title: 'Retro Game Start', artist: 'Game Boy Sounds', duration: '0:15', url: '/music/game-start.mp3' },
+  { id: '7', title: 'Level Complete', artist: '8-Bit Victory', duration: '0:30', url: '/music/level-complete.mp3' },
+];
 
-  const toggleDrawer = useCallback(() => {
-    const newState = !isOpen;
-    setIsOpen(newState);
-    localStorage.setItem("winamp-drawer-open", String(newState));
-  }, [isOpen]);
+export default function WinampPlaylistDrawer({ className }: WinampPlaylistDrawerProps) {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
+  const [volume, setVolume] = useState(0.7);
+  const [filter, setFilter] = useState('');
+  const [filteredTracks, setFilteredTracks] = useState<Track[]>(CHIPTUNE_TRACKS);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    const savedState = localStorage.getItem("winamp-drawer-open");
-    if (savedState !== null) {
-      setIsOpen(savedState === "true");
-    }
-  }, []);
-
-  const formatDuration = (seconds?: number): string => {
-    if (!seconds) return "--:--";
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
-  };
-
-  const handleTrackClick = (track: PlaylistTrack) => {
-    if (onTrackSelect) {
-      onTrackSelect(track);
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent, track: PlaylistTrack) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      handleTrackClick(track);
-    }
-  };
-
-  if (autoCollapse && !isOpen) {
-    return (
-      <div
-        className={`fixed bottom-4 right-4 z-50 ${className}`}
-        onClick={toggleDrawer}
-      >
-        <button className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white font-pixel text-xs rounded shadow-lg transition-colors">
-          <span>🎵</span>
-          <span>Playlist ({tracks.length})</span>
-        </button>
-      </div>
+    const lowerFilter = filter.toLowerCase();
+    const filtered = CHIPTUNE_TRACKS.filter(track =>
+      track.title.toLowerCase().includes(lowerFilter) ||
+      track.artist.toLowerCase().includes(lowerFilter)
     );
-  }
+    setFilteredTracks(filtered);
+  }, [filter]);
+
+  const handlePlay = (track: Track) => {
+    if (audioRef.current) {
+      audioRef.current.src = track.url;
+      audioRef.current.volume = volume;
+      audioRef.current.play();
+      setCurrentTrack(track);
+      setIsPlaying(true);
+    }
+  };
+
+  const handlePause = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    }
+  };
+
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newVolume = parseFloat(e.target.value);
+    setVolume(newVolume);
+    if (audioRef.current) {
+      audioRef.current.volume = newVolume;
+    }
+  };
+
+  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFilter(e.target.value);
+  };
 
   return (
-    <div className={`flex flex-col ${className}`}>
-      <div className="flex items-center justify-between mb-2">
+    <div className={`winamp-player bg-gradient-to-b from-gray-800 to-gray-900 rounded-lg p-3 ${className || ''}`}>
+      {/* Start: Winamp Header */}
+      <div className="winamp-header flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <button
-            onClick={toggleDrawer}
-            className="font-pixel text-xs text-gray-400 hover:text-white transition-colors"
-            aria-label={isOpen ? "Collapse playlist" : "Expand playlist"}
-          >
-            {isOpen ? "▲" : "▼"}
-          </button>
-          <h3 className="font-pixel text-xs text-gray-300">Playlist</h3>
-          <span className="font-pixel text-xs text-gray-600">({tracks.length})</span>
+          <span className="text-lg">🎵</span>
+          <span className="text-sm font-bold text-cyan-400 pixel-font">
+            Winamp Retro Player
+          </span>
         </div>
+        
+        <div className="flex items-center gap-1">
+          <span className="text-xs text-gray-400">🔊</span>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.1"
+            value={volume}
+            onChange={handleVolumeChange}
+            className="w-20 h-1"
+          />
+        </div>
+      </div>
+      {/* End: Winamp Header */}
 
-        {currentTrack && (
-          <div className="flex items-center gap-2">
-            <button
-              onClick={onPlayPause}
-              className="font-pixel text-xs text-gray-400 hover:text-white transition-colors"
-              aria-label="Play/Pause"
-            >
-              {currentTrack.isPlaying ? "⏸" : "▶"}
-            </button>
+      {/* Start: Filter Field */}
+      <div className="mb-2">
+        <input
+          type="text"
+          placeholder="Cari trek (taip untuk menapis)..."
+          value={filter}
+          onChange={handleFilterChange}
+          className="winamp-filter w-full px-2 py-1 text-xs bg-gray-700 text-gray-200 rounded border border-gray-600 focus:border-cyan-400 outline-none pixel-font"
+        />
+      </div>
+      {/* End: Filter Field */}
+
+      {/* Start: Playlist Tracks */}
+      <div className="winamp-playlist max-h-48 overflow-y-auto retroscrollbar">
+        {filteredTracks.length === 0 ? (
+          <div className="text-center py-4 text-xs text-gray-500 pixel-font">
+            Tiada trek ditemui
           </div>
+        ) : (
+          filteredTracks.map(track => (
+            <div
+              key={track.id}
+              className={`
+                flex items-center justify-between p-2 rounded
+                transition-all duration-200 text-xs pixel-font
+                ${currentTrack?.id === track.id 
+                  ? 'bg-cyan-500/20 text-cyan-300' 
+                  : 'text-gray-300 hover:bg-gray-700/50'
+                }
+              `}
+            >
+              {/* Track Info */}
+              <div className="flex-1 min-w-0">
+                <div className="truncate font-bold">{track.title}</div>
+                <div className="text-gray-500 truncate">{track.artist}</div>
+              </div>
+              
+              {/* Duration */}
+              <span className="text-gray-500 mx-2">{track.duration}</span>
+              
+              {/* Play Button */}
+              <button
+                onClick={() => currentTrack?.id === track.id && isPlaying ? handlePause() : handlePlay(track)}
+                className="text-cyan-400 hover:text-cyan-300 px-1"
+                title={currentTrack?.id === track.id && isPlaying ? 'Jeda' : 'Main'}
+              >
+                {currentTrack?.id === track.id && isPlaying ? '⏸️' : '▶️'}
+              </button>
+            </div>
+          ))
         )}
       </div>
+      {/* End: Playlist Tracks */}
 
-      <div className={`overflow-hidden transition-all duration-300 ${
-        isOpen ? "max-h-96" : "max-h-0"
-      }`}>
-        <div className="space-y-1">
-          {tracks.map((track) => {
-            const isCurrent = currentTrack?.id === track.id;
-            return (
-              <div
-                key={track.id}
-                className={`font-pixel text-xs rounded transition-all duration-200 ${
-                  isCurrent
-                    ? "bg-blue-900/50 border border-blue-500/50"
-                    : "bg-gray-800/30 hover:bg-gray-700/50"
-                }`}
-                onClick={() => handleTrackClick(track)}
-                onKeyDown={(e) => handleKeyDown(e, track)}
-                onMouseEnter={() => setHoveredTrack(track.id)}
-                onMouseLeave={() => setHoveredTrack(null)}
-                tabIndex={0}
-                role="button"
-                aria-selected={isCurrent}
-              >
-                <div className="flex items-center justify-between p-2">
-                  <div className="flex-1 min-w-0">
-                    <div className={`truncate ${
-                      isCurrent ? "text-white font-bold" : "text-gray-300"
-                    }`}>
-                      {track.title}
-                    </div>
-                    <div className="text-gray-500 text-xs truncate">
-                      {track.artist}
-                      {track.album && ` • ${track.album}`}
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-2 text-gray-500">
-                    <span className="text-xs">
-                      {formatDuration(track.duration)}
-                    </span>
-                    
-                    {isCurrent && (
-                      <span className="text-xs animate-pulse">▶</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {!isOpen && (
-        <div className="mt-2">
-          <button
-            onClick={toggleDrawer}
-            className="w-full font-pixel text-xs text-center text-gray-400 hover:text-white transition-colors"
-          >
-            Click to expand playlist
-          </button>
+      {/* Start: Now Playing */}
+      {currentTrack && (
+        <div className="mt-2 pt-2 border-t border-gray-700">
+          <div className="text-xs text-cyan-400 pixel-font">
+            <span>Now Playing: </span>
+            <span className="text-gray-300">{currentTrack.title}</span>
+          </div>
         </div>
       )}
+      {/* End: Now Playing */}
 
-      {tracks.length === 0 && isOpen && (
-        <div className="py-4 text-center">
-          <p className="font-pixel text-xs text-gray-600">No tracks in playlist</p>
-        </div>
-      )}
+      {/* Hidden Audio Element */}
+      <audio ref={audioRef} />
     </div>
   );
-};
-
-export default WinampPlaylistDrawer;
+}

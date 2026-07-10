@@ -1,167 +1,158 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import useTerminalCommandHistory from '@/hooks/useTerminalCommandHistory';
+
+interface TerminalEntry {
+  id: string;
+  command: string;
+  output: string;
+  timestamp: Date;
+}
 
 interface RetroTerminalWidgetProps {
-  title?: string;
   className?: string;
 }
 
-interface MatrixOption {
-  enabled: boolean;
-  chars: string;
-  speed: number;
-  opacity: number;
-}
+const COMMANDS: Record<string, string> = {
+  help: `Available commands:
+  help        - Show this help message
+  date        - Display current date
+  time        - Display current time
+  clear       - Clear terminal screen
+  whoami      - Display current user
+  ls          - List directory contents
+  echo [text] - Echo text back
+  about       - About this terminal
+  matrix      - Enter the matrix mode`,
+  date: () => new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
+  time: () => new Date().toLocaleTimeString(),
+  clear: '',
+  whoami: 'resident',
+  ls: 'desktop  documents  downloads  links  games',
+  about: 'Kampung Siber Retro Terminal v1.0',
+};
 
-const MATRIX_CHARS = 'アァカサタナハマヤラワガザダバパイィキシチニヒミュリヰグズデブプウゥクスツヌフムユルグズデブプエェケセテネヘメヱレゲゼデベペオォコソトノホマヨロワゴゾドボポ';
-
-export default function RetroTerminalWidget({ title = 'Coretan Terminal', className }: RetroTerminalWidgetProps) {
-  const [input, setInput] = useState('');
-  const [history, setHistory] = useState<string[]>([
-    'Coretan Terminal aktif.',
-    "Taip 'help' untuk melihat arahan.",
-  ]);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [matrixState, setMatrixState] = useState<MatrixOption>({
-    enabled: false,
-    chars: MATRIX_CHARS,
-    speed: 50,
-    opacity: 0.8,
-  });
-  const matrixRef = useRef<number | null>(null);
-  const [isMatrixActive, setIsMatrixActive] = useState(false);
-
-  useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.scrollTo({ top: containerRef.current.scrollHeight, behavior: 'auto' });
-    }
-  }, [history]);
-
-  const handleCommand = (rawCommand: string) => {
-    const command = rawCommand.trim().toLowerCase();
-
-    if (!command) {
-      return;
-    }
-
-    if (command === 'matrix') {
-      if (!matrixState.enabled) {
-        setMatrixState(prev => ({ ...prev, enabled: true }));
-        setIsMatrixActive(true);
-        setHistory(prev => [...prev, '> matrix', 'Mode Matrix diaktifkan! Tekan ESC untuk kembali.']);
-      } else {
-        setMatrixState(prev => ({ ...prev, enabled: false }));
-        setIsMatrixActive(false);
-        setHistory(prev => [...prev, '> matrix', 'Mode Matrix dimatikan.']);
-      }
-      setInput('');
-      return;
-    }
-
-    if (isMatrixActive && command === 'esc') {
-      setMatrixState(prev => ({ ...prev, enabled: false }));
-      setIsMatrixActive(false);
-      setHistory(prev => [...prev, '> esc', 'Kembali ke mod normal.']);
-      setInput('');
-      return;
-    }
-
-    if (isMatrixActive) {
-      setHistory(prev => [...prev, '> ' + rawCommand, 'Arahan tidak sah di mod Matrix.']);
-      setInput('');
-      return;
-    }
-
-    const responses: Record<string, string> = {
-      help: 'Arahan tersedia: help, siri, tetapan, papan pemuka, clear, matrix.',
-      siri: 'Siri Tutorial sedang disusun untuk modul baharu.',
-      tetapan: 'Tetapan mod retro kini aktif dan stabil.',
-      'papan pemuka': 'Papan Pemuka komuniti dikemas kini setiap jam.',
-      clear: '',
-      matrix: 'Aktifkan mod Matrix! Tekan "matrix" lagi untuk matikan.',
-    };
-
-    const response = responses[command] ?? `Arahan tidak dikenali: ${rawCommand}`;
-
-    setHistory((current) => {
-      const nextEntries = command === 'clear' ? [] : [...current, `> ${rawCommand}`, response];
-      return nextEntries;
-    });
-    setInput('');
-  };
+export default function RetroTerminalWidget({ className }: RetroTerminalWidgetProps) {
+  const [entries, setEntries] = useState<TerminalEntry[]>([]);
+  const [currentInput, setCurrentInput] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  
+  const { addCommand, navigateUp, navigateDown, resetIndex } = useTerminalCommandHistory();
 
   useEffect(() => {
-    if (!isMatrixActive) return;
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
 
-    const generateMatrixLine = (): string => {
-      let line = '';
-      for (let i = 0; i < 80; i++) {
-        if (Math.random() < 0.3) {
-          line += matrixState.chars.charAt(Math.floor(Math.random() * matrixState.chars.length));
-        } else {
-          line += ' ';
-        }
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      const prevCommand = navigateUp();
+      if (prevCommand !== null) {
+        setCurrentInput(prevCommand);
       }
-      return line;
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      const nextCommand = navigateDown();
+      setCurrentInput(nextCommand || '');
+    } else if (e.key === 'Enter') {
+      const command = currentInput.trim();
+      if (command && !isProcessing) {
+        executeCommand(command);
+      }
+    }
+  }, [currentInput, isProcessing, navigateUp, navigateDown]);
+
+  const executeCommand = async (command: string) => {
+    addCommand(command);
+    setIsProcessing(true);
+    
+    const newEntry: TerminalEntry = {
+      id: Date.now().toString(),
+      command,
+      output: '',
+      timestamp: new Date(),
     };
 
-    const matrixInterval = setInterval(() => {
-      setHistory(prev => [...prev.slice(-50), generateMatrixLine()]);
-    }, matrixState.speed);
+    const parts = command.split(' ');
+    const cmd = parts[0].toLowerCase();
+    const args = parts.slice(1).join(' ');
 
-    return () => clearInterval(matrixInterval);
-  }, [isMatrixActive, matrixState.speed, matrixState.chars]);
+    if (cmd === 'clear') {
+      setEntries([]);
+    } else if (cmd === 'echo') {
+      newEntry.output = args;
+      setEntries(prev => [...prev, newEntry]);
+    } else if (cmd === 'matrix') {
+      newEntry.output = 'Entering matrix mode...';
+      setEntries(prev => [...prev, newEntry]);
+    } else if (COMMANDS[cmd]) {
+      const output = typeof COMMANDS[cmd] === 'function' 
+        ? COMMANDS[cmd as 'date' | 'time']() 
+        : COMMANDS[cmd];
+      newEntry.output = output;
+      setEntries(prev => [...prev, newEntry]);
+    } else {
+      newEntry.output = `bash: ${cmd}: command not found`;
+      setEntries(prev => [...prev, newEntry]);
+    }
 
-  const TypingLine = ({ text }: { text: string }) => {
-    const [displayed, setDisplayed] = useState('');
-    useEffect(() => {
-      let i = 0;
-      const speed = 20;
-      const timer = setInterval(() => {
-        setDisplayed((prev) => prev + text.charAt(i));
-        i++;
-        if (i >= text.length) clearInterval(timer);
-      }, speed);
-      return () => clearInterval(timer);
-    }, [text]);
-    return <div className="whitespace-pre-wrap matrix-line">{displayed}</div>;
+    setCurrentInput('');
+    resetIndex();
+    setIsProcessing(false);
   };
 
   return (
-    <div className={`retro-window border-2 border-pink-500 bg-[#0e1330] p-3 text-sm text-green-200 retro-shadow ${className || ''}`}>
-      <div className="mb-2 flex items-center justify-between border-b border-green-800 pb-2">
-        <span className="font-bold uppercase tracking-wide text-green-300">{title}</span>
-        <span className={`rounded px-2 py-1 text-[10px] ${isMatrixActive ? 'bg-red-500' : 'bg-green-900/70'} text-green-100`}>
-          {isMatrixActive ? 'MATRIX' : 'Live'}
-        </span>
-      </div>
-       <div
-          ref={containerRef}
-          className="mb-2 max-h-[70vh] overflow-y-auto rounded border border-green-900 bg-black/80 p-2 font-mono text-xs leading-5"
-        >
-          {history.map((line, index) => (
-            <TypingLine key={`${line}-${index}`} text={line} />
-          ))}
+    <div className={`retro-terminal bg-black rounded-lg p-4 font-mono ${className || ''}`}>
+      {/* Start: Terminal Header */}
+      <div className="retro-terminal-header flex items-center gap-2 mb-3">
+        <div className="flex gap-1">
+          <div className="w-3 h-3 rounded-full bg-red-500" />
+          <div className="w-3 h-3 rounded-full bg-yellow-500" />
+          <div className="w-3 h-3 rounded-full bg-green-500" />
         </div>
-       <div className="flex items-center gap-2 font-mono text-xs">
-         <span className="text-green-300">retro@kampung:~$</span>
-         <input
-           value={input}
-           onChange={(event) => setInput(event.target.value)}
-           onKeyDown={(event) => {
-             if (event.key === 'Enter') {
-               handleCommand(input);
-             }
-             if (event.key === 'Escape' && isMatrixActive) {
-               handleCommand('esc');
-             }
-           }}
-           className="w-full bg-transparent text-green-100 outline-none"
-           placeholder={isMatrixActive ? "ESC untuk kembali..." : "masukkan arahan"}
-           aria-label="terminal command input"
-         />
-       </div>
-     </div>
+        <span className="text-xs text-gray-400">terminal@server:~</span>
+      </div>
+      {/* End: Terminal Header */}
+
+      {/* Start: Terminal Output */}
+      <div className="retro-terminal-output h-64 overflow-y-auto mb-3 text-green-400 text-sm">
+        {entries.map(entry => (
+          <div key={entry.id} className="mb-2">
+            <div className="text-cyan-400">
+              <span className="text-green-400">guest@retro:~$</span> {entry.command}
+            </div>
+            {entry.output && (
+              <div className="pl-4 text-white">
+                {entry.output}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+      {/* End: Terminal Output */}
+
+      {/* Start: Input Line */}
+      <div className="retro-terminal-input flex items-center gap-2">
+        <span className="text-green-400">guest@retro:~$</span>
+        <input
+          ref={inputRef}
+          type="text"
+          value={currentInput}
+          onChange={(e) => setCurrentInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          className="flex-1 bg-transparent text-green-400 outline-none caret-green-400"
+          disabled={isProcessing}
+          autoComplete="off"
+          autoCapitalize="none"
+          spellCheck="false"
+        />
+        {isProcessing && <span className="animate-pulse">▋</span>}
+      </div>
+      {/* End: Input Line */}
+    </div>
   );
 }

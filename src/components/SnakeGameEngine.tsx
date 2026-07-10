@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { playArcadeSound, SoundEffect } from "@/components/ArcadeSoundSynthesizer";
 
 interface SnakeGameEngineProps {
   width: number;
@@ -14,13 +15,6 @@ type Direction = "up" | "down" | "left" | "right";
 interface Position {
   x: number;
   y: number;
-}
-
-interface SnakeGameEngineProps {
-  width: number;
-  height: number;
-  onGameOver: (score: number) => void;
-  onScoreUpdate: (score: number) => void;
 }
 
 const CELL_SIZE = 20;
@@ -101,6 +95,7 @@ export const SnakeGameEngine: React.FC<SnakeGameEngineProps> = ({
       if (hitWall || hitSelf) {
         setIsRunning(false);
         onGameOver(score);
+        playArcadeSound('gameOver');
         return prevSnake;
       }
 
@@ -113,13 +108,14 @@ export const SnakeGameEngine: React.FC<SnakeGameEngineProps> = ({
         const newScore = score + 10;
         setScore(newScore);
         onScoreUpdate(newScore);
+        playArcadeSound('crash');
       } else {
         newSnake.pop();
       }
 
       return newSnake;
     });
-  }, [width, height, food, score, onGameOver, onScoreUpdate]);
+  }, [width, height, food, score, onGameOver, onScoreUpdate, generateFood]);
 
   useEffect(() => {
     initGame();

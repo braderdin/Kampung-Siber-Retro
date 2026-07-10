@@ -7,6 +7,7 @@ import { enDictionary, msDictionary } from '@/i18n/dictionaries';
 import PixelGameCanvas from '@/components/PixelGameCanvas';
 import PixelCursorEffect from '@/components/PixelCursorEffect';
 import HydrationGuard from '@/components/HydrationGuard';
+import ArcadeLeaderboard from '@/components/ArcadeLeaderboard';
 
 export default function CyberCafePage() {
   const { language } = useLanguageStore();
@@ -160,24 +161,34 @@ export default function CyberCafePage() {
         </div>
         {/* End: Navigation Tabs */}
 
-        {/* Start: Games Section */}
+        {/* Start: Games Section - Two Column Grid */}
         {activeSection === 'games' && (
-          <div className="retro-card border-2 border-dashed border-cyan-400/30">
-            <div className="retro-card-header bg-gray-200 dark:bg-gray-700 px-4 py-2 border-b-2 border-dashed border-gray-300 dark:border-gray-600">
-              <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200 pixel-font flex items-center gap-2">
-                <span className="text-xl">🕹️</span>
-                <span>{t.gameTitle || 'Brick Breaker Classic'}</span>
-              </h2>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Start: Main Game Viewport */}
+            <div className="lg:col-span-2 retro-card border-2 border-dashed border-cyan-400/30">
+              <div className="retro-card-header bg-gray-200 dark:bg-gray-700 px-4 py-2 border-b-2 border-dashed border-gray-300 dark:border-gray-600">
+                <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200 pixel-font flex items-center gap-2">
+                  <span className="text-xl">🕹️</span>
+                  <span>{t.gameTitle || 'Brick Breaker Classic'}</span>
+                </h2>
+              </div>
+              <div className="p-4">
+                <HydrationGuard>
+                  <PixelGameCanvas
+                    className="w-full"
+                    onScoreUpdate={setCurrentScore}
+                    onGameOver={handleGameOver}
+                  />
+                </HydrationGuard>
+              </div>
             </div>
-            <div className="p-4">
-              <HydrationGuard>
-                <PixelGameCanvas
-                  className="w-full"
-                  onScoreUpdate={setCurrentScore}
-                  onGameOver={handleGameOver}
-                />
-              </HydrationGuard>
+            {/* End: Main Game Viewport */}
+
+            {/* Start: Arcade Leaderboard Card */}
+            <div className="retro-card h-full border-2 border-dashed border-purple-400/30">
+              <ArcadeLeaderboard gameId="retro-pong" className="h-full" />
             </div>
+            {/* End: Arcade Leaderboard Card */}
           </div>
         )}
         {/* End: Games Section */}
