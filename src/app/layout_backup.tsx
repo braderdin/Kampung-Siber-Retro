@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import { Geist, Geist_Mono, VT323 } from "next/font/google";
 import "./globals.css";
 import "../styles/retro.css";

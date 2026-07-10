@@ -124,9 +124,10 @@ export default function TutorialsPage({ className }: TutorialsPageProps) {
             onClick={() => setFilter('all')} 
             className={`rounded px-3 py-1 text-xs border-2 transition-all duration-300 ${
               filter === 'all' 
-                ? 'bg-pink-500 text-white border-pink-500 shadow-[0_0_10px_rgba(255,0,127,0.5)]' 
+                ? 'bg-pink-500 text-white border-pink-500' 
                 : 'border-pink-500 bg-pink-50 hover:bg-pink-100'
             }`}
+            style={filter === 'all' ? { boxShadow: '0 0 10px rgba(255,0,127,0.5)' } : undefined}
           >
             Semua Siri
           </button>
@@ -134,9 +135,10 @@ export default function TutorialsPage({ className }: TutorialsPageProps) {
             onClick={() => setFilter('Beginner')} 
             className={`rounded px-3 py-1 text-xs border-2 transition-all duration-300 ${
               filter === 'Beginner' 
-                ? 'bg-emerald-500 text-white border-emerald-500 shadow-[0_0_10px_rgba(0,255,102,0.5)]' 
+                ? 'bg-emerald-500 text-white border-emerald-500' 
                 : 'border-emerald-500 bg-emerald-50 hover:bg-emerald-100'
             }`}
+            style={filter === 'Beginner' ? { boxShadow: '0 0 10px rgba(0,255,102,0.5)' } : undefined}
           >
             Pemula
           </button>
@@ -144,9 +146,10 @@ export default function TutorialsPage({ className }: TutorialsPageProps) {
             onClick={() => setFilter('Intermediate')} 
             className={`rounded px-3 py-1 text-xs border-2 transition-all duration-300 ${
               filter === 'Intermediate' 
-                ? 'bg-amber-500 text-white border-amber-500 shadow-[0_0_10px_rgba(255,170,0,0.5)]' 
+                ? 'bg-amber-500 text-white border-amber-500' 
                 : 'border-amber-500 bg-amber-50 hover:bg-amber-100'
             }`}
+            style={filter === 'Intermediate' ? { boxShadow: '0 0 10px rgba(255,170,0,0.5)' } : undefined}
           >
             Pertengahan
           </button>
@@ -154,9 +157,10 @@ export default function TutorialsPage({ className }: TutorialsPageProps) {
             onClick={() => setFilter('Advanced')} 
             className={`rounded px-3 py-1 text-xs border-2 transition-all duration-300 ${
               filter === 'Advanced' 
-                ? 'bg-rose-500 text-white border-rose-500 shadow-[0_0_10px_rgba(255,0,85,0.5)]' 
+                ? 'bg-rose-500 text-white border-rose-500' 
                 : 'border-rose-500 bg-rose-50 hover:bg-rose-100'
             }`}
+            style={filter === 'Advanced' ? { boxShadow: '0 0 10px rgba(255,0,85,0.5)' } : undefined}
           >
             Lanjutan
           </button>

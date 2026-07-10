@@ -1,7 +1,8 @@
+// Start: Interactive Background Component
 "use client";
 
 import { useState } from 'react';
-import { useLanguageStore } from "@/store/useLanguageStore";
+import { useLanguageStore } from '@/store/useLanguageStore';
 import { useRouter } from 'next/navigation';
 
 export default function InteractiveBackground() {
@@ -30,7 +31,7 @@ export default function InteractiveBackground() {
       <main className="flex flex-1 w-full max-w-4xl flex-col items-center justify-between py-8 px-4 sm:px-8">
         {/* Start: Cyber Marquee Message Ticker - Rigid Overflow Container */}
         <div className="marquee-rigid-container w-full text-center mb-8">
-          <div className="marquee-content inline-block whitespace-nowrap animate-marquee text-white font-bold text-sm tracking-wider drop-shadow-[0_0_5px_#ff007f]">
+          <div className="marquee-content inline-block whitespace-nowrap animate-marquee text-white font-bold text-sm tracking-wider" style={{ textShadow: '0 0 5px #ff007f' }}>
             ✨ Selamat Datang ke Pusat Siber Komuniti Nusantara • Jumlah Teratak Digital Terkini: 1,240 buah • Pastakan kod HTML anda comel dan kreatif! ✨
           </div>
         </div>
@@ -40,13 +41,14 @@ export default function InteractiveBackground() {
           {/* Start: Cozy Traditional Malay House Emblem */}
           <div className="inline-block mb-6">
             <svg 
-              className="w-20 h-20 cozy-house-emblem drop-shadow-[0_0_10px_#00ffff]" 
+              className="w-20 h-20 cozy-house-emblem" 
               viewBox="0 0 24 24" 
               fill="none" 
               stroke="currentColor" 
               strokeWidth="1.5" 
               strokeLinecap="round" 
               strokeLinejoin="round"
+              style={{ filter: 'drop-shadow(0 0 10px #00ffff)' }}
             >
               {/* Pitched Roof with Gabled Design */}
               <path d="M4 18 L12 6 L20 18 Z" className="cozy-house-path"/>
@@ -65,12 +67,12 @@ export default function InteractiveBackground() {
           </div>
           {/* End: Cozy Traditional Malay House Emblem */}
 
-          <h1 className="text-5xl md:text-6xl font-bold text-white dark:text-gray-200 mb-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 via-cyan-400 to-purple-600 uppercase tracking-wider drop-shadow-[0_0_15px_#ff007f]">
+          <h1 className="text-5xl md:text-6xl font-bold text-white dark:text-gray-200 mb-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 via-cyan-400 to-purple-600 uppercase tracking-wider" style={{ textShadow: '0 0 15px #ff007f' }}>
             KAMPUNG SIBER
           </h1>
           
           {/* Start: Bilingual Welcome Message */}
-          <p className="text-xl text-gray-300 dark:text-gray-400 mb-10 max-w-2xl mx-auto drop-shadow-[0_0_10px_#00ffff]">
+          <p className="text-xl text-gray-300 dark:text-gray-400 mb-10 max-w-2xl mx-auto" style={{ textShadow: '0 0 10px #00ffff' }}>
             {language === 'ms' 
               ? 'Ekosistem pembinaan teratak digital tanpa kekangan algoritma dan pengiklanan. Bina dan miliki laman web HTML & CSS tulen anda secara bebas selamanya! / An algorithmic-free and ad-free digital workspace ecosystem. Build and own your pure HTML & CSS websites freely forever!'
               : 'An algorithmic-free and ad-free digital workspace ecosystem. Build and own your pure HTML & CSS websites freely forever! / Ekosistem pembinaan teratak digital tanpa kekangan algoritma dan pengiklanan. Bina dan miliki laman web HTML & CSS tulen anda secara bebas selamanya!'}
@@ -80,7 +82,11 @@ export default function InteractiveBackground() {
           {/* Start: Core Action Button */}
           <button
             onClick={handleEnterWorkspace}
-            className="retro-btn-primary text-xl px-12 py-4 rounded-full shadow-2xl hover:shadow-cyan-500/50 transform hover:scale-105 transition-all duration-300 font-bold drop-shadow-[0_0_10px_#ff007f]"
+            className="retro-btn-primary text-xl px-12 py-4 rounded-full shadow-2xl transform hover:scale-105 transition-all duration-300 font-bold"
+            style={{ 
+              filter: 'drop-shadow(0 0 10px #ff007f)',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+            }}
           >
             MASUK & LOG MASUK SEKARANG
           </button>
@@ -90,3 +96,4 @@ export default function InteractiveBackground() {
     </div>
   );
 }
+// End: Interactive Background Component

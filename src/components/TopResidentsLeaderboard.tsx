@@ -1,3 +1,4 @@
+// Start: Top Residents Leaderboard Component
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -99,18 +100,17 @@ export default function TopResidentsLeaderboard({
     return 'text-gray-500';
   };
 
-  const getNeonShadow = (rank: number): string => {
-    if (rank === 1) return 'shadow-[0_0_10px_#fbbf24,_0_0_20px_#fbbf24]';
-    if (rank === 2) return 'shadow-[0_0_10px_#9ca3af,_0_0_20px_#9ca3af]';
-    if (rank === 3) return 'shadow-[0_0_10px_#d97706,_0_0_20px_#d97706]';
-    return '';
+  const getNeonStyle = (rank: number): React.CSSProperties | undefined => {
+    if (rank === 1) return { boxShadow: '0 0 10px #fbbf24, 0 0 20px #fbbf24' };
+    if (rank === 2) return { boxShadow: '0 0 10px #9ca3af, 0 0 20px #9ca3af' };
+    if (rank === 3) return { boxShadow: '0 0 10px #d97706, 0 0 20px #d97706' };
+    return undefined;
   };
 
   const getRankBadgeClass = (rank: number): string => {
     const baseClass = 'flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm text-white';
     const colorClass = getRankColor(rank);
-    const shadowClass = getNeonShadow(rank);
-    return `${baseClass} ${colorClass} ${shadowClass}`;
+    return `${baseClass} ${colorClass}`;
   };
 
   const getResidentItemClass = (rank: number): string => {
@@ -157,7 +157,10 @@ export default function TopResidentsLeaderboard({
               className={getResidentItemClass(resident.rank)}
             >
               {/* Start: Rank Badge */}
-              <div className={getRankBadgeClass(resident.rank)}>
+              <div 
+                className={getRankBadgeClass(resident.rank)}
+                style={getNeonStyle(resident.rank)}
+              >
                 {getRankBadge(resident.rank)}
               </div>
               {/* End: Rank Badge */}
@@ -204,3 +207,4 @@ export default function TopResidentsLeaderboard({
     </div>
   );
 }
+// End: Top Residents Leaderboard Component

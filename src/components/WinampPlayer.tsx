@@ -275,7 +275,7 @@ export default function WinampPlayer() {
     <div className="fixed bottom-4 right-4 z-50">
       <audio ref={audioRef} preload="auto" />
 
-      <div className="bg-gradient-to-b from-gray-900 to-gray-800 border-4 border-yellow-400 rounded-none shadow-[8px_8px_0_0_rgba(255,255,0,0.5)] w-[400px] sm:w-[320px] xs:w-[280px] max-w-full">
+      <div className="bg-gradient-to-b from-gray-900 to-gray-800 border-4 border-yellow-400 rounded-none w-[400px] sm:w-[320px] xs:w-[280px] max-w-full" style={{ boxShadow: '8px 8px 0 0 rgba(255,255,0,0.5)' }}>
         <div className="bg-yellow-300 h-4 flex">
           <div className="bg-yellow-400 w-2 h-full"></div>
           <div className="bg-yellow-500 w-2 h-full"></div>

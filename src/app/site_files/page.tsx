@@ -283,8 +283,8 @@ export default function SiteFilesPage() {
         </div>
       )}
 
-      {!loading && !error && (
-        <div className={'mt-4 rounded-2xl border p-4 transition-all duration-200 ' + (crtEnabled ? 'border-slate-400 bg-slate-100/90 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.4)]' : 'border-slate-300 bg-white/80 shadow-sm')}>
+        {!loading && !error && (
+        <div className={'mt-4 rounded-2xl border p-4 transition-all duration-200 ' + (crtEnabled ? 'border-slate-400 bg-slate-100/90' : 'border-slate-300 bg-white/80 shadow-sm')} style={crtEnabled ? { boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.4)' } : undefined}>
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
             <div className="space-y-4 lg:col-span-3">
               <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">{t.myFiles}</h2>

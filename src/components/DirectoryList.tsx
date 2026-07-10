@@ -1,3 +1,4 @@
+// Start: Directory List Component
 "use client";
 
 import { useState, useMemo } from 'react';
@@ -511,7 +512,6 @@ export default function DirectoryList() {
               className="
                 retro-card border-2 border-gray-300 dark:border-gray-600
                 bg-white dark:bg-gray-900 rounded-none p-3
-                hover:shadow-[4px_4px_0_0_rgba(255,255,0,0.3)] 
                 transition-all duration-200
               "
             >
@@ -559,3 +559,4 @@ export default function DirectoryList() {
     </div>
   );
 }
+// End: Directory List Component

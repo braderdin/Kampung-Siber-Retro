@@ -155,7 +155,6 @@ export default function SitemapPage() {
                     className="
                       retro-card border-2 border-gray-300 dark:border-gray-600
                       bg-white dark:bg-gray-900 p-4 rounded-none
-                      hover:shadow-[4px_4px_0_0_rgba(255,255,0,0.3)] hover:transform hover:translate-[-2px_-2px]
                       transition-all duration-200
                     "
                   >
@@ -208,7 +207,6 @@ export default function SitemapPage() {
                     className="
                       retro-card border-2 border-gray-300 dark:border-gray-600
                       bg-white dark:bg-gray-900 p-4 rounded-none
-                      hover:shadow-[4px_4px_0_0_rgba(0,255,0,0.3)] hover:transform hover:translate-[-2px_-2px]
                       transition-all duration-200
                     "
                   >
@@ -261,7 +259,6 @@ export default function SitemapPage() {
                     className="
                       retro-card border-2 border-gray-300 dark:border-gray-600
                       bg-white dark:bg-gray-900 p-4 rounded-none
-                      hover:shadow-[4px_4px_0_0_rgba(0,0,255,0.3)] hover:transform hover:translate-[-2px_-2px]
                       transition-all duration-200
                     "
                   >
@@ -314,7 +311,6 @@ export default function SitemapPage() {
                     className="
                       retro-card border-2 border-gray-300 dark:border-gray-600
                       bg-white dark:bg-gray-900 p-4 rounded-none
-                      hover:shadow-[4px_4px_0_0_rgba(128,0,128,0.3)] hover:transform hover:translate-[-2px_-2px]
                       transition-all duration-200
                     "
                   >

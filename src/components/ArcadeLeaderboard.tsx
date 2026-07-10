@@ -100,7 +100,7 @@ export default function ArcadeLeaderboard({
           <div className={`absolute -top-1 -right-1 text-yellow-400 text-lg ${flashingStars.has(scores[0]?.id) ? 'animate-ping' : ''}`}>
             ⭐
           </div>
-          <div className="absolute inset-0 rounded-full shadow-[0_0_15px_#fbbf24,0_0_30px_#fbbf24] animate-pulse"></div>
+          <div className="absolute inset-0 rounded-full animate-pulse" style={{ boxShadow: '0 0 15px #fbbf24, 0 0 30px #fbbf24' }}></div>
         </div>
       );
     }

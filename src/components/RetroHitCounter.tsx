@@ -25,7 +25,7 @@ export default function RetroHitCounter({ value, label = 'Kaunter Pelawat', clas
       <div className="flex flex-wrap items-center gap-2">
         <div className="flex flex-wrap gap-1 rounded bg-black p-2 text-lg font-mono text-emerald-300 shadow-inner">
           {digits.map((digit, index) => (
-            <span key={`${digit}-${index}`} className="min-w-6 rounded bg-slate-950 px-2 py-1 text-center shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]">
+              <span key={`${digit}-${index}`} className="min-w-6 rounded bg-slate-950 px-2 py-1 text-center" style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.08)' }}>
               {digit}
             </span>
           ))}

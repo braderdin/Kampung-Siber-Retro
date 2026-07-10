@@ -1,3 +1,4 @@
+// Start: Theme Showcase Component
 "use client";
 
 import { useState } from 'react';
@@ -59,6 +60,22 @@ const themes: Theme[] = [
   },
 ];
 
+// Helper function to check if style prop should be applied
+function getThemeCardStyle(selected: boolean): React.CSSProperties | undefined {
+  if (selected) {
+    return { boxShadow: '4px 4px 0 0 rgba(255,255,0,0.3)' };
+  }
+  return undefined;
+}
+
+// Helper function to check if hover style should be applied
+function getThemeHoverStyle(selected: boolean): React.CSSProperties | undefined {
+  if (!selected) {
+    return { boxShadow: '4px 4px 0 0 rgba(0,0,0,0.2)' };
+  }
+  return undefined;
+}
+
 export default function ThemeShowcase() {
   const [selectedTheme, setSelectedTheme] = useState<string>('space');
   const { currentTheme, setTheme } = useThemeStore();
@@ -72,10 +89,10 @@ export default function ThemeShowcase() {
     const baseClasses = "retro-card border-2 rounded-none p-4 cursor-pointer transition-all duration-300";
     
     if (selectedTheme === theme.id) {
-      return `${baseClasses} border-pink-400 shadow-[4px_4px_0_0_rgba(255,255,0,0.3)] scale-105`;
+      return `${baseClasses} border-pink-400 scale-105`;
     }
     
-    return `${baseClasses} border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 hover:shadow-[4px_4px_0_0_rgba(0,0,0,0.2)]`;
+    return `${baseClasses} border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900`;
   };
 
   return (
@@ -97,6 +114,7 @@ export default function ThemeShowcase() {
           <div
             key={theme.id}
             className={getThemeCardClasses(theme)}
+            style={getThemeCardStyle(selectedTheme === theme.id)}
             onClick={() => handleThemeSelect(theme.id)}
           >
             {/* Start: Theme Header */}
@@ -163,3 +181,4 @@ export default function ThemeShowcase() {
     </div>
   );
 }
+// End: Theme Showcase Component

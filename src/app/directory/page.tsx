@@ -30,7 +30,7 @@ export default function DirectoryPage() {
         {/* End: Page Header */}
 
         {/* Start: Directory Grid Container */}
-        <div className="retro-card border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 rounded-none shadow-[8px_8px_0_0_rgba(0,0,0,0.3)]">
+        <div className="retro-card border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 rounded-none" style={{ boxShadow: '8px 8px 0 0 rgba(0,0,0,0.3)' }}>
           <div className="p-4">
             <HydrationGuard>
               <DirectoryList />

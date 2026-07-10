@@ -71,9 +71,8 @@ export default function KeyboardShortcutOverlay() {
           onClick={closeOverlay}
         >
           <div 
-            className="relative retro-card border-2 border-cyan-500 bg-white dark:bg-gray-900 rounded-none 
-                         w-full max-w-lg mx-4 p-8 shadow-[10px_10px_0_0_rgba(0,0,0,0.5)]
-                         animate-scale-in"
+            className="relative retro-card border-2 border-cyan-500 bg-white dark:bg-gray-900 rounded-none w-full max-w-lg mx-4 p-8 animate-scale-in"
+            style={{ boxShadow: '10px 10px 0 0 rgba(0,0,0,0.5)' }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Start: Close Button */}
