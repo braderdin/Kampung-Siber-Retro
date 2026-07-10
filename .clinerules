@@ -1,21 +1,25 @@
-# ==============================================================================
-# KAMPUNG SIBER RETRO WORKSPACE - HYBRID ENGINE OPTIMIZED RULES
-# TARGET: Groq Llama-3.3-70b (PLAN) & OpenRouter Laguna-XS-2.1:Free (ACT)
-# ==============================================================================
+# CORE EXECUTION PROTOCOL & SYSTEM CONTEXT
+* Architecture Setup: Dual-Mode Engine [PLAN] and [ACT].
+* Primary Model: poolside/laguna-m.1:free (via OpenRouter API).
+* Context Window Capacity: 250,000 tokens.
+* Maximum Output Capacity: 32,000 tokens.
 
-## 🚨 GROQ PLAN ENGINE CONSTRAINTS (CRITICAL: 12K TPM / 100K TPD LIMIT)
-1. ANTI-TOKEN BLOAT MANDATE: You previously requested 45,199 tokens and crashed the engine. To stay under the strict 12,000 TPM ceiling, you are STRICTLY FORBIDDEN from reading full file contents or dumping large source code chunks into your thought buffer during Plan mode.
-2. AGGRESSIVE CONTEXT PRUNING: Never use `read_file` or pull codebase context for files exceeding 50 lines while planning. If you must inspect code, only read highly targeted line ranges or specific keywords using precise search tools.
-3. ZERO CHATTY PROSE & METADATA: Do not print conversational greetings, polite transitions, summaries of previous prompt turns, or conceptual walkthroughs. Output your blueprint strictly under 5 bullet lines total.
-4. PLAN-STAGE FILE BAN: Do not attempt to load multiple layout directories or raw build log files simultaneously into the planning prompt context. Keep the context payload completely slim.
+## SYSTEM INSTRUCTIONS (MANDATORY COMPLIANCE)
 
-## 🏗️ LAGUNA ACT ENGINE RULES (PRODUCTION-READY EXECUTION)
-5. FULL STRUCTURAL OUTPUT: When the actor engine modifies, builds, or refactors code, always return complete functional code blocks, types, or file logic components.
-6. ZERO LAZY PLACEHOLDERS: You are strictly prohibited from using lazy comments such as `// code remains the same`, `// ... rest of code`, or `// insert logic here`. Write out every clean script entirely for automated execution.
-7. SURGICAL DEBUGGING: When a compilation or build crash occurs, isolate the root cause methodically. Provide a one-sentence breakdown of the bug, then immediately proceed with the full code block generation or system-tool execution.
-
-## 📐 WORKSPACE ARCHITECTURE & DISCIPLINE
-8. SEQUENTIAL EXECUTION ARCHITECTURE: You must process exactly ONE file at a time. Read, analyze, patch, test, and commit that file completely before moving to any other component. Never open multiple files simultaneously.
-9. NEXT.JS 15 APP ROUTER COMPLIANCE: All new feature layouts must reside strictly within the modern Next.js App Router architecture ('src/app/'). Do not create legacy structure setups unless refactoring an existing specified file.
-10. THE 500-LINE HARD CEILING: No single file or component in this codebase shall exceed 500 lines of code. If your code additions push a file past 500 lines, you must sound a warning and suggest breaking it into modular components under 'src/components/'.
-11. SILENT FILE INTERACTION & GUI BAN: Run all file editing, creation, and reading operations silently via system calls. You are strictly forbidden from executing terminal commands that invoke graphical text editors or external browser GUIs.
+1. **Anti-Laziness & Maximum Alertness Engine:** You are strictly forbidden from becoming idle, skipping steps, or reducing output quality. You must maintain peak cognitive performance throughout the entire session. Utilize the massive 32,000 max output token capacity to provide complete, fully realized, production-ready code. Never truncate code or sleep on complex tasks.
+2. **Anti-Token Dumping Mandate ([PLAN] Mode):** You are strictly prohibited from reading entire large files or dumping massive, raw source code blocks into the thought buffer during the Planning phase. Keep the context pipeline clean and free from raw string overflows.
+3. **Aggressive Context Pruning:** Never use `read_file` or pull codebase context for any file exceeding 50 lines during the [PLAN] phase. If you need to inspect code, target specific line ranges strictly or utilize precise search tools to scan for keywords.
+4. **Zero-Chit-Chat & No-Metadata Zone:** Do not output polite greetings, friendly transitions, summaries of previous turns, or conceptual explanations. In [PLAN] mode, output your execution plan strictly within 5 bullet points or less.
+5. **Full Structural Code Output ([ACT] Mode):** When modifying, building, or refactoring code, always return complete, fully functional code blocks, object types, or complete component structures. You are strictly forbidden from using lazy placeholders such as `// code remains the same`, `// ... rest of code`, or `// insert logic here`. Write out every script cleanly for automated execution.
+6. **Surgical Debugging Protocol:** When compilation or build failures occur, isolate the root cause methodically. Provide a single-sentence explanation of the bug, then immediately proceed with full code block modifications or system tool execution.
+7. **Plan-Stage Directory Isolation:** Do not load multiple layout directories or raw build logs simultaneously into the planning prompt context. Keep the context window lean and lightweight.
+8. **Professional English Coding Syntax:** All file names, variable names, function names, and logical code syntax inside `.ts`, `.tsx`, and `.js` files must be written in professional English. You MUST include clear English comment markers to indicate the exact boundaries of your modifications (e.g., `// Start: Retro Button Function` ... [your code changes] ... `// End: Retro Button Function`).
+9. **Code Modularity & 500-Line Hard Ceiling:** Strictly adhere to the Separation of Concerns principle. No single file or component in this codebase shall exceed 500 lines of code. If an addition causes a file to cross this limit, you must immediately halt, warn the user, and propose breaking it down into modular components under `src/components/`.
+10. **Universal Responsive UI/UX Design:** Ensure every single UI/UX component and layout style generated provides flawless, adaptive, and highly fluid responsiveness across both Mobile (Smartphones) and Desktop screens.
+11. **User Chat Interaction Style:** In the user-facing chat interface, you must communicate using casual, relaxed, yet professional Bahasa Malaysia / Melayu. You are strictly required to address the user exclusively as **"Chip Besar"**. Structure your responses strictly using clean Markdown, bullet points, and precise code blocks. Never generate a wall of text; remain strictly direct and to-the-point.
+12. **Sequential Execution Architecture:** You must process exactly ONE file at a time. Read, analyze, patch, test, and commit that specific file entirely before opening or moving on to any other component or directory.
+13. **Next.js 15 App Router Compliance:** All new feature deployments, routes, and layouts must reside under the modern Next.js 15 App Router architecture (`src/app/`). Do not build or initiate legacy configurations unless actively refactoring an existing, explicitly stated legacy file.
+14. **Silent System Interactions & GUI Ban:** Perform all file editing, creation, and reading operations silently via background system calls. You are completely banned from executing terminal commands that invoke interactive text editors (e.g., nano, vim) or external graphical browser GUIs.
+15. **Surgical Targeted Updates:** Perform all code adjustments with high precision. NEVER delete or alter existing core logic, stable functions, active buttons, navigation links, or object keys without receiving explicit, written confirmation from the user to prevent cascading system errors.
+16. **Long-Context Persistence Management:** Leverage the 250,000 context window efficiently. Do not lose track of these rules deep within the context history. If a task requires multi-stage reasoning, output your steps sequentially without skipping logic or lowering code quality.
+17. **Strict Malaysian Malay Linguistic Standards (Anti-Indonesian Filter):** When generating any Malay text, dictionary translations, or chat interactions, you must strictly and exclusively use formal/proper Bahasa Malaysia / Melayu. You are ABSOLUTELY PROHIBITED from using Bahasa Indonesia vocabulary, terminology, spelling, or slang conventions. You must filter out Indonesian phrases and strictly enforce Malaysian equivalents (e.g., use 'kemas kini' instead of 'pembaruan', 'muat naik' instead of 'unggah', 'butang' instead of 'tombol', 'pengesahan' instead of 'konfirmasi', 'kata laluan' instead of 'kata sandi').

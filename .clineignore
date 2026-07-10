@@ -1,3 +1,34 @@
+# ==========================================
+# CLINE IGNORE LIST - OPTIMIZED FOR CHIP BESAR
+# ==========================================
+
+# Huge Dependency & Virtual Environment Folders
+node_modules/
+venv/
+
+# Build & Cache Outputs (Very Heavy)
+.next/
+.cline/
+
+# Aider AI System & History Files
+.aider.tags.cache.v4
+.aider.chat.history.md
+.aider.conf.yml
+.aider.input.history
+.aider.instruction.md
+
+# Package Lock (Massive JSON file)
+package-lock.json
+
+# Environment & Sensitive Files
+.env
+.env.local
+.env.*
+
+# Meta & Non-code Files
+LICENSE.txt
+filename.txt
+
 .next/
 node_modules/
 .git/
