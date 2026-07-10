@@ -38,14 +38,7 @@ export default function QuickLinksSidebar() {
           <button
             key={link.href}
             onClick={() => router.push(link.href)}
-            className={`
-              w-full flex items-center gap-2 px-3 py-2 text-sm rounded
-              transition-all duration-200 pixel-font
-              ${pathname === link.href
-                ? 'bg-cyan-500/20 text-cyan-600 dark:bg-cyan-500/30 dark:text-cyan-400'
-                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
-              }
-            `}
+            className={`w-full flex items-center gap-2 px-3 py-2 text-sm rounded transition-all duration-200 pixel-font ${pathname === link.href ? 'bg-cyan-500/20 text-cyan-600 dark:bg-cyan-500/30 dark:text-cyan-400' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
           >
             <span className="text-lg">{link.icon}</span>
             <span>{link.name}</span>

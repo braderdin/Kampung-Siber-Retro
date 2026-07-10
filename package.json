@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint"
   },
-  "dependencies": {
+"dependencies": {
     "@aws-sdk/client-s3": "^3.1079.0",
     "@aws-sdk/s3-request-presigner": "^3.1079.0",
     "@codemirror/lang-css": "^6.3.1",
@@ -17,9 +17,9 @@
     "@supabase/supabase-js": "^2.110.0",
     "@uiw/codemirror-theme-vscode": "^4.25.10",
     "@uiw/react-codemirror": "^4.25.10",
+    "@upstash/redis": "^1.31.0",
     "clsx": "^2.1.1",
     "framer-motion": "^12.42.2",
-    "lightningcss-linux-x64-gnu": "^1.32.0",
     "lucide-react": "^1.23.0",
     "next": "16.2.10",
     "react": "19.2.4",
