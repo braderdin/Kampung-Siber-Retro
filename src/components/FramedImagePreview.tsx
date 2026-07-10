@@ -185,24 +185,24 @@ export default function FramedImagePreview({
         onError={handleImageError}
       />
       
-      {state.loaded && (
-        <div className="absolute top-2 right-2 flex gap-2">
-          <button
-            onClick={zoomOut}
-            className="p-1.5 rounded-full bg-black/50 hover:bg-black/70 text-white transition-colors"
-            title "Zum bolak"
-          >
-            <ZoomOut className="h-4 w-4" />
-          </button>
-          <button
-            onClick={zoomIn}
-            className="p-1.5 rounded-full bg-black/50 hover:bg-black/70 text-white transition-colors"
-            title "Zum tinggi"
-          >
-            <ZoomIn className="h-4 w-4" />
-          </button>
-        </div>
-      )}
+       {state.loaded && (
+         <div className="absolute top-2 right-2 flex gap-2">
+           <button
+             onClick={zoomOut}
+             className="p-1.5 rounded-full bg-black/50 hover:bg-black/70 text-white transition-colors"
+             title="Zum bolak"
+           >
+             <ZoomOut className="h-4 w-4" />
+           </button>
+           <button
+             onClick={zoomIn}
+             className="p-1.5 rounded-full bg-black/50 hover:bg-black/70 text-white transition-colors"
+             title="Zum tinggi"
+           >
+             <ZoomIn className="h-4 w-4" />
+           </button>
+         </div>
+       )}
     </div>
   );
 

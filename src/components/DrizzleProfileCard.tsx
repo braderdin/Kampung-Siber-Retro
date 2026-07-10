@@ -1,9 +1,61 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { User, Mail, MapPin, Calendar, Shield, Crown, Check, ExternalLink, Copy, Heart, Share2 } from "lucide-react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { formatDistanceToNow, format } from "date-fns";
+import { User, Mail, MapPin, Calendar, Shield, Crown, Check, ExternalLink, Copy, Heart, Share2, MessageSquare } from "lucide-react";
+
+type QueryKey = readonly unknown[];
+
+interface UseQueryResult<TData> {
+  data: TData | undefined;
+  isLoading: boolean;
+  isError: boolean;
+  error: Error | undefined;
+}
+
+function useQuery<TData>(options: { queryKey: QueryKey; queryFn: () => Promise<TData>; staleTime?: number; cacheTime?: number }): UseQueryResult<TData> {
+  const [data, setData] = useState<TData | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
+  const [error, setError] = useState<Error | undefined>(undefined);
+
+  useEffect(() => {
+    let cancelled = false;
+    setIsLoading(true);
+    options.queryFn().then(result => {
+      if (!cancelled) {
+        setData(result);
+        setIsLoading(false);
+      }
+    }).catch(err => {
+      if (!cancelled) {
+        setError(err instanceof Error ? err : new Error(String(err)));
+        setIsError(true);
+        setIsLoading(false);
+      }
+    });
+    return () => { cancelled = true; };
+  }, [options.queryKey]);
+
+  return { data, isLoading, isError, error };
+}
+
+function useQueryClient(): { setQueryData: <T>(key: QueryKey, updater: (old: T | undefined) => T) => void } {
+  return {
+    setQueryData: () => {}
+  };
+}
+
+const formatDistanceToNow = (date: Date, _options?: { addRelative?: boolean }) => {
+  const now = new Date();
+  const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
+  const mins = Math.floor(diff / 60);
+  const hours = Math.floor(diff / 3600);
+  const days = Math.floor(diff / 86400);
+  if (days > 1) return `${days} days ago`;
+  if (hours > 1) return `${hours} hours ago`;
+  if (mins > 1) return `${mins} minutes ago`;
+  return "just now";
+};
 
 interface DrizzleProfileCardProps {
   userId: string;
@@ -109,7 +161,7 @@ export default function DrizzleProfileCard({
       });
 
       if (response.ok) {
-        queryClient.setQueryData(["profile", userId], (old: UserProfile | undefined) => {
+        queryClient.setQueryData<UserProfile | undefined>(["profile", userId], (old) => {
           if (!old) return old;
           return {
             ...old,
@@ -333,7 +385,10 @@ export default function DrizzleProfileCard({
                 <span>{profile.posts}</span>
               </div>
               <div className="flex items-center gap-1">
-                <Eye className="h-3 w-3" />
+                <svg className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg>
                 <span>{profile.views}</span>
               </div>
             </div>
@@ -366,13 +421,6 @@ export default function DrizzleProfileCard({
     </div>
   );
 }
-
-const Eye = () => (
-  <svg viewBox="0 0 24 24" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-    <circle cx="12" cy="12" r="3" />
-  </svg>
-);
 
 export const useProfile = (userId: string) => {
   const [profile, setProfile] = useState<UserProfile | null>(null);

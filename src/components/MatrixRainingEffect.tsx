@@ -1,7 +1,16 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Matrix, Zap, Shield, Activity, Settings, Play, Pause } from "lucide-react";
+import { Zap, Shield, Activity, Settings, Play, Pause } from "lucide-react";
+
+// Matrix icon as SVG
+const MatrixIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="2" y="2" width="20" height="20" rx="2" ry="2" />
+    <path d="M14 2l-4 20" />
+    <path d="M10 2l4 20" />
+  </svg>
+);
 
 interface MatrixRainingEffectProps {
   className?: string;

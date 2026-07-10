@@ -301,7 +301,7 @@ export default function ArcadeMinigame({
     );
   }
 
-  const gameState = gameStateRef.current;
+  const gameState = gameStateRef.current!;
 
   return (
     <div className={`arcade-minigame ${className || ''}`}>

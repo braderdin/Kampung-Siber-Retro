@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface ResidentLink {
   id: string;
@@ -117,10 +117,10 @@ export default function ResidentLinkCollection({
   className
 }: ResidentLinkCollectionProps) {
   const [isClient, setIsClient] = useState(false);
-  const [sortBy, setSortBy] = useState<' favorites' | 'title' | 'category'>('favorites');
+  const [sortBy, setSortBy] = useState<'favorites' | 'title' | 'category'>('favorites');
   const [filterCategory, setFilterCategory] = useState<string>('all');
 
-  useState(() => {
+  useEffect(() => {
     setIsClient(true);
   }, []);
 

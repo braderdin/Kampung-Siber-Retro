@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { Volume2, VolumeX, Volume1, VolumeMute, Zap, Bell, BellOff } from "lucide-react";
-import { useStore } from "@/store";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { Volume2, VolumeX, Volume1, Zap, Bell, BellOff } from "lucide-react";
 
 interface GlobalAudioToggleProps {
   className?: string;
@@ -21,6 +20,14 @@ type AudioState = {
 
 const DEFAULT_SIZE = "md";
 const DEFAULT_VARIANT: "switch" | "button" | "toggle" = "switch";
+
+// VolumeMute icon as SVG
+const VolumeMuteIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polygon points="12 2 15.09 8 22 9.27 18 16 15 22 9 18 2 12 5.27 9.27" />
+    <line x1="19" y1="4" x2="20.5" y2="5.5" />
+  </svg>
+);
 
 export default function GlobalAudioToggle({ 
   className,
@@ -73,25 +80,10 @@ export default function GlobalAudioToggle({
     const newState = !enabled;
     setEnabled(newState);
     onToggle?.(newState);
-    
-    if (typeof window !== "undefined") {
-      const storage = useStore.getState();
-      if (storage && storage.setAudioEnabled) {
-        storage.setAudioEnabled(newState);
-      }
-    }
   }, [enabled, onToggle]);
 
   const toggleMute = useCallback(() => {
-    const newMute = !muteAll;
-    setMuteAll(newMute);
-    
-    if (typeof window !== "undefined") {
-      const storage = useStore.getState();
-      if (storage && storage.setMuteAll) {
-        storage.setMuteAll(newMute);
-      }
-    }
+    setMuteAll(!muteAll);
   }, [muteAll]);
 
   const adjustVolume = useCallback((amount: number) => {
@@ -291,8 +283,8 @@ export const useGlobalAudio = () => {
     setEnabled(prev => !prev);
   }, []);
 
-  const mute = useCallback(() => {
-    setMuteAll(true);
+  const mute = useCallback((muted?: boolean) => {
+    setMuteAll(muted !== undefined ? muted : true);
   }, []);
 
   const unmute = useCallback(() => {

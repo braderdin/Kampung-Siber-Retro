@@ -154,19 +154,19 @@ export function toast(notification: Omit<Notification, 'id' | 'createdAt'>) {
 }
 
 export function toastSuccess(title: string, message?: string) {
-  toast({ type: 'success', title, message });
+  toast({ type: 'success', title, message: message || '' });
 }
 
 export function toastError(title: string, message?: string) {
-  toast({ type: 'error', title, message });
+  toast({ type: 'error', title, message: message || '' });
 }
 
 export function toastInfo(title: string, message?: string) {
-  toast({ type: 'info', title, message });
+  toast({ type: 'info', title, message: message || '' });
 }
 
 export function toastWarning(title: string, message?: string) {
-  toast({ type: 'warning', title, message });
+  toast({ type: 'warning', title, message: message || '' });
 }
 
 // Set instance reference (called by NotificationProvider)

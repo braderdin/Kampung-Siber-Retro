@@ -243,15 +243,15 @@ export default function ImgurAssetBridge({
           <Copy className="h-4 w-4" />
         </button>
         
-        <a
-          href={image.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="p-1 rounded-full hover:bg-gray-700 text-gray-400 transition-colors"
-          title "Lihat di sebelah"
-        >
-          <ExternalLink className="h-4 w-4" />
-        </a>
+         <a
+           href={image.url}
+           target="_blank"
+           rel="noopener noreferrer"
+           className="p-1 rounded-full hover:bg-gray-700 text-gray-400 transition-colors"
+           title="Lihat di sebelah"
+         >
+           <ExternalLink className="h-4 w-4" />
+         </a>
       </div>
     </div>
   );

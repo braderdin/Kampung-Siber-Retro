@@ -67,14 +67,15 @@ export default function HelpPage() {
           a: 'Go to your profile page, click "Write Entry", and start sharing your cyber adventures!'
         },
         {
-        q: 'Can I format my journal entries?',
-        a: 'Yes! You can use markdown-like formatting. Special words like "kampung", "siber", and "retro" will be highlighted.'
-      },
-      {
-        q: 'How do I add links to my webring?',
-        a: 'Visit your Links page and click "Add Link". You can organize them by category.'
-      }
-    ]
+          q: 'Can I format my journal entries?',
+          a: 'Yes! You can use markdown-like formatting. Special words like "kampung", "siber", and "retro" will be highlighted.'
+        },
+        {
+          q: 'How do I add links to my webring?',
+          a: 'Visit your Links page and click "Add Link". You can organize them by category.'
+        }
+      ]
+    }
   ];
 
   if (!isClient) {

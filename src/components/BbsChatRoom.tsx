@@ -60,7 +60,7 @@ export default function BbsChatRoom({
   
   const wsRef = useRef<WebSocket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const [userId] = useState(`user_${Math.random().toString(36).substr(2, 9)}`);
   const [userName, setUserName] = useState(() => {
     return localStorage.getItem("bbs_user_name") || `User_${Math.floor(Math.random() * 1000)}`;

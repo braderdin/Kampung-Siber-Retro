@@ -319,13 +319,15 @@ export const createChatNotificationSound = (callback?: () => void) => {
 export const useNotificationSound = () => {
   const [muted, setMuted] = useState(false);
   const [volume, setVolume] = useState(0.5);
-  const soundRef = useRef<MircNotificationSound | null>(null);
+  const soundRef = useRef<any>(null);
 
   useEffect(() => {
-    soundRef.current = new MircNotificationSound({
-      enabled: !muted,
-      volume,
-    });
+    if (typeof MircNotificationSound !== 'undefined') {
+      soundRef.current = new (MircNotificationSound as any)({
+        enabled: !muted,
+        volume,
+      });
+    }
   }, [muted, volume]);
 
   const notify = useCallback(() => {

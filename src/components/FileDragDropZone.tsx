@@ -129,10 +129,13 @@ export default function FileDragDropZone({
       progress: 0,
     };
 
-    setFiles(prev => multiple ? [...prev, newFile] : [newFile]);
+    setFiles(prev => {
+      const newFiles = multiple ? [...prev, newFile] : [newFile];
+      onFilesSelected?.(newFiles.map(f => f.file));
+      return newFiles;
+    });
     setTotalSize(prev => prev + file.size);
-    onFilesSelected?.(multiple ? [...files.map(f => f.file), newFile] : [newFile]);
-  }, [validateFile, onUploadError, onFilesSelected, files, multiple]);
+  }, [validateFile, onUploadError, onFilesSelected, multiple]);
 
   const removeFile = useCallback((id: string) => {
     setFiles(prev => {
@@ -307,13 +310,13 @@ export default function FileDragDropZone({
             <X className="h-4 w-4 text-red-400" />
           )}
           
-          <button
-            onClick={() => removeFile(fileInfo.id)}
-            className="p-1 rounded-full hover:bg-gray-700 text-gray-400 transition-colors"
-            title "Buang"
-          >
-            <X className="h-4 w-4" />
-          </button>
+           <button
+             onClick={() => removeFile(fileInfo.id)}
+             className="p-1 rounded-full hover:bg-gray-700 text-gray-400 transition-colors"
+             title="Buang"
+           >
+             <X className="h-4 w-4" />
+           </button>
         </div>
       </div>
     );

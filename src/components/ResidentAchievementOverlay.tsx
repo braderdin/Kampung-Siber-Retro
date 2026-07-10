@@ -23,7 +23,7 @@ export default function ResidentAchievementOverlay({
   onClose
 }: ResidentAchievementOverlayProps) {
   const [isAnimating, setIsAnimating] = useState(false);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [position, setPosition] = useState<{ x: number | string; y: number }>({ x: 0, y: 0 });
 
   useEffect(() => {
     if (isVisible && achievement) {
