@@ -1,251 +1,181 @@
 "use client";
 
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useCallback } from "react";
+import { JournalEntry } from "@/types/journal";
 
 interface JournalEntryFormProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (title: string, content: string) => void;
-  username: string;
+  onSubmit?: (entry: JournalEntry) => void;
+  initialEntry?: Partial<JournalEntry>;
+  className?: string;
 }
 
-export default function JournalEntryForm({ 
-  isOpen, 
-  onClose, 
+export const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
   onSubmit,
-  username 
-}: JournalEntryFormProps) {
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
-  const [characterCount, setCharacterCount] = useState(0);
-  const [wordCount, setWordCount] = useState(0);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  initialEntry,
+  className = "",
+}) => {
+  const [title, setTitle] = useState(initialEntry?.title || "");
+  const [slug, setSlug] = useState(initialEntry?.slug || "");
+  const [content, setContent] = useState(initialEntry?.content || "");
+  const [isPublic, setIsPublic] = useState(initialEntry?.isPublic ?? true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const MAX_CHARS = 2000;
-
-  useEffect(() => {
-    if (isOpen && textareaRef.current) {
-      textareaRef.current.focus();
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        onClose();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener('keydown', handleKeyDown);
-    }
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isOpen, onClose]);
-
-  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const text = e.target.value;
-    setContent(text);
-    setCharacterCount(text.length);
-    setWordCount(text.trim().split(/\s+/).filter(w => w.length > 0).length);
-  };
+  const generateSlug = useCallback((text: string) => {
+    return text
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/[\s_-]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }, []);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTitle(e.target.value);
-  };
-
-  const handleSave = async () => {
-    if (!title.trim() || !content.trim()) {
-      return;
+    const value = e.target.value;
+    setTitle(value);
+    if (!slug) {
+      setSlug(generateSlug(value) || "untitled");
     }
-
-    setIsSaving(true);
-    
-    // Simulate async save operation
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    onSubmit(title, content);
-    setIsSaving(false);
-    onClose();
   };
 
-  const handleCancel = () => {
-    setTitle('');
-    setContent('');
-    setCharacterCount(0);
-    setWordCount(0);
-    setIsSaving(false);
-    onClose();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const entry: JournalEntry = {
+        id: initialEntry?.id || crypto.randomUUID(),
+        username: initialEntry?.username || "anonymous",
+        title,
+        slug: slug || generateSlug(title) || "untitled",
+        content,
+        createdAt: initialEntry?.createdAt || new Date().toISOString(),
+        isPublic,
+      };
+
+      if (onSubmit) {
+        await onSubmit(entry);
+      }
+
+      if (!initialEntry) {
+        setTitle("");
+        setSlug("");
+        setContent("");
+        setIsPublic(true);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to submit entry");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  if (!isOpen) {
-    return null;
-  }
+  const handleCopySlug = () => {
+    navigator.clipboard.writeText(slug);
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Start: Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-all duration-300"
-        onClick={handleCancel}
-      />
-      {/* End: Backdrop */}
-
-      {/* Start: Modal Content */}
-      <div className="relative retro-card w-full max-w-2xl mx-auto bg-gray-50 dark:bg-gray-900 border-2 border-dashed border-purple-400/50">
-        {/* Start: Modal Header */}
-        <div className="retro-card-header bg-gradient-to-r from-purple-900/80 to-pink-900/80 text-white px-4 py-3 border-b-2 border-dashed border-white/30">
-          <div className="flex justify-between items-center">
-            <h2 className="text-lg font-bold pixel-font flex items-center gap-2">
-              <span className="text-2xl">✍️</span>
-              <span>Buat Entri Baru</span>
-            </h2>
-            <button
-              onClick={handleCancel}
-              className="retro-btn-secondary text-xs px-2 py-1 bg-white/20 hover:bg-white/30"
-              disabled={isSaving}
-            >
-              ✕
-            </button>
-          </div>
+    <form onSubmit={handleSubmit} className={`w-full ${className}`}>
+      <div className="space-y-4">
+        <div>
+          <label className="font-pixel text-xs text-gray-400 block mb-1">
+            Title
+          </label>
+          <input
+            type="text"
+            value={title}
+            onChange={handleTitleChange}
+            placeholder="Enter journal title..."
+            className="retro-textarea w-full px-3 py-2 bg-gray-800/30 border border-gray-700/50 rounded focus:outline-none focus:border-blue-500/50 transition-colors"
+            maxLength={100}
+            required
+          />
         </div>
-        {/* End: Modal Header */}
 
-        {/* Start: Modal Body */}
-        <div className="p-4 max-h-96 overflow-y-auto">
-          {/* Start: Title Input */}
-          <div className="mb-4">
-            <label className="text-xs font-bold text-gray-700 dark:text-gray-300 pixel-font mb-2 block">
-              Tajuk Entri
-            </label>
+        <div>
+          <label className="font-pixel text-xs text-gray-400 block mb-1">
+            URL Slug
+          </label>
+          <div className="flex gap-2">
             <input
               type="text"
-              placeholder="Masukkan tajuk entri anda..."
-              value={title}
-              onChange={handleTitleChange}
-              className="retro-input w-full"
-              maxLength={100}
-              disabled={isSaving}
+              value={slug}
+              onChange={(e) => setSlug(e.target.value)}
+              placeholder="url-slug"
+              className="retro-textarea flex-1 px-3 py-2 bg-gray-800/30 border border-gray-700/50 rounded focus:outline-none focus:border-blue-500/50 transition-colors"
             />
-            <div className="text-xs text-gray-500 dark:text-gray-400 pixel-font mt-1">
-              {title.length}/100
-            </div>
+            <button
+              type="button"
+              onClick={handleCopySlug}
+              className="px-3 py-2 bg-gray-800/30 hover:bg-gray-700/50 border border-gray-700/50 rounded font-pixel text-xs text-gray-300 transition-colors"
+            >
+              Copy
+            </button>
           </div>
-          {/* End: Title Input */}
+        </div>
 
-          {/* Start: Content Textarea */}
-          <div className="mb-4">
-            <label className="text-xs font-bold text-gray-700 dark:text-gray-300 pixel-font mb-2 block">
-              Kandungan
+        <div>
+          <label className="font-pixel text-xs text-gray-400 block mb-1">
+            Visibility
+          </label>
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isPublic}
+                onChange={(e) => setIsPublic(e.target.checked)}
+                className="w-4 h-4 bg-gray-800/30 border border-gray-700/50 rounded focus:ring-2 focus:ring-blue-500/50"
+              />
+              <span className="font-pixel text-xs text-gray-300">Public</span>
             </label>
-            <textarea
-              ref={textareaRef}
-              placeholder="Ceritakan apa yang anda alami hari ini..."
-              value={content}
-              onChange={handleContentChange}
-              className="retro-textarea w-full resize-y"
-              rows={6}
-              maxLength={MAX_CHARS}
-              disabled={isSaving}
-            />
-            <div className="flex justify-between items-center mt-2">
-              <span className="text-xs text-gray-500 dark:text-gray-400 pixel-font">
-                {wordCount} perkataan
-              </span>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-500 dark:text-gray-400 pixel-font">
-                  {characterCount.toLocaleString()}/{MAX_CHARS}
-                </span>
-                {characterCount >= MAX_CHARS * 0.9 && characterCount < MAX_CHARS && (
-                  <span className="text-xs text-amber-500 pixel-font">⚠️ Hampir penuh</span>
-                )}
-                {characterCount >= MAX_CHARS && (
-                  <span className="text-xs text-red-500 pixel-font">❌ Penuh</span>
-                )}
-              </div>
-            </div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={!isPublic}
+                onChange={() => setIsPublic(false)}
+                className="w-4 h-4 bg-gray-800/30 border border-gray-700/50 rounded focus:ring-2 focus:ring-blue-500/50"
+              />
+              <span className="font-pixel text-xs text-gray-300">Private</span>
+            </label>
           </div>
-          {/* End: Content Textarea */}
-
-          {/* Start: Preview */}
-          <div className="retro-card bg-white dark:bg-gray-800 border-2 border-dashed border-cyan-400/30">
-            <div className="retro-card-header bg-gray-100 dark:bg-gray-800 px-3 py-2 border-b-2 border-dashed border-gray-200 dark:border-gray-700">
-              <span className="text-xs font-bold text-gray-700 dark:text-gray-300 pixel-font">
-                Penonton Keseluruhan
-              </span>
-            </div>
-            <div className="p-3">
-              <h3 className="text-sm font-bold text-purple-600 dark:text-purple-300 pixel-font mb-2 break-words">
-                {title || 'Tajuk tidak tersedia'}
-              </h3>
-              <p className="text-xs text-gray-600 dark:text-gray-400 pixel-font leading-relaxed whitespace-pre-wrap break-words">
-                {content || 'Tiada kandungan...'}
-              </p>
-              <div className="mt-3 flex gap-2 text-xs text-gray-500 dark:text-gray-400 pixel-font">
-                <span>👤 {username}</span>
-                <span>⏱️ {new Date().toLocaleDateString('ms-MY')}</span>
-              </div>
-            </div>
-          </div>
-          {/* End: Preview */}
         </div>
-        {/* End: Modal Body */}
 
-        {/* Start: Modal Footer */}
-        <div className="retro-card-footer bg-gray-100 dark:bg-gray-800 px-4 py-3 border-t-2 border-dashed border-gray-200 dark:border-gray-700 flex justify-between items-center">
-          <div className="flex gap-2">
-            <button
-              onClick={handleSave}
-              className={`retro-btn-primary text-xs px-4 py-2 ${isSaving ? 'opacity-50 cursor-not-allowed' : ''}`}
-              disabled={isSaving || !title.trim() || !content.trim()}
-            >
-              {isSaving ? '⏳ Menyimpan...' : '💾 Simpan Entri'}
-            </button>
-            <button
-              onClick={handleCancel}
-              className="retro-btn-secondary text-xs px-4 py-2"
-              disabled={isSaving}
-            >
-              ❌ Batal
-            </button>
-          </div>
-          <span className="text-xs text-gray-500 dark:text-gray-400 pixel-font">
-            Tekan ESC untuk tutup
-          </span>
+        <div>
+          <label className="font-pixel text-xs text-gray-400 block mb-1">
+            Content
+          </label>
+          <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="Write your journal entry..."
+            rows={10}
+            className="retro-textarea w-full px-3 py-2 bg-gray-800/30 border border-gray-700/50 rounded focus:outline-none focus:border-blue-500/50 transition-colors resize-y"
+            required
+          />
         </div>
-        {/* End: Modal Footer */}
 
-        {/* Start: Custom Styles */}
-        <style jsx>{`
-          .retro-textarea {
-            background-color: #00000020;
-            border: 1px solid #d1d5db;
-            border-radius: 0.375rem;
-            padding: 0.75rem;
-            color: #065f46;
-            font-family: inherit;
-            font-size: 0.875rem;
-            line-height: 1.5rem;
-            resize: vertical;
-            transition: border-color 0.2s, box-shadow 0.2s;
-          }
-          
-          .retro-textarea:focus {
-            outline: none;
-            border-color: #0891b2;
-            box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.3);
-          }
-          
-          .retro-textarea::placeholder {
-            color: #6b7280;
-          }
-        `}</style>
-        {/* End: Custom Styles */}
+        {error && (
+          <div className="p-2 bg-red-500/10 border border-red-500/20 rounded">
+            <p className="font-pixel text-xs text-red-400">{error}</p>
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={isSubmitting || !title || !content}
+          className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-pixel text-xs rounded transition-colors"
+        >
+          {isSubmitting
+            ? initialEntry
+              ? "Updating Entry..."
+              : "Publishing..."
+            : initialEntry
+              ? "Update Entry"
+              : "Publish Entry"}
+        </button>
       </div>
-      {/* End: Modal Content */}
-    </div>
+    </form>
   );
-}
+};
+
+export default JournalEntryForm;

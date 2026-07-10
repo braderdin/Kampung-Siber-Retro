@@ -1,221 +1,176 @@
-"use client";
-
-import { useState, useEffect } from 'react';
-import { useLanguageStore } from '@/store/useLanguageStore';
-import { enDictionary, msDictionary } from '@/i18n/dictionaries';
-import JournalEntryForm from '@/components/JournalEntryForm';
-import PixelCursorEffect from '@/components/PixelCursorEffect';
-import HydrationGuard from '@/components/HydrationGuard';
-
-interface LogPost {
-  id: string;
-  title: string;
-  content: string;
-  timestamp: string;
-  tags: string[];
-}
+import { JournalEntry } from "@/types/journal";
+import HydrationGuard from "@/components/HydrationGuard";
+import { JournalEntryForm } from "@/components/JournalEntryForm";
 
 interface JournalPageProps {
-  params: { username: string };
+  params: {
+    username: string;
+  };
 }
 
-// Sample log posts - in production this would come from an API
-const SAMPLE_LOGS: Record<string, LogPost[]> = {
-  'cyber-pioneer': [
-    {
-      id: '1',
-      title: 'Petualangan Pertama Saya',
-      content: 'Hari ini saya mula menjelajah dunia retro internet. Saya telah menemui banyak teknologi yang menarik dan komuniti yang sangat mesra.',
-      timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-      tags: ['permainan', 'komuniti']
-    },
-    {
-      id: '2',
-      title: 'Pembangunan Proyek Pertama',
-      content: 'Saya telah selesai mencuba membuat satu laman web kecil dengan gaya retro. Hasilnya sangat memuaskan!',
-      timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-      tags: ['pembangunan', 'web']
-    }
-  ],
-  'pixel-warrior': [
-    {
-      id: '1',
-      title: 'Update Terbaru',
-      content: 'Saya baru saja menyiapkan ciri-ciri baru untuk projek saya. Saya sangat teruas dengan kemaklumannya.',
-      timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-      tags: ['update', 'berita']
-    }
-  ],
-  'retro-hacker': [
-    {
-      id: '1',
-      title: 'Penemuan Kaunter',
-      content: 'Saya telah menemui satu kod yang menarik untuk mengubah laluan pengguna pada laman web retro.',
-      timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-      tags: ['kod', 'retro']
-    }
-  ]
-};
+interface JournalData {
+  entries: JournalEntry[];
+  hasNextPage: boolean;
+  currentPage: number;
+}
 
-export default function JournalPage({ params }: JournalPageProps) {
-  const { username } = params;
-  const { language } = useLanguageStore();
-  const t = language === 'ms' ? msDictionary : enDictionary;
-  const [isClient, setIsClient] = useState(false);
-  const [logPosts, setLogPosts] = useState<LogPost[]>([]);
-  const [showForm, setShowForm] = useState(false);
-  const [newPost, setNewPost] = useState({ title: '', content: '' });
-
-  useEffect(() => {
-    setIsClient(true);
-    
-    // Load posts from sample data or localStorage
-    const storedPosts = localStorage.getItem(`journal_${username}`);
-    if (storedPosts) {
-      setLogPosts(JSON.parse(storedPosts));
-    } else if (SAMPLE_LOGS[username]) {
-      setLogPosts(SAMPLE_LOGS[username]);
-    } else {
-      setLogPosts([]);
-    }
-  }, [username]);
-
-  const handleCreatePost = (title: string, content: string) => {
-    if (!title.trim() || !content.trim()) return;
-    
-    const post: LogPost = {
-      id: Date.now().toString(),
-      title,
-      content,
-      timestamp: new Date().toISOString(),
-      tags: []
-    };
-    
-    const updatedPosts = [post, ...logPosts];
-    setLogPosts(updatedPosts);
-    localStorage.setItem(`journal_${username}`, JSON.stringify(updatedPosts));
-    setNewPost({ title: '', content: '' });
-    setShowForm(false);
-  };
-
-  const handleDeletePost = (postId: string) => {
-    const updatedPosts = logPosts.filter(post => post.id !== postId);
-    setLogPosts(updatedPosts);
-    localStorage.setItem(`journal_${username}`, JSON.stringify(updatedPosts));
-  };
-
-  const formatTimestamp = (timestamp: string): string => {
-    const date = new Date(timestamp);
-    return date.toLocaleDateString('ms-MY') + ' ' + date.toLocaleTimeString();
-  };
-
-  if (!isClient) {
-    return (
-      <main className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto" />
-        </div>
-      </main>
+async function fetchJournalEntries(username: string, page: number = 1): Promise<JournalData> {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SITE_URL || ''}/api/users/${username}/journal?page=${page}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        next: { revalidate: 60 },
+      }
     );
+
+    if (!response.ok) {
+      return { entries: [], hasNextPage: false, currentPage: page };
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error(`Failed to fetch journal entries for ${username}:`, error);
+    return { entries: [], hasNextPage: false, currentPage: page };
   }
+}
+
+async function fetchUser(username: string) {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SITE_URL || ''}/api/users/${username}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        next: { revalidate: 60 },
+      }
+    );
+
+    if (!response.ok) {
+      return null;
+    }
+
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
+export default async function JournalPage({ params }: JournalPageProps) {
+  const { username } = params;
+  const [journalData, user] = await Promise.all([
+    fetchJournalEntries(username),
+    fetchUser(username),
+  ]);
+
+  const { entries, hasNextPage, currentPage } = journalData;
 
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300 pt-16">
-      <PixelCursorEffect />
+    <HydrationGuard>
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black">
+        <div className="container mx-auto px-4 py-8">
+          <header className="mb-8">
+            <h1 className="font-pixel text-3xl text-white mb-2">
+              {username}'s Journal
+            </h1>
+            <p className="font-pixel text-xs text-gray-400">
+              {entries.length} public entries • {new Date().toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })}
+            </p>
+          </header>
 
-      {/* Start: Header Section */}
-      <div className="sticky top-16 z-40 bg-gradient-to-r from-green-900/80 to-teal-900/80 backdrop-blur-md border-b-2 border-dashed border-cyan-500/20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <h1 className="text-3xl font-bold text-cyan-400 pixel-font flex items-center gap-3">
-            <span className="text-4xl">📔</span>
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-pink-400 to-cyan-300">
-              Diari {username}
-            </span>
-          </h1>
-          <p className="text-sm text-gray-300 dark:text-gray-400 mt-1 pixel-font border-l-2 border-dashed border-pink-400/50 pl-3">
-            Catatan peribadi dan petuaan harian
-          </p>
-        </div>
-      </div>
-      {/* End: Header Section */}
-
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Start: New Post Button */}
-        <div className="mb-6">
-          <button
-            onClick={() => setShowForm(true)}
-            className="retro-btn-primary text-sm px-4 py-2"
-          >
-            ✍️ {t.newPost || 'Buat Entri Baru'}
-          </button>
-        </div>
-        {/* End: New Post Button */}
-
-        {/* Start: JournalEntryForm Modal */}
-        {showForm && (
-          <JournalEntryForm
-            isOpen={showForm}
-            onClose={() => setShowForm(false)}
-            onSubmit={handleCreatePost}
-            username={username}
-          />
-        )}
-        {/* End: JournalEntryForm Modal */}
-
-        {/* Start: Timeline Stream */}
-        <div className="space-y-4">
-          {logPosts.length === 0 ? (
-            <div className="retro-card text-center py-8 border-2 border-dashed border-gray-200 dark:border-gray-700">
-              <p className="text-gray-500 dark:text-gray-400 pixel-font mb-4">
-                Tiada entri lagi. Jadilah yang pertama menulis!
-              </p>
-            </div>
-          ) : (
-            logPosts.map((post, index) => (
-              <HydrationGuard key={post.id}>
-                <div className="retro-card border-2 border-dashed border-purple-400/20 hover:border-purple-400/40 transition-all duration-200">
-                  <div className="retro-card-header bg-gray-100 dark:bg-gray-800 px-4 py-2 border-b-2 border-dashed border-gray-200 dark:border-gray-700">
-                    <div className="flex justify-between items-center">
-                      <h3 className="text-base font-bold text-gray-800 dark:text-gray-200 pixel-font">
-                        {post.title}
-                      </h3>
-                      <span className="text-xs text-gray-500 dark:text-gray-400 pixel-font">
-                        {formatTimestamp(post.timestamp)}
-                      </span>
+          <div className="space-y-6">
+            {entries.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="font-pixel text-xs text-gray-500">
+                  No journal entries found.
+                </p>
+                <p className="font-pixel text-xs text-gray-600 mt-2">
+                  Be the first to write something!
+                </p>
+              </div>
+            ) : (
+              entries.map((entry) => (
+                <article
+                  key={entry.id}
+                  className="bg-gray-800/30 border border-gray-700/30 rounded-lg p-4 transition-all duration-200 hover:shadow-lg"
+                >
+                  <header className="mb-3">
+                    <h2 className="font-pixel text-lg text-white mb-1">
+                      {entry.title}
+                    </h2>
+                    <div className="flex items-center gap-2 text-xs text-gray-400">
+                      <span>{new Date(entry.createdAt).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                      })}</span>
+                      {entry.isPublic && (
+                        <span className="px-2 py-0.5 bg-blue-600/20 text-blue-400 rounded-full">
+                          Public
+                        </span>
+                      )}
                     </div>
-                  </div>
-                  <div className="p-4">
-                    <p className="text-sm text-gray-700 dark:text-gray-300 pixel-font leading-relaxed whitespace-pre-wrap">
-                      {post.content}
+                  </header>
+
+                  <div className="prose prose-sm prose-gray max-w-none">
+                    <p className="font-pixel text-xs text-gray-300 whitespace-pre-wrap">
+                      {entry.content}
                     </p>
-                    {post.tags.length > 0 && (
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {post.tags.map(tag => (
-                          <span
-                            key={tag}
-                            className="text-xs px-2 py-1 bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 rounded pixel-font"
-                          >
-                            #{tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                    <div className="mt-3 flex gap-2">
-                      <button
-                        onClick={() => handleDeletePost(post.id)}
-                        className="retro-btn-secondary text-xs px-2 py-1"
-                      >
-                        🗑️ Padam
-                      </button>
-                    </div>
                   </div>
-                </div>
-              </HydrationGuard>
-            ))
-          )}
+
+                  <footer className="mt-3 pt-3 border-t border-gray-700/30 flex items-center justify-between">
+                    <div className="font-pixel text-xs text-gray-500">
+                      by {entry.username}
+                    </div>
+                    <a
+                      href={`/site/${username}/journal/${entry.slug}`}
+                      className="font-pixel text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                    >
+                      Read More →
+                    </a>
+                  </footer>
+                </article>
+              ))
+            )}
+
+            {hasNextPage && (
+              <div className="text-center">
+                <a
+                  href={`/site/${username}/journal?page=${currentPage + 1}`}
+                  className="font-pixel text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                >
+                  Load More Entries →
+                </a>
+              </div>
+            )}
+          </div>
+
+          <section className="mt-12 pt-8 border-t border-gray-700/30">
+            <h2 className="font-pixel text-xl text-white mb-4">Write a New Entry</h2>
+            <JournalEntryForm
+              username={username}
+              onSubmit={async (entry) => {
+                await fetch(`/api/users/${username}/journal`, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify(entry),
+                });
+              }}
+            />
+          </section>
         </div>
-        {/* End: Timeline Stream */}
       </div>
-    </main>
+    </HydrationGuard>
   );
 }
