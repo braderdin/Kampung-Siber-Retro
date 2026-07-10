@@ -1,9 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useLanguageStore } from '@/store/useLanguageStore';
-import { enDictionary, msDictionary } from '@/i18n/dictionaries';
-import MuseumExhibitCard from '@/components/MuseumExhibitCard';
+import CyberMuseumArchive from '@/components/CyberMuseumArchive';
 import PixelCursorEffect from '@/components/PixelCursorEffect';
 import HydrationGuard from '@/components/HydrationGuard';
 
@@ -95,25 +93,15 @@ Mesej: Selamat datang ke BBS kami!`,
 ];
 
 export default function CyberMuseumPage() {
-  const { language } = useLanguageStore();
-  const t = language === 'ms' ? msDictionary : enDictionary;
   const [isClient, setIsClient] = useState(false);
-  const [selectedEra, setSelectedEra] = useState<string>('all');
-  const [searchTerm, setSearchTerm] = useState<string>('');
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  const eras = ['all', '1980-an', '1990-an'];
-  
-  const filteredArtifacts = MUSEUM_COLLECTION.filter(artifact => {
-    const matchesEra = selectedEra === 'all' || artifact.era === selectedEra;
-    const matchesSearch = searchTerm.toLowerCase() === '' || 
-      artifact.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      artifact.description.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesEra && matchesSearch;
-  });
+  const handleArtifactClick = (artifact: MuseumArtifact) => {
+    console.log('Artifact clicked:', artifact.title);
+  };
 
   if (!isClient) {
     return (
@@ -129,90 +117,49 @@ export default function CyberMuseumPage() {
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300 pt-16">
       <PixelCursorEffect />
 
-      {/* Start: Header Section */}
-      <div className="sticky top-16 z-40 bg-gradient-to-r from-indigo-900/80 to-purple-900/80 backdrop-blur-md border-b border-cyan-500/20">
+      {/* Start: Header Section with Retro Dashed Borders */}
+      <div className="sticky top-16 z-40 bg-gradient-to-r from-indigo-900/80 to-purple-900/80 backdrop-blur-md border-b-2 border-dashed border-cyan-500/20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <h1 className="text-3xl font-bold text-cyan-400 pixel-font flex items-center gap-3">
             <span className="text-4xl">🏛️</span>
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-pink-400 to-cyan-300">
-              Muzium Khazanah
+              Muzium Khazanah Siber
             </span>
           </h1>
-          <p className="text-sm text-gray-300 dark:text-gray-400 mt-1 pixel-font">
+          <p className="text-sm text-gray-300 dark:text-gray-400 mt-1 pixel-font border-l-2 border-dashed border-pink-400/50 pl-3">
             Arkib sejarah internet kami - 56k, mIRC, dan lagu latar
           </p>
         </div>
       </div>
       {/* End: Header Section */}
 
+      {/* Start: Museum Gallery with CyberMuseumArchive */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Start: Filter Controls */}
-        <div className="retro-card mb-6">
-          <div className="p-4">
-            <div className="flex flex-col sm:flex-row gap-3">
-              <input
-                type="text"
-                placeholder={t.searchPlaceholder || 'Cari artefak...'}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="retro-input flex-1"
-              />
-              <select
-                value={selectedEra}
-                onChange={(e) => setSelectedEra(e.target.value)}
-                className="retro-input w-auto"
-              >
-                <option value="all">{t.allEras || 'Semua Era'}</option>
-                {eras.slice(1).map(era => (
-                  <option key={era} value={era}>{era}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
-        {/* End: Filter Controls */}
+        <HydrationGuard>
+          <CyberMuseumArchive
+            artifacts={MUSEUM_COLLECTION}
+            onArtifactClick={handleArtifactClick}
+          />
+        </HydrationGuard>
+      </div>
+      {/* End: Museum Gallery */}
 
-        {/* Start: Museum Gallery */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredArtifacts.length === 0 ? (
-            <div className="retro-card text-center py-8 col-span-full">
-              <p className="text-gray-500 dark:text-gray-400 pixel-font mb-4">
-                Tiada artefak yang padu dengan carian anda.
-              </p>
-            </div>
-          ) : (
-            filteredArtifacts.map(artifact => (
-              <HydrationGuard key={artifact.id}>
-                <MuseumExhibitCard
-                  id={artifact.id}
-                  title={artifact.title}
-                  era={artifact.era}
-                  description={artifact.description}
-                  imagePlaceholder={artifact.imagePlaceholder}
-                  codeSnippet={artifact.codeSnippet}
-                  historicalSignificance={artifact.historicalSignificance}
-                />
-              </HydrationGuard>
-            ))
-          )}
-        </div>
-        {/* End: Museum Gallery */}
-
-        {/* Start: Museum Notes */}
-        <div className="mt-8 retro-card">
-          <div className="retro-card-header bg-gray-200 dark:bg-gray-700 px-4 py-2 border-b border-gray-300 dark:border-gray-600">
+      {/* Start: Museum Notes Section */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="retro-card border-2 border-dashed border-purple-400/30">
+          <div className="retro-card-header bg-gray-200 dark:bg-gray-700 px-4 py-2 border-b-2 border-dashed border-gray-300 dark:border-gray-600">
             <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200 pixel-font flex items-center gap-2">
               <span className="text-xl">📝</span>
               <span>Nota Sejarah</span>
             </h2>
           </div>
           <div className="p-4">
-            <div className="text-sm text-gray-700 dark:text-gray-300 pixel-font space-y-3">
+            <div className="text-sm text-gray-700 dark:text-gray-300 pixel-font space-y-3 border-l-2 border-dashed border-cyan-400 pl-4">
               <p>
                 <strong>56k Dial-Up:</strong> Kecepatan pautan dial-up 56k melambatkan muat turun tetapi membuka pintu ke internet global.
               </p>
               <p>
-                <strong>mIRC & IRC:</strong> Internet Relay Chat membolehkan komunikasi langsung dalam bilik perbincangan.
+                <strong>mIRC & IRC:</strong> Internet Relay Chat membolehkan komunikasi langsung dalam bilik perbincangang.
               </p>
               <p>
                 <strong>Geocities & Tripod:</strong> Perkhidmatan ini membolehkan pengguna membuat laman web percuma dengan ruang penyimpanan terhad.
@@ -220,11 +167,14 @@ export default function CyberMuseumPage() {
               <p>
                 <strong>BBS & FidoNet:</strong> Sistem bulletin board adalah asas komuniti talian sebelum internet komersial.
               </p>
+              <p className="border-t-2 border-dashed border-pink-400/30 pt-3">
+                <strong>Kesedaran:</strong> Klik pada setiap artefak untuk melihat detail sejarahnya dengan moda interaktif.
+              </p>
             </div>
           </div>
         </div>
-        {/* End: Museum Notes */}
       </div>
+      {/* End: Museum Notes Section */}
     </main>
   );
 }

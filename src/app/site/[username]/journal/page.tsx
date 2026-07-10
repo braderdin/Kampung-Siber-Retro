@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { enDictionary, msDictionary } from '@/i18n/dictionaries';
+import JournalEntryForm from '@/components/JournalEntryForm';
 import PixelCursorEffect from '@/components/PixelCursorEffect';
 import HydrationGuard from '@/components/HydrationGuard';
 
@@ -79,13 +80,13 @@ export default function JournalPage({ params }: JournalPageProps) {
     }
   }, [username]);
 
-  const handleCreatePost = () => {
-    if (!newPost.title.trim() || !newPost.content.trim()) return;
+  const handleCreatePost = (title: string, content: string) => {
+    if (!title.trim() || !content.trim()) return;
     
     const post: LogPost = {
       id: Date.now().toString(),
-      title: newPost.title,
-      content: newPost.content,
+      title,
+      content,
       timestamp: new Date().toISOString(),
       tags: []
     };
@@ -95,6 +96,12 @@ export default function JournalPage({ params }: JournalPageProps) {
     localStorage.setItem(`journal_${username}`, JSON.stringify(updatedPosts));
     setNewPost({ title: '', content: '' });
     setShowForm(false);
+  };
+
+  const handleDeletePost = (postId: string) => {
+    const updatedPosts = logPosts.filter(post => post.id !== postId);
+    setLogPosts(updatedPosts);
+    localStorage.setItem(`journal_${username}`, JSON.stringify(updatedPosts));
   };
 
   const formatTimestamp = (timestamp: string): string => {
@@ -117,7 +124,7 @@ export default function JournalPage({ params }: JournalPageProps) {
       <PixelCursorEffect />
 
       {/* Start: Header Section */}
-      <div className="sticky top-16 z-40 bg-gradient-to-r from-green-900/80 to-teal-900/80 backdrop-blur-md border-b border-cyan-500/20">
+      <div className="sticky top-16 z-40 bg-gradient-to-r from-green-900/80 to-teal-900/80 backdrop-blur-md border-b-2 border-dashed border-cyan-500/20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <h1 className="text-3xl font-bold text-cyan-400 pixel-font flex items-center gap-3">
             <span className="text-4xl">📔</span>
@@ -125,7 +132,7 @@ export default function JournalPage({ params }: JournalPageProps) {
               Diari {username}
             </span>
           </h1>
-          <p className="text-sm text-gray-300 dark:text-gray-400 mt-1 pixel-font">
+          <p className="text-sm text-gray-300 dark:text-gray-400 mt-1 pixel-font border-l-2 border-dashed border-pink-400/50 pl-3">
             Catatan peribadi dan petuaan harian
           </p>
         </div>
@@ -144,61 +151,30 @@ export default function JournalPage({ params }: JournalPageProps) {
         </div>
         {/* End: New Post Button */}
 
-        {/* Start: New Post Form */}
+        {/* Start: JournalEntryForm Modal */}
         {showForm && (
-          <div className="retro-card mb-6">
-            <div className="retro-card-header bg-gray-200 dark:bg-gray-700 px-4 py-2 border-b border-gray-300 dark:border-gray-600">
-              <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 pixel-font">
-                {t.newPost || 'Buat Entri Baru'}
-              </h3>
-            </div>
-            <div className="p-4 space-y-3">
-              <input
-                type="text"
-                placeholder={t.postTitle || 'Tajuk entri...'}
-                value={newPost.title}
-                onChange={(e) => setNewPost({...newPost, title: e.target.value})}
-                className="retro-input w-full"
-              />
-              <textarea
-                placeholder={t.postContent || 'Kandungan entri...'}
-                value={newPost.content}
-                onChange={(e) => setNewPost({...newPost, content: e.target.value})}
-                className="retro-textarea w-full"
-                rows={4}
-              />
-              <div className="flex gap-2">
-                <button
-                  onClick={handleCreatePost}
-                  className="retro-btn-primary text-xs px-3 py-1"
-                >
-                  {t.save || 'Simpan'}
-                </button>
-                <button
-                  onClick={() => setShowForm(false)}
-                  className="retro-btn-secondary text-xs px-3 py-1"
-                >
-                  {t.cancel || 'Batal'}
-                </button>
-              </div>
-            </div>
-          </div>
+          <JournalEntryForm
+            isOpen={showForm}
+            onClose={() => setShowForm(false)}
+            onSubmit={handleCreatePost}
+            username={username}
+          />
         )}
-        {/* End: New Post Form */}
+        {/* End: JournalEntryForm Modal */}
 
         {/* Start: Timeline Stream */}
         <div className="space-y-4">
           {logPosts.length === 0 ? (
-            <div className="retro-card text-center py-8">
-              <p className="text-gray-500 dark:text-gray-400 pixel-font">
+            <div className="retro-card text-center py-8 border-2 border-dashed border-gray-200 dark:border-gray-700">
+              <p className="text-gray-500 dark:text-gray-400 pixel-font mb-4">
                 Tiada entri lagi. Jadilah yang pertama menulis!
               </p>
             </div>
           ) : (
             logPosts.map((post, index) => (
               <HydrationGuard key={post.id}>
-                <div className="retro-card">
-                  <div className="retro-card-header bg-gray-100 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+                <div className="retro-card border-2 border-dashed border-purple-400/20 hover:border-purple-400/40 transition-all duration-200">
+                  <div className="retro-card-header bg-gray-100 dark:bg-gray-800 px-4 py-2 border-b-2 border-dashed border-gray-200 dark:border-gray-700">
                     <div className="flex justify-between items-center">
                       <h3 className="text-base font-bold text-gray-800 dark:text-gray-200 pixel-font">
                         {post.title}
@@ -224,6 +200,14 @@ export default function JournalPage({ params }: JournalPageProps) {
                         ))}
                       </div>
                     )}
+                    <div className="mt-3 flex gap-2">
+                      <button
+                        onClick={() => handleDeletePost(post.id)}
+                        className="retro-btn-secondary text-xs px-2 py-1"
+                      >
+                        🗑️ Padam
+                      </button>
+                    </div>
                   </div>
                 </div>
               </HydrationGuard>

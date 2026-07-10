@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface ProfileBioEditorProps {
   initialBio?: string;
@@ -9,59 +9,88 @@ interface ProfileBioEditorProps {
 }
 
 export default function ProfileBioEditor({ 
-  initialBio = 'Saya warga kampung siber retro yang antara.',
+  initialBio = 'I am a resident of the retro cyber village.',
   onBioChange,
   className
 }: ProfileBioEditorProps) {
-  const [bio, setBio] = useState(initialBio);
-  const [previewBio, setPreviewBio] = useState(initialBio);
-  const [isEditing, setIsEditing] = useState(false);
+  const [bioContent, setBioContent] = useState<string>(initialBio);
+  const [previewContent, setPreviewContent] = useState<string>(initialBio);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [characterCount, setCharacterCount] = useState<number>(0);
+  const [isHovered, setIsHovered] = useState<boolean>(false);
 
   useEffect(() => {
-    setBio(initialBio);
-    setPreviewBio(initialBio);
+    setBioContent(initialBio);
+    setPreviewContent(initialBio);
+    setCharacterCount(initialBio.length);
   }, [initialBio]);
 
-  const handleBioChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newBio = e.target.value;
-    setBio(newBio);
-    setPreviewBio(newBio);
+  const handleContentChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newContent = e.target.value;
+    setBioContent(newContent);
+    setPreviewContent(newContent);
+    setCharacterCount(newContent.length);
     
     if (onBioChange) {
-      onBioChange(newBio);
+      onBioChange(newContent);
     }
-  };
+  }, [onBioChange]);
 
-  const handleSave = () => {
+  const handleSave = useCallback(async () => {
+    if (bioContent.trim().length === 0) return;
+    
+    setIsSaving(true);
+    
+    // Simulate async save operation with debounce
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    setIsSaving(false);
     setIsEditing(false);
+    
     if (onBioChange) {
-      onBioChange(bio);
+      onBioChange(bioContent);
     }
-  };
+  }, [bioContent, onBioChange]);
 
-  const handleCancel = () => {
-    setBio(previewBio);
+  const handleCancel = useCallback(() => {
+    setBioContent(previewContent);
+    setCharacterCount(previewContent.length);
     setIsEditing(false);
-  };
+  }, [previewContent]);
 
-  const handlePreviewChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setPreviewBio(e.target.value);
-  };
+  const handlePreviewChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setPreviewContent(e.target.value);
+  }, []);
 
-  const toggleEdit = () => {
+  const toggleEdit = useCallback(() => {
     setIsEditing(!isEditing);
-  };
+  }, [isEditing]);
 
-  const formatBioForDisplay = (text: string): string => {
+  const formatBioForDisplay = useCallback((text: string): string => {
     return text
       .replace(/\n/g, '<br/>')
       .replace(/@/g, '<span class="text-cyan-400 font-bold">@</span>')
       .replace(/\b(Halo|Hello|Hi)\b/gi, '<span class="text-yellow-400 font-bold">$1</span>')
       .replace(/\b(kampung|siber|retro)\b/gi, '<span class="text-purple-400 font-bold">$1</span>');
-  };
+  }, []);
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.ctrlKey && e.key === 's') {
+      e.preventDefault();
+      if (isEditing && !isSaving) {
+        handleSave();
+      }
+    }
+  }, [isEditing, isSaving, handleSave]);
+
+  const MAX_CHARACTERS = 500;
 
   return (
-    <div className={`profile-bio-editor ${className || ''}`}>
+    <div 
+      className={`profile-bio-editor ${className || ''}`}
+      onKeyDown={handleKeyDown}
+    >
       {/* Start: Editor Header */}
       <div className="retro-window-header bg-gray-200 dark:bg-gray-700 px-3 py-2 border-b border-gray-300 dark:border-gray-600 flex justify-between items-center">
         <h4 className="text-sm font-bold text-gray-800 dark:text-gray-200 pixel-font">
@@ -72,6 +101,7 @@ export default function ProfileBioEditor({
           <button
             onClick={toggleEdit}
             className="retro-btn-secondary text-xs px-2 py-1"
+            disabled={isSaving}
           >
             Edit
           </button>
@@ -80,14 +110,16 @@ export default function ProfileBioEditor({
             <button
               onClick={handleCancel}
               className="retro-btn-secondary text-xs px-2 py-1"
+              disabled={isSaving}
             >
               Cancel
             </button>
             <button
               onClick={handleSave}
               className="retro-btn-primary text-xs px-2 py-1"
+              disabled={isSaving || bioContent.trim().length === 0}
             >
-              Save
+              {isSaving ? '⏳ Saving...' : 'Save'}
             </button>
           </div>
         )}
@@ -108,7 +140,7 @@ export default function ProfileBioEditor({
           </div>
           <div 
             className="retro-terminal-body p-3 font-mono text-xs leading-5 text-green-400"
-            dangerouslySetInnerHTML={{ __html: formatBioForDisplay(previewBio) }}
+            dangerouslySetInnerHTML={{ __html: formatBioForDisplay(previewContent) }}
           />
         </div>
         {/* End: Live Preview Terminal */}
@@ -121,16 +153,19 @@ export default function ProfileBioEditor({
             </span>
           </label>
           <textarea
-            value={bio}
-            onChange={handleBioChange}
+            value={bioContent}
+            onChange={handleContentChange}
             className="w-full p-3 bg-black/20 border border-gray-300 dark:border-gray-600 rounded-b retro-textarea text-green-400 font-mono resize-vertical"
             rows={4}
-            maxLength={500}
+            maxLength={MAX_CHARACTERS}
             placeholder="Type your bio here..."
+            disabled={isSaving}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
           />
           <div className="retro-window-footer bg-gray-100 dark:bg-gray-800 px-3 py-2 border-t border-gray-300 dark:border-gray-600 flex justify-between items-center">
-            <span className="text-xs text-gray-500 dark:text-gray-400 pixel-font">
-              {bio.length}/500
+            <span className={`text-xs pixel-font ${characterCount >= MAX_CHARACTERS ? 'text-red-500' : 'text-gray-500 dark:text-gray-400'}`}>
+              {characterCount.toLocaleString()}/{MAX_CHARACTERS}
             </span>
             <span className="text-xs text-gray-500 dark:text-gray-400 pixel-font">
               Ctrl+S to save
