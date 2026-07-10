@@ -3,9 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import GuestbookModeratorControls from './GuestbookModeratorControls';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_KEY || 'placeholder-key';
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabase = createMockClient();
 
 interface GuestbookEntry {
   id: number;
@@ -18,25 +16,58 @@ interface GuestbookComponentProps {
   className?: string;
 }
 
-function createClient(url: string, key: string) {
+interface Payload {
+  new: GuestbookEntry;
+}
+
+interface QueryResult {
+  data?: GuestbookEntry[];
+  error: Error | null;
+}
+
+interface RealtimeSubscription {
+  on: (
+    event: string,
+    config: { event: string; schema: string; table: string },
+    callback: (payload: Payload) => void
+  ) => RealtimeSubscription;
+  subscribe: () => { unsubscribe: () => void };
+}
+
+interface QueryBuilder {
+  select: (columns: string) => QueryBuilder;
+  order: (column: string, options: { ascending: boolean }) => QueryBuilder;
+  limit: (limit: number) => QueryBuilder;
+  insert: (data: GuestbookEntry[]) => QueryBuilder;
+  then: (callback: (result: QueryResult) => void) => Promise<QueryResult>;
+}
+
+interface SupabaseClient {
+  from: (table: string) => QueryBuilder;
+  channel: (table: string) => RealtimeSubscription;
+}
+
+function createMockClient(): SupabaseClient {
+  const createQueryBuilder = (): QueryBuilder => ({
+    select: () => createQueryBuilder(),
+    order: () => createQueryBuilder(),
+    limit: () => createQueryBuilder(),
+    insert: () => createQueryBuilder(),
+    then: async (callback: (result: QueryResult) => void) => {
+      const result: QueryResult = { data: [], error: null };
+      await callback(result);
+      return result;
+    }
+  });
+
+  const createSubscription = (): RealtimeSubscription => ({
+    on: () => createSubscription(),
+    subscribe: () => ({ unsubscribe: () => {} })
+  });
+
   return {
-    from: (table: string) => ({
-      select: (columns: string) => ({
-        order: (column: string, options: any) => ({
-          limit: (limit: number) => ({
-            then: async (callback: any) => callback({ data: [], error: null })
-          })
-        }),
-        insert: (data: any) => ({
-          then: async (callback: any) => callback({ error: null })
-        })
-      }),
-      channel: (table: string) => ({
-        on: (event: string, config: any, callback: any) => ({
-          subscribe: () => ({ unsubscribe: () => {} })
-        })
-      })
-    })
+    from: () => createQueryBuilder(),
+    channel: () => createSubscription()
   };
 }
 
@@ -83,14 +114,15 @@ export default function GuestbookComponent({ className }: GuestbookComponentProp
 
   const fetchEntries = async () => {
     try {
-      const { data, error } = await supabase
+      const result = await supabase
         .from('guestbook_entries')
         .select('*')
         .order('timestamp', { ascending: false })
-        .limit(50);
+        .limit(50)
+        .then((res: QueryResult) => res);
       
-      if (error) throw error;
-      setEntries(data as GuestbookEntry[] || []);
+      if (result.error) throw result.error;
+      setEntries(result.data || []);
     } catch (err) {
       console.error('Error fetching entries:', err);
       setError('Gagal memuat entri buku pelawat');
@@ -98,23 +130,23 @@ export default function GuestbookComponent({ className }: GuestbookComponentProp
   };
 
   useEffect(() => {
-    const subscription = supabase
+    const sub = supabase
       .channel('guestbook_entries')
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'guestbook_entries' },
-        (payload) => {
+        (payload: Payload) => {
           const newEntry = payload.new as GuestbookEntry;
           setEntries(prev => [newEntry, ...prev]);
         }
       )
       .subscribe();
     
-    setSubscription(subscription);
+    setSubscription(sub);
     
     return () => {
-      if (subscription) {
-        subscription.unsubscribe();
+      if (sub) {
+        (sub as { unsubscribe: () => void }).unsubscribe();
       }
     };
   }, []);
@@ -183,11 +215,12 @@ export default function GuestbookComponent({ className }: GuestbookComponentProp
     };
     
     try {
-      const { error } = await supabase
+      const result = await supabase
         .from('guestbook_entries')
-        .insert([newEntry]);
+        .insert([newEntry])
+        .then((res: QueryResult) => res);
       
-      if (error) throw error;
+      if (result.error) throw result.error;
       setMessage('');
       setUsername('');
       setSuccessMessage('Berjaya menandatangani buku pelawat!');

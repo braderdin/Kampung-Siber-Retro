@@ -112,10 +112,10 @@ export default function TutorialsPage({ className }: TutorialsPageProps) {
           </div>
           <p className="mt-2 text-[11px] text-gray-500">{completedCount} daripada {tutorials.length} modul siap.</p>
         </div>
-        <div className="space-y-3">
-          <RetroHitCounter value={1200 + completedCount * 340} label="Kaunter Pelawat" />
-          <RetroTerminalWidget title="Coretan Terminal" />
-        </div>
+<div className="space-y-3">
+           <RetroHitCounter value={1200 + completedCount * 340} label="Kaunter Pelawat" />
+           <RetroTerminalWidget />
+         </div>
       </div>
 
       <div className="retro-window border-2 border-pink-500 bg-white p-3 retro-shadow">

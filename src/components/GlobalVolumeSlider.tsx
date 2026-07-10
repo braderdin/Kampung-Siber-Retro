@@ -44,9 +44,8 @@ export const GlobalVolumeSlider: React.FC<GlobalVolumeSliderProps> = ({
 
   const colors = getThemeColors();
 
-  const handleChange = useCallback((e: Event) => {
-    const target = e.target as HTMLInputElement;
-    const newVolume = parseInt(target.value, 10);
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const newVolume = parseInt(e.target.value, 10);
     setVolume(newVolume);
     localStorage.setItem("global-volume", newVolume.toString());
   }, []);

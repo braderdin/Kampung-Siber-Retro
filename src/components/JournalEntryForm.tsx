@@ -4,9 +4,10 @@ import React, { useState, useCallback } from "react";
 import { JournalEntry } from "@/types/journal";
 
 interface JournalEntryFormProps {
-  onSubmit?: (entry: JournalEntry) => void;
+  onSubmit?: (entry: JournalEntry) => Promise<void> | void;
   initialEntry?: Partial<JournalEntry>;
   className?: string;
+  username?: string;
 }
 
 export const JournalEntryForm: React.FC<JournalEntryFormProps> = ({

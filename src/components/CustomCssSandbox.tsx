@@ -113,7 +113,7 @@ export const CustomCssSandbox: React.FC<CustomCssSandboxProps> = ({
               Sample HTML to test with:
             </div>
             <div className="font-pixel text-xs text-gray-500 bg-gray-800/50 p-2 rounded">
-              <div class="test">Your content here</div>
+              <div className="test">Your content here</div>
             </div>
           </div>
         </div>

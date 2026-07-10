@@ -1,6 +1,10 @@
 "use client";
 
 import React, { useRef, useState, useCallback } from "react";
+interface Html2CanvasOptions {
+  backgroundColor?: string;
+  scale?: number;
+}
 
 interface ProfileCardExporterProps {
   username: string;
@@ -26,22 +30,17 @@ export const ProfileCardExporter: React.FC<ProfileCardExporterProps> = ({
     setIsExporting(true);
 
     try {
-      const canvas = document.createElement("canvas");
-      const scale = 2;
-      const rect = cardRef.current.getBoundingClientRect();
-
-      canvas.width = rect.width * scale;
-      canvas.height = rect.height * scale;
-
-      const ctx = canvas.getContext("2d");
-      if (!ctx) throw new Error("Failed to get canvas context");
-
-      ctx.scale(scale, scale);
-
-      const dataURL = await html2canvas(cardRef.current, {
+      // Start: Dynamic import html2canvas
+      const html2canvasModule = await import("html2canvas");
+      const html2canvasFn = html2canvasModule.default || html2canvasModule;
+      // End: Dynamic import html2canvas
+      
+      const canvas = await html2canvasFn(cardRef.current, {
         backgroundColor: "#0a0a0a",
-        scale: scale,
-      });
+        scale: 2,
+      } as Html2CanvasOptions) as HTMLCanvasElement;
+      
+      const dataURL = canvas.toDataURL("image/png");
 
       const link = document.createElement("a");
       link.download = `${username}-profile-card.png`;

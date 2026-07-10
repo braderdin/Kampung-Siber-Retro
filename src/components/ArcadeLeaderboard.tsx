@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ReactElement } from 'react';
 import { ArcadeLeaderboardEntry } from '@/types/arcade';
 
 interface ArcadeLeaderboardProps {
@@ -92,7 +92,7 @@ export default function ArcadeLeaderboard({
     return () => clearInterval(flashInterval);
   }, [isLoading, scores]);
 
-  const getRankDisplay = (rank: number): JSX.Element => {
+  const getRankDisplay = (rank: number): ReactElement => {
     if (rank === 1) {
       return (
         <div className="relative flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 border-2 border-yellow-300">

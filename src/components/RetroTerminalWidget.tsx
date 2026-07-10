@@ -14,7 +14,10 @@ interface RetroTerminalWidgetProps {
   className?: string;
 }
 
-const COMMANDS: Record<string, string> = {
+type CommandFunction = () => string;
+type CommandValue = string | CommandFunction;
+
+const COMMANDS: Record<string, CommandValue> = {
   help: `Available commands:
   help        - Show this help message
   date        - Display current date
@@ -90,9 +93,10 @@ export default function RetroTerminalWidget({ className }: RetroTerminalWidgetPr
       newEntry.output = 'Entering matrix mode...';
       setEntries(prev => [...prev, newEntry]);
     } else if (COMMANDS[cmd]) {
-      const output = typeof COMMANDS[cmd] === 'function' 
-        ? COMMANDS[cmd as 'date' | 'time']() 
-        : COMMANDS[cmd];
+      const commandValue = COMMANDS[cmd];
+      const output = typeof commandValue === 'function'
+        ? commandValue()
+        : commandValue;
       newEntry.output = output;
       setEntries(prev => [...prev, newEntry]);
     } else {
