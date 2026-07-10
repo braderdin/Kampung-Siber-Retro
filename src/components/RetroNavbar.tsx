@@ -5,6 +5,7 @@ import { useLanguageStore } from '@/store/useLanguageStore';
 import { enDictionary, msDictionary } from '@/i18n/dictionaries';
 import { useEffect, useState } from 'react';
 import RandomExplorerBtn from '@/components/RandomExplorerBtn';
+import LanguageToggleSwitch from '@/components/LanguageToggleSwitch';
 
 interface NavItem {
   name: string;
@@ -51,8 +52,8 @@ export default function RetroNavbar() {
     }
   }, [mobileMenuOpen, navItems.length]);
 
-  const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setLanguage(e.target.value as 'en' | 'ms');
+  const handleLanguageToggle = (lang: 'en' | 'ms') => {
+    setLanguage(lang);
   };
 
   const handleDarkModeToggle = () => {
@@ -126,18 +127,12 @@ export default function RetroNavbar() {
 
           {/* Start: Controls Container */}
           <div className="flex items-center space-x-1 sm:space-x-2">
-            {/* Start: Language Selector */}
-            <div>
-              <select
-                value={language}
-                onChange={handleLanguageChange}
-                className="retro-input w-auto text-sm bg-black/50 border-cyan-400 text-white min-w-[60px] max-w-[80px] inline-flex items-center justify-center"
-              >
-                <option value="en">EN</option>
-                <option value="ms">MS</option>
-              </select>
-            </div>
-            {/* End: Language Selector */}
+            {/* Start: Language Toggle Switch (replaces dropdown) */}
+            <LanguageToggleSwitch
+              currentLanguage={language}
+              onToggle={handleLanguageToggle}
+            />
+            {/* End: Language Toggle Switch */}
 
             {/* Start: Random Explorer Button */}
             <div className="hidden sm:block">

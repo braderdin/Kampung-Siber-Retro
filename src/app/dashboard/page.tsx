@@ -11,6 +11,7 @@ import TopResidentsLeaderboard from '@/components/TopResidentsLeaderboard';
 import AccountAllocationBox from '@/components/AccountAllocationBox';
 import NewsletterSubscription from '@/components/NewsletterSubscription';
 import HydrationGuard from '@/components/HydrationGuard';
+import FeedbackWidget from '@/components/FeedbackWidget';
 
 type ActiveTab = 'main' | 'community';
 
@@ -158,6 +159,12 @@ export default function DashboardPage() {
         </div>
         {/* End: Tab Content */}
       </div>
+
+      {/* Start: Feedback Widget - Fixed bottom-right corner */}
+      <div className="fixed bottom-6 right-6 z-40">
+        <FeedbackWidget />
+      </div>
+      {/* End: Feedback Widget */}
     </main>
   );
 }

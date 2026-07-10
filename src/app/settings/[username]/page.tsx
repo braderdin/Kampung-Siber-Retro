@@ -8,6 +8,7 @@ import ProfileStatusBadge from '@/components/ProfileStatusBadge';
 import ProfileBioEditor from '@/components/ProfileBioEditor';
 import SettingsTipping from '@/components/SettingsTipping';
 import { showSuccess, showError, showWarning, showInfo } from '@/components/RetroToast';
+import AccessibilityMenu from '@/components/AccessiblityMenu';
 
 type BackgroundTheme = 'space_neon' | 'windows_gray' | 'retro_matrix' | 'neon_cyan' | 'retro_orange';
 
@@ -144,6 +145,20 @@ export default function SettingsPage({ params }: { params: { username: string } 
           </p>
         </div>
         {/* End: Page Header */}
+
+        {/* Start: Accessibility Menu */}
+        <div className="retro-card mb-6">
+          <div className="retro-card-header bg-gray-200 dark:bg-gray-700 px-4 py-2 border-b border-gray-300 dark:border-gray-600">
+            <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200 pixel-font flex items-center gap-2">
+              <span className="text-xl">♿</span>
+              <span>{t.accessibility || 'Aksesibiliti'}</span>
+            </h2>
+          </div>
+          <div className="p-4">
+            <AccessibilityMenu />
+          </div>
+        </div>
+        {/* End: Accessibility Menu */}
 
         {/* Start: Theme Picker Section */}
         <div className="retro-card mb-6">

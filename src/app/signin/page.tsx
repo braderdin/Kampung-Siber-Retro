@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
+import TermsModal from '@/components/TermsModal';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_KEY || 'placeholder-key';
@@ -86,6 +87,7 @@ export default function SignInPage() {
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [errorNotificationMessage, setErrorNotificationMessage] = useState('');
   const [isBlinking, setIsBlinking] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
   const router = useRouter();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -128,7 +130,13 @@ export default function SignInPage() {
       }
 
       if (!needsVerification && !error) {
-        router.push('/dashboard');
+        // Check if user has accepted terms from localStorage
+        const hasAcceptedTerms = localStorage.getItem('terms_accepted') === 'true';
+        if (!hasAcceptedTerms) {
+          setShowTermsModal(true);
+        } else {
+          router.push('/dashboard');
+        }
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Log masuk gagal';
@@ -173,6 +181,16 @@ export default function SignInPage() {
     setShowErrorNotification(false);
     setError(null);
     setIsBlinking(false);
+  };
+
+  const handleTermsAccept = () => {
+    localStorage.setItem('terms_accepted', 'true');
+    setShowTermsModal(false);
+    router.push('/dashboard');
+  };
+
+  const handleTermsDecline = () => {
+    setShowTermsModal(false);
   };
 
   return (
@@ -288,6 +306,13 @@ export default function SignInPage() {
           {/* End: Password Recovery Links */}
         </form>
       </div>
+
+      {/* Terms Modal */}
+      <TermsModal
+        isOpen={showTermsModal}
+        onClose={handleTermsDecline}
+        onAccept={handleTermsAccept}
+      />
     </main>
   );
 }

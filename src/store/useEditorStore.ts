@@ -10,6 +10,7 @@ interface EditorState {
   jsCode: string;
   activeTab: ActiveTab;
   themeMode: ThemeMode;
+  isSaving: boolean;
 }
 
 interface EditorActions {
@@ -19,6 +20,7 @@ interface EditorActions {
   setActiveTab: (tab: ActiveTab) => void;
   setThemeMode: (mode: ThemeMode) => void;
   resetToDefaults: () => void;
+  setIsSaving: (saving: boolean) => void;
 }
 
 const RETRO_GREETING_CARD_HTML = `<!DOCTYPE html>
@@ -161,17 +163,20 @@ export const useEditorStore = create<EditorState & EditorActions>()(
     jsCode: DEFAULT_JS,
     activeTab: 'html',
     themeMode: 'modern',
+    isSaving: false,
     setHtmlCode: (code: string) => set({ htmlCode: code }),
     setCssCode: (code: string) => set({ cssCode: code }),
     setJsCode: (code: string) => set({ jsCode: code }),
     setActiveTab: (tab: ActiveTab) => set({ activeTab: tab }),
     setThemeMode: (mode: ThemeMode) => set({ themeMode: mode }),
+    setIsSaving: (saving: boolean) => set({ isSaving: saving }),
     resetToDefaults: () => set({
       htmlCode: RETRO_GREETING_CARD_HTML,
       cssCode: DEFAULT_CSS,
       jsCode: DEFAULT_JS,
       activeTab: 'html',
       themeMode: 'modern',
+      isSaving: false,
     }),
   }))
 );

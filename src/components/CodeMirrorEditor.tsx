@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEditorStore } from "@/store/useEditorStore";
 import CodeMirror from "@uiw/react-codemirror";
@@ -8,6 +8,7 @@ import { javascript } from "@codemirror/lang-javascript";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import useDebounce from "@/hooks/useDebounce";
 import { useRef, useState, useEffect } from "react";
+import DraftSyncIndicator from "./DraftSyncIndicator";
 
 interface CodeMirrorEditorProps {
   className?: string;
@@ -45,7 +46,7 @@ export default function CodeMirrorEditor({
   language = "html",
   onChange 
 }: CodeMirrorEditorProps) {
-  const { htmlCode, cssCode, jsCode, activeTab, setHtmlCode, setCssCode, setJsCode } = useEditorStore();
+  const { htmlCode, cssCode, jsCode, activeTab, setHtmlCode, setCssCode, setJsCode, isSaving, setIsSaving } = useEditorStore();
   const editorRef = useRef<any>(null);
   const { isDark } = useDarkMode();
 
@@ -134,12 +135,25 @@ export default function CodeMirrorEditor({
   }, [debouncedValue, activeTab, onChange, setHtmlCode, setCssCode, setJsCode]);
   // End: Sync Debounced Value to Store
 
+  // Start: Simulate Auto-save
+  useEffect(() => {
+    if (rawInputValue !== getCurrentCode()) {
+      setIsSaving(true);
+      const timer = setTimeout(() => {
+        setIsSaving(false);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [rawInputValue, getCurrentCode, setIsSaving]);
+  // End: Simulate Auto-save
+
   // Start: Cyberpunk Theme Configuration
   const theme = vscodeDark;
   // End: Cyberpunk Theme Configuration
 
   return (
     <div className={className || "w-full h-full"} >
+      <DraftSyncIndicator />
       <CodeMirror
         ref={editorRef}
         value={getCurrentCode()}

@@ -6,6 +6,7 @@ import RetroNavbar from "@/components/RetroNavbar";
 import RetroFooter from "@/components/RetroFooter";
 import KeyboardShortcutOverlay from "@/components/KeyboardShortcutOverlay";
 import PageTransitionOverlay from "@/components/PageTransitionOverlay";
+import QuickLinksSidebar from "@/components/QuickLinksSidebar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -56,9 +57,16 @@ export default function RootLayout({
       {/* End: Inline Pre-Hydration Theme Script */}
       <body className="min-h-full flex flex-col bg-zinc-50 dark:bg-black font-sans">
         <RetroNavbar />
-        <main className="flex-1">
+        <main className="flex-1 flex">
           <PageTransitionOverlay>
-            {children}
+            {/* QuickLinksSidebar visible on large screens (lg and up) */}
+            <div className="hidden lg:block">
+              <QuickLinksSidebar />
+            </div>
+            {/* Main content area */}
+            <div className="flex-1">
+              {children}
+            </div>
           </PageTransitionOverlay>
         </main>
         <RetroFooter />

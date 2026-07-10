@@ -1,9 +1,11 @@
 "use client";
+
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import { useLanguageStore } from "@/store/useLanguageStore";
 import { enDictionary, msDictionary } from "@/lib/dictionary";
 import CodeMirrorEditor from "@/components/CodeMirrorEditor";
+import DraftSyncIndicator from "@/components/DraftSyncIndicator";
 
 interface TextEditorProps {
   className?: string;
@@ -69,7 +71,6 @@ function TextEditorContent({ className }: TextEditorProps) {
   const searchParams = useSearchParams();
   const { language } = useLanguageStore();
   const t = language === 'ms' ? msDictionary : enDictionary;
-
   const [filename, setFilename] = useState<string>('');
   const [content, setContent] = useState<string>('');
   const [fileLanguage, setFileLanguage] = useState<string>('html');
@@ -105,6 +106,11 @@ function TextEditorContent({ className }: TextEditorProps) {
 
   return (
     <div className={`flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4 ${className || ''}`}>
+      {/* Draft Sync Indicator */}
+      <div className="absolute top-4 right-4 z-50">
+        <DraftSyncIndicator />
+      </div>
+
       <div className="retro-window w-full max-w-4xl">
         <div className="retro-window-title-bar">
           <div className="retro-window-title">
