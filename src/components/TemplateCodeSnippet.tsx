@@ -53,9 +53,9 @@ export const TemplateCodeSnippet: React.FC<TemplateCodeSnippetProps> = ({
           <code
             className={`font-pixel text-xs ${getLanguageColor()} p-3 rounded bg-gray-800/50 border border-gray-700/30`}
           >
-            <span className="text-green-400"><</span>
+            <span className="text-green-400">&lt;</span>
             {code}
-            <span className="text-green-400">></span>
+            <span className="text-green-400">&gt;</span>
           </code>
         </pre>
 

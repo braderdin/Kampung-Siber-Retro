@@ -83,11 +83,12 @@ export async function POST(request: NextRequest) {
       userAgent,
     });
 
+    // Start: Fix Zod error typing
     if (!validated.success) {
       return new NextResponse(
         JSON.stringify({ 
           error: "Invalid request body", 
-          details: validated.error.errors 
+          details: validated.error.issues 
         }),
         {
           status: 400,
@@ -95,6 +96,7 @@ export async function POST(request: NextRequest) {
         }
       );
     }
+    // End: Fix Zod error typing
 
     const { assetId, userId } = validated.data;
 

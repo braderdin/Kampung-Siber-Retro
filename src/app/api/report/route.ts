@@ -58,14 +58,16 @@ export async function POST(request: NextRequest) {
       userAgent,
     });
 
+    // Start: Fix Zod error typing
     if (!validated.success) {
+      const errorDetails = validated.error.issues.map((issue) => ({
+        field: issue.path.join("."),
+        message: issue.message,
+      }));
       return new NextResponse(
         JSON.stringify({ 
-          error: "Validation failed",
-          details: validated.error.errors.map(e => ({
-            field: e.path.join("."),
-            message: e.message,
-          })),
+          error: "Validation failed", 
+          details: errorDetails,
         }),
         {
           status: 400,
@@ -73,6 +75,7 @@ export async function POST(request: NextRequest) {
         }
       );
     }
+    // End: Fix Zod error typing
 
     const { subject, description, targetId, targetType, severity, userId } = validated.data;
 

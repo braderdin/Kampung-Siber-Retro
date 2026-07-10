@@ -34,9 +34,10 @@ export async function POST(request: NextRequest): Promise<NextResponse<ResolveRe
     
     const validationResult = ResolvePayloadSchema.safeParse(body);
     if (!validationResult.success) {
+      const errorMessages = validationResult.error.issues?.map(e => e.message).join(', ') || 'Unknown validation error';
       return NextResponse.json({
         success: false,
-        message: 'Invalid payload: ' + validationResult.error.errors.map(e => e.message).join(', '),
+        message: 'Invalid payload: ' + errorMessages,
       }, { status: 400 });
     }
 

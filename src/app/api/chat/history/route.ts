@@ -92,15 +92,17 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
+    // Start: Fix Zod error typing
     if (error instanceof z.ZodError) {
       return new NextResponse(
-        JSON.stringify({ error: "Invalid parameters", details: error.errors }),
+        JSON.stringify({ error: "Invalid parameters", details: error.issues }),
         {
           status: 400,
           headers: { "Content-Type": "application/json" },
         }
       );
     }
+    // End: Fix Zod error typing
 
     console.error("Error fetching chat history:", error);
     return new NextResponse(

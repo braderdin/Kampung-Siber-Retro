@@ -1,5 +1,5 @@
-import { JournalEntry } from "@/types/journal";
-import { NextRequest, NextResponse } from "next/server";
+import { JournalEntry } from '@/types/journal';
+import { NextRequest, NextResponse } from 'next/server';
 
 interface RSSItem {
   title: string;
@@ -19,11 +19,11 @@ interface RSSFeed {
 
 function escapeXML(str: string): string {
   return str
-    .replace(/&/g, "&")
-    .replace(/</g, "<")
-    .replace(/>/g, ">")
-    .replace(/"/g, """)
-    .replace(/'/g, "'");
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/\'/g, '&#39;');
 }
 
 function generateRSSFeed(data: RSSFeed): string {
@@ -39,14 +39,14 @@ function generateRSSFeed(data: RSSFeed): string {
     .join("");
 
   return `<?xml version="1.0" encoding="UTF-8"?>
-  <rss version="2.0" xmlns:content="http://purl.org/rss/1.0/content/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:slash="http://purl.org/rss/1.0/slash/">
+  <rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:slash="http://purl.org/rss/1.0/modules/slash/">
     <channel>
       <title>${escapeXML(data.title)}</title>
       <link>${escapeXML(data.link)}</link>
       <description>${escapeXML(data.description)}</description>
       <lastBuildDate>${new Date(data.lastBuildDate).toUTCString()}</lastBuildDate>
       <language>en-US</language>
-      <copyright>© ${new Date().getFullYear()} Kampung Siber Retro</copyright>
+      <copyright>&#169; ${new Date().getFullYear()} Kampung Siber Retro</copyright>
       <category>Retro Journal</category>
       <items>
 ${itemsXML}
@@ -60,9 +60,9 @@ async function fetchJournalEntries(username: string, limit: number = 50): Promis
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_SITE_URL || ''}/api/users/${username}/journal?limit=${limit}&public=true`,
       {
-        method: "GET",
+        method: 'GET',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         next: { revalidate: 300 },
       }
@@ -81,8 +81,8 @@ async function fetchJournalEntries(username: string, limit: number = 50): Promis
 }
 
 export async function GET(request: NextRequest) {
-  const username = request.nextUrl.searchParams.get("username") || "anonymous";
-  const limit = parseInt(request.nextUrl.searchParams.get("limit") || "50", 10);
+  const username = request.nextUrl.searchParams.get('username') || 'anonymous';
+  const limit = parseInt(request.nextUrl.searchParams.get('limit') || '50', 10);
 
   const entries = await fetchJournalEntries(username, Math.min(limit, 100));
 
@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
     title: entry.title,
     link: `${process.env.NEXT_PUBLIC_SITE_URL || ''}/site/${username}/journal/${entry.slug}`,
     description: entry.content.length > 500
-      ? entry.content.substring(0, 500) + "..."
+      ? entry.content.substring(0, 500) + '...'
       : entry.content,
     pubDate: entry.createdAt,
     guid: entry.id,
@@ -109,8 +109,8 @@ export async function GET(request: NextRequest) {
   return new NextResponse(rss, {
     status: 200,
     headers: {
-      "Content-Type": "application/rss+xml; charset=utf-8",
-      "Cache-Control": "public, s-maxage=300, stale-while-revalidate=60",
+      'Content-Type': 'application/rss+xml; charset=utf-8',
+      'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=60',
     },
   });
 }

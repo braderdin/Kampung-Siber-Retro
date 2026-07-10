@@ -23,15 +23,18 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
     
     const validationResult = ScorePayloadSchema.safeParse(body);
     
+    // Start: Fix Zod error typing
     if (!validationResult.success) {
+      const errors = validationResult.error.issues.map((issue) => issue.message);
       return NextResponse.json(
         {
           success: false,
-          message: 'Invalid payload: ' + validationResult.error.errors.map(e => e.message).join(', '),
+          message: 'Invalid payload: ' + errors.join(', '),
         },
         { status: 400 }
       );
     }
+    // End: Fix Zod error typing
 
     const { username, gameId, highScore }: ScorePayload = validationResult.data;
 
