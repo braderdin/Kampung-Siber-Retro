@@ -1,11 +1,13 @@
 "use client";
 
+// Start: Site Profile Page with R2 Dynamic Content
+"use client";
+
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { enDictionary, msDictionary } from '@/i18n/dictionaries';
 import ProfileStatusBadge from '@/components/ProfileStatusBadge';
-import ProfileBioEditor from '@/components/ProfileBioEditor';
 import HydrationGuard from '@/components/HydrationGuard';
 
 type BackgroundTheme = 'space_neon' | 'windows_gray' | 'retro_matrix' | 'neon_cyan' | 'retro_orange';
@@ -72,6 +74,7 @@ const THEME_OPTIONS: ThemeConfig[] = [
   }
 ];
 
+// Start: Site Profile Page with R2 Dynamic Content
 export default function SiteProfilePage({ params }: SiteProfileProps) {
   const { username } = params;
   const { language } = useLanguageStore();
@@ -82,6 +85,39 @@ export default function SiteProfilePage({ params }: SiteProfileProps) {
   const [publicBio, setPublicBio] = useState('');
   const [isClient, setIsClient] = useState(false);
   const [activeSection, setActiveSection] = useState<'profile' | 'journal' | 'links' | 'stats'>('profile');
+  const [siteContent, setSiteContent] = useState<string>('');
+  const [contentLoading, setContentLoading] = useState<boolean>(true);
+
+  // Start: Fetch R2 Index.html Effect
+  useEffect(() => {
+    const fetchSiteContent = async () => {
+      setContentLoading(true);
+      try {
+        // Fetch index.html from R2 for this user
+        const response = await fetch(`/api/storage/read?filename=index.html&userId=${username}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('sb-access-token') || ''}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.content) {
+            setSiteContent(data.content);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch site content:', error);
+      } finally {
+        setContentLoading(false);
+      }
+    };
+
+    if (username) {
+      fetchSiteContent();
+    }
+  }, [username]);
+  // End: Fetch R2 Index.html Effect
 
   useEffect(() => {
     setIsClient(true);

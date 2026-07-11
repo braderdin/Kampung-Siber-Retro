@@ -37,7 +37,31 @@ export default function DashboardPage() {
   };
   // End: Tab Toggle Handler
 
-  return (
+    // Start: Dashboard Header with Editor Link
+    const renderDashboardHeader = () => (
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 pixel-font">
+          {t.dashboardTitle}
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-1">
+          {t.welcomeMessage || 'Welcome to your retro dashboard!'}
+        </p>
+        {/* Start: Editor Access Button */}
+        <div className="mt-4">
+          <Link
+            href="/site_files/text_editor"
+            className="retro-btn-primary inline-flex items-center gap-2 px-6 py-3 pixel-font font-bold text-lg shadow-lg hover:shadow-xl transition-all"
+          >
+            <span className="text-xl">💻</span>
+            <span>Buka Editor Kod Teratak Anda</span>
+          </Link>
+        </div>
+        {/* End: Editor Access Button */}
+      </div>
+    );
+    // End: Dashboard Header with Editor Link
+
+    return (
     // Start: Main Dashboard Container
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
       {/* Start: Navigation Toolbar with Retro Sitemap Button */}
@@ -58,6 +82,12 @@ export default function DashboardPage() {
       </div>
       {/* End: Navigation Toolbar */}
 
+      {/* Start: Dashboard Header with Editor Link */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        {renderDashboardHeader()}
+      </div>
+      {/* End: Dashboard Header with Editor Link */}
+
       {/* Start: Marquee Ticker */}
       {showMarquee && (
         <div className="fixed top-16 left-0 right-0 z-40">
@@ -73,17 +103,9 @@ export default function DashboardPage() {
       )}
       {/* End: Marquee Ticker */}
 
+      {/* Start: Tab Navigation and Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Start: Dashboard Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 pixel-font">
-            {t.dashboardTitle}
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
-            {t.welcomeMessage || 'Welcome to your retro dashboard!'}
-          </p>
-        </div>
-        {/* End: Dashboard Header */}
+        {/* Start: Main Content Area - No Duplicate Header */}
 
         {/* Start: Tab Navigation */}
         <div className="mb-6">

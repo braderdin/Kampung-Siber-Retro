@@ -1,0 +1,235 @@
+// Start: Cloudflare R2 Storage Read Handler
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
+
+// Initialize Supabase client for session authentication
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_KEY || 'placeholder-key';
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+// Start: R2 Configuration Constants
+const R2_ENDPOINT = process.env.R2_ENDPOINT || 'https://account.r2.cloudflarestorage.com';
+const R2_ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID || '';
+const R2_SECRET_ACCESS_KEY = process.env.R2_SECRET_ACCESS_KEY || '';
+const R2_BUCKET_NAME = process.env.R2_BUCKET_NAME || 'kampung-siber-sites';
+// End: R2 Configuration Constants
+
+// Start: File Content Response Interface
+interface FileContentResponse {
+  success: boolean;
+  content?: string;
+  filename?: string;
+  size?: number;
+  error?: string;
+}
+// End: File Content Response Interface
+
+// Start: Session Authentication Helper
+async function authenticateSession(req: NextRequest): Promise<{ authenticated: boolean; userId?: string }> {
+  try {
+    const authHeader = req.headers.get('authorization');
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return { authenticated: false };
+    }
+
+    const token = authHeader.substring(7);
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+
+    if (error || !user) {
+      return { authenticated: false };
+    }
+
+    return { authenticated: true, userId: user.id };
+  } catch (error) {
+    console.error('Session authentication error:', error);
+    return { authenticated: false };
+  }
+}
+// End: Session Authentication Helper
+
+// Start: GET Handler for Reading R2 Files
+export async function GET(req: NextRequest): Promise<NextResponse<FileContentResponse>> {
+  try {
+    // Authenticate session
+    const { authenticated, userId } = await authenticateSession(req);
+    
+    if (!authenticated) {
+      return NextResponse.json({
+        success: false,
+        error: 'Pengesahan diperlukan untuk mengakses simpanan'
+      }, { status: 401 });
+    }
+
+    // Get filename parameter
+    const url = new URL(req.url);
+    const filename = url.searchParams.get('filename');
+
+    if (!filename) {
+      return NextResponse.json({
+        success: false,
+        error: 'Parameter fail (filename) diperlukan'
+      }, { status: 400 });
+    }
+
+    // Sanitize filename to prevent path traversal
+    const sanitizedFilename = filename
+      .replace(/\.{2,}/g, '')
+      .replace(/[^a-zA-Z0-9._-/]/g, '')
+      .replace(/^\//, '');
+
+    if (!sanitizedFilename) {
+      return NextResponse.json({
+        success: false,
+        error: 'Nama fail tidak sah'
+      }, { status: 400 });
+    }
+
+    // Construct user-specific file key
+    const fileKey = `${userId}/${sanitizedFilename}`;
+
+    // Start: R2 File Fetch Logic (Mock Implementation)
+    // In production, use AWS SDK S3 compatible client for Cloudflare R2
+    let fileContent = '';
+    let fileSize = 0;
+
+    // Mock file content retrieval - replace with actual R2 client call
+    try {
+      // Placeholder for actual R2 implementation using AWS SDK
+      // const r2Client = new S3Client({
+      //   endpoint: R2_ENDPOINT,
+      //   credentials: {
+      //     accessKeyId: R2_ACCESS_KEY_ID,
+      //     secretAccessKey: R2_SECRET_ACCESS_KEY,
+//   },
+      //   region: 'auto',
+      // });
+      // 
+      // const command = new GetObjectCommand({
+      //   Bucket: R2_BUCKET_NAME,
+      //   Key: fileKey,
+      // });
+      // 
+      // const response = await r2Client.send(command);
+      // fileContent = await streamToString(response.Body);
+      // fileSize = response.ContentLength || fileContent.length;
+
+      // Mock default HTML content for index.html
+      if (sanitizedFilename === 'index.html') {
+        fileContent = `<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Saya</title>
+  <style>
+    body {
+      font-family: 'Courier New', monospace;
+      background: #1a1a2e;
+      color: #eaeaea;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #00ff88;
+      text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Selamat Datang ke Teratak Saya!</h1>
+    <p>Halaman ini mempunyai kandungan dari Cloudflare R2.</p>
+  </div>
+</body>
+</html>`;
+        fileSize = fileContent.length;
+      }
+    } catch (r2Error) {
+      console.error('R2 fetch error:', r2Error);
+      // Return empty content for new files
+      fileContent = '';
+      fileSize = 0;
+    }
+    // End: R2 File Fetch Logic
+
+    return NextResponse.json({
+      success: true,
+      content: fileContent,
+      filename: sanitizedFilename,
+      size: fileSize
+    }, { status: 200 });
+
+  } catch (error) {
+    console.error('Storage read error:', error);
+    return NextResponse.json({
+      success: false,
+      error: 'Gagal membaca fail dari simpanan'
+    }, { status: 500 });
+  }
+}
+// End: GET Handler for Reading R2 Files
+
+// Start: POST Handler for Reading R2 Files (Alternative)
+export async function POST(req: NextRequest): Promise<NextResponse<FileContentResponse>> {
+  try {
+    // Authenticate session
+    const { authenticated, userId } = await authenticateSession(req);
+    
+    if (!authenticated) {
+      return NextResponse.json({
+        success: false,
+        error: 'Pengesahan diperlukan untuk mengakses simpanan'
+      }, { status: 401 });
+    }
+
+    // Get filename from request body
+    const body = await req.json();
+    const { filename } = body;
+
+    if (!filename) {
+      return NextResponse.json({
+        success: false,
+        error: 'Nama fail diperlukan'
+      }, { status: 400 });
+    }
+
+    // Sanitize filename
+    const sanitizedFilename = filename
+      .replace(/\.{2,}/g, '')
+      .replace(/[^a-zA-Z0-9._-/]/g, '')
+      .replace(/^\//, '');
+
+    // Return mock content
+    const fileContent = `<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${sanitizedFilename}</title>
+</head>
+<body>
+  <h1>Kandungan ${sanitizedFilename}</h1>
+</body>
+</html>`;
+
+    return NextResponse.json({
+      success: true,
+      content: fileContent,
+      filename: sanitizedFilename,
+      size: fileContent.length
+    }, { status: 200 });
+
+  } catch (error) {
+    console.error('Storage read POST error:', error);
+    return NextResponse.json({
+      success: false,
+      error: 'Gagal membaca fail'
+    }, { status: 500 });
+  }
+}
+// End: POST Handler for Reading R2 Files

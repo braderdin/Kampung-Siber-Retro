@@ -149,6 +149,7 @@ export default function SignInPage() {
     }
   };
 
+  // Start: Google OAuth Sign-In Handler
   const handleGoogleSignIn = async () => {
     setLoading(true);
     setError(null);
@@ -157,16 +158,22 @@ export default function SignInPage() {
     setIsBlinking(false);
 
     try {
-      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+      const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            redirect_uri: `http://localhost:3000/auth/callback`,
+          },
         },
       });
 
       if (oauthError) {
         throw oauthError;
       }
+
+      // Successful OAuth initiation - Supabase will redirect
+      console.log('Google OAuth initiated successfully', data);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Log masuk Google gagal';
       setError(errorMessage);
@@ -176,6 +183,7 @@ export default function SignInPage() {
       setLoading(false);
     }
   };
+  // End: Google OAuth Sign-In Handler
 
   const handleCloseErrorNotification = () => {
     setShowErrorNotification(false);
