@@ -1,3 +1,4 @@
+// Start: Streamlined Retro Navigation Bar
 "use client";
 
 import { usePathname, useRouter } from 'next/navigation';
@@ -5,7 +6,6 @@ import { useLanguageStore } from '@/store/useLanguageStore';
 import { enDictionary, msDictionary } from '@/i18n/dictionaries';
 import { useEffect, useState } from 'react';
 import RandomExplorerBtn from '@/components/RandomExplorerBtn';
-import LanguageToggleSwitch from '@/components/LanguageToggleSwitch';
 
 interface NavItem {
   name: string;
@@ -16,7 +16,7 @@ interface NavItem {
 export default function RetroNavbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { language, setLanguage } = useLanguageStore();
+  const { language } = useLanguageStore();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileMenuHeight, setMobileMenuHeight] = useState(0);
@@ -24,14 +24,16 @@ export default function RetroNavbar() {
 
   const t = language === 'ms' ? msDictionary : enDictionary;
 
+  // Start: Primary Navigation Items
   const navItems: NavItem[] = [
     { name: t.dashboardTitle, href: '/dashboard', icon: '🏠' },
     { name: 'Directory', href: '/directory', icon: '👥' },
-    { name: t.fileEditor, href: '/site_files', icon: '📝' },
     { name: t.guestbookTitle, href: '/guestbook', icon: '📘' },
     { name: t.settings, href: '/settings', icon: '⚙️' },
   ];
+  // End: Primary Navigation Items
 
+  // Start: Theme Initialization
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
@@ -39,13 +41,14 @@ export default function RetroNavbar() {
       document.documentElement.classList.add('dark');
     }
   }, []);
+  // End: Theme Initialization
 
-  // Start: Mobile Drawer Padding Calculation
+  // Start: Mobile Menu Height Calculation
   useEffect(() => {
     if (mobileMenuOpen) {
       const menuElement = document.getElementById('mobile-nav');
       if (menuElement) {
-        const itemsCount = navItems.length + 2; // +2 for Help & Random Explorer
+        const itemsCount = navItems.length + 1;
         const itemHeight = 48;
         const paddingBase = 24;
         const totalHeight = itemsCount * itemHeight + paddingBase;
@@ -54,38 +57,26 @@ export default function RetroNavbar() {
       }
     }
   }, [mobileMenuOpen, navItems.length]);
-  // End: Mobile Drawer Padding Calculation
+  // End: Mobile Menu Height Calculation
 
-  const handleLanguageToggle = (lang: 'en' | 'ms') => {
-    setLanguage(lang);
-  };
-
-  const handleDarkModeToggle = () => {
-    const newDarkMode = !isDarkMode;
-    setIsDarkMode(newDarkMode);
-
-    if (newDarkMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-  };
-
+  // Start: Navigation Handler
   const handleNavClick = (href: string) => {
     setMobileMenuOpen(false);
     router.push(href);
   };
+  // End: Navigation Handler
 
+  // Start: Help Links Configuration
   const helpLinks = [
     { name: 'Help Center', href: '/help', icon: '❓' },
     { name: 'FAQ', href: '/faq', icon: '📋' },
     { name: 'System Status', href: '/status', icon: '📡' },
     { name: 'Contact Support', href: '/contact', icon: '📧' },
   ];
+  // End: Help Links Configuration
 
   return (
+    // Start: Navigation Container
     <nav className="fixed top-0 left-0 right-0 z-50 retro-nav bg-black/30 backdrop-blur-md border-b border-cyan-500/20 overflow-x-hidden w-full">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
@@ -105,11 +96,13 @@ export default function RetroNavbar() {
                 <button
                   key={item.href}
                   onClick={() => handleNavClick(item.href)}
-                  className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    pathname === item.href
+                  className={`
+                    flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors
+                    ${pathname === item.href
                       ? 'bg-pink-500/20 text-pink-400 dark:bg-pink-500/30 dark:text-pink-300'
                       : 'text-gray-300 hover:text-white hover:bg-cyan-500/10 dark:text-gray-400 dark:hover:text-white dark:hover:bg-cyan-500/10'
-                  }`}
+                    }
+                  `}
                 >
                   <span className="text-lg inline-flex items-center justify-center w-5 h-5">{item.icon}</span>
                   <span className="hidden sm:inline inline-flex items-center gap-1 align-middle">{item.name}</span>
@@ -117,7 +110,7 @@ export default function RetroNavbar() {
               ))}
             </div>
           </div>
-          {/* End: Navigation Items */}
+          {/* End: Navigation Items - Desktop */}
 
           {/* Start: Mobile Menu Button */}
           <div className="md:hidden">
@@ -136,33 +129,9 @@ export default function RetroNavbar() {
           </div>
           {/* End: Mobile Menu Button */}
 
-          {/* Start: Controls Container */}
-          <div className="flex items-center space-x-1 sm:space-x-2">
-            {/* Start: Language Toggle Switch (replaces dropdown) */}
-            <LanguageToggleSwitch
-              currentLanguage={language}
-              onToggle={handleLanguageToggle}
-            />
-            {/* End: Language Toggle Switch */}
-
-            {/* Start: Random Explorer Button */}
-            <div className="hidden sm:block">
-              <RandomExplorerBtn 
-                label="🌐"
-                className="px-2 py-1 text-xs min-w-[60px]"
-              />
-            </div>
-            {/* End: Random Explorer Button */}
-
-            {/* Start: Dark Mode Toggle */}
-            <button
-              onClick={handleDarkModeToggle}
-              className="retro-btn-secondary text-xs px-2 py-1 flex items-center space-x-1 border-pink-400 hover:border-pink-300 min-w-[80px] justify-center"
-            >
-              <span className="inline-flex items-center justify-center w-5 h-5">{isDarkMode ? '☀️' : '🌙'}</span>
-              <span className="hidden sm:inline inline-flex items-center gap-1 align-middle">{isDarkMode ? t.modernTheme : t.crtTheme}</span>
-            </button>
-            {/* End: Dark Mode Toggle */}
+          {/* Start: Controls Container - Removed Random Explorer button for streamlined header */}
+          <div className="flex items-center space-x-2">
+            {/* Controls removed - moved to navigation-bar.tsx toolbar for top-right positioning */}
           </div>
           {/* End: Controls Container */}
         </div>
@@ -180,18 +149,20 @@ export default function RetroNavbar() {
               <button
                 key={item.href}
                 onClick={() => handleNavClick(item.href)}
-                className={`flex items-center w-full px-3 py-2 rounded-md text-base font-medium transition-colors ${
-                  pathname === item.href
+                className={`
+                  flex items-center w-full px-3 py-2 rounded-md text-base font-medium transition-colors
+                  ${pathname === item.href
                     ? 'bg-pink-500/20 text-pink-400'
                     : 'text-gray-300 hover:text-white hover:bg-cyan-500/10'
-                }`}
+                  }
+                `}
               >
                 <span className="text-lg mr-2 inline-flex items-center justify-center w-5 h-5">{item.icon}</span>
                 <span className="inline-flex items-center gap-1 align-middle">{item.name}</span>
               </button>
             ))}
             
-            {/* Start: Help & FAQ Dropdown Controller Button */}
+            {/* Start: Help & FAQ Dropdown Controller */}
             <div className="relative">
               <button
                 onClick={() => setHelpDropdownOpen(!helpDropdownOpen)}
@@ -223,31 +194,12 @@ export default function RetroNavbar() {
               )}
               {/* End: Help Dropdown Menu */}
             </div>
-            {/* End: Help & FAQ Dropdown Controller Button */}
-            
-            {/* Start: Mobile Random Explorer Button */}
-            <button
-              onClick={() => {
-                setMobileMenuOpen(false);
-                const randomIndex = Math.floor(Math.random() * 20);
-                const randomUser = [
-                  'cyber-pioneer', 'pixel-warrior', 'byte-collector', 'retro-hacker', 'glitch-master',
-                  'neon-drifter', 'terminal-wizard', 'code-archaeologist', 'synth-wave', 'digital-trailblazer',
-                  'analog-dreamer', 'floppy-disk', 'modem-rider', 'BBS-legend', 'phreaker-legend',
-                  'telnet-navigator', 'gopher-guru', 'usenet-explorer', 'ftp-finder', 'irc-wanderer'
-                ][randomIndex];
-                router.push('/site/' + randomUser);
-              }}
-              className="flex items-center w-full px-3 py-2 rounded-md text-base font-medium transition-colors text-gray-300 hover:text-white hover:bg-cyan-500/10"
-            >
-              <span className="text-lg mr-2 inline-flex items-center justify-center w-5 h-5">🌐</span>
-              <span className="inline-flex items-center gap-1 align-middle">Jelajah Rawak</span>
-            </button>
-            {/* End: Mobile Random Explorer Button */}
+            {/* End: Help & FAQ Dropdown Controller */}
           </div>
         </div>
       )}
       {/* End: Mobile Navigation Menu */}
     </nav>
+    // End: Navigation Container
   );
 }

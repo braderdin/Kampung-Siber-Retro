@@ -1,11 +1,10 @@
-// Start: Imports
+// Start: Activity Page with Metric Entry Constraints
 'use client';
 import { useState, useEffect } from 'react';
 import { ActivityEntry } from '@/components/LiveActivityFeed';
 import CommunityInteraction from '@/components/CommunityInteraction';
 import CrtThemeController from '@/components/CrtThemeController';
 import ProfileUpdateBox from '@/components/ProfileUpdateBox';
-// End: Imports
 
 // Start: Type Definitions
 interface ActivityPageProps {
@@ -95,7 +94,7 @@ export default function ActivityPage({ className }: ActivityPageProps) {
   };
   // End: Get Activity Icon
 
-  // Start: Render Activity Entry
+  // Start: Render Activity Entry with Constraints
   const renderActivityEntry = (entry: ActivityEntry) => {
     const toneClasses: Record<ActivityEntry['type'], string> = {
       code: 'border-cyan-500 bg-cyan-50 text-cyan-700',
@@ -105,19 +104,25 @@ export default function ActivityPage({ className }: ActivityPageProps) {
     };
 
     return (
-      <div key={entry.id} className={`mb-2 rounded border-l-4 p-3 ${toneClasses[entry.type]}`}>
+      <div 
+        key={entry.id} 
+        className={`
+          mb-2 rounded border-l-4 p-3 ${toneClasses[entry.type]}
+          max-h-[80px] overflow-hidden
+        `}
+      >
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <span className="text-lg">{getActivityIcon(entry.type)}</span>
-            <span className="font-mono text-xs font-bold">{entry.user}</span>
+            <span className="font-mono text-xs font-bold truncate">{entry.user}</span>
           </div>
-          <span className="text-xs opacity-75">{formatTimestamp(entry.timestamp)}</span>
+          <span className="text-xs opacity-75 flex-shrink-0">{formatTimestamp(entry.timestamp)}</span>
         </div>
-        <p className="mt-1 text-sm">{entry.action}</p>
+        <p className="mt-1 text-sm truncate">{entry.action}</p>
       </div>
     );
   };
-  // End: Render Activity Entry
+  // End: Render Activity Entry with Constraints
 
   // Start: Render Activity Page
   return (
@@ -158,7 +163,11 @@ export default function ActivityPage({ className }: ActivityPageProps) {
             <p className="text-sm text-gray-500 dark:text-gray-400">Tiada aktiviti terkini</p>
           </div>
         ) : (
-          <div className="space-y-2">{activities.map(renderActivityEntry)}</div>
+          // Start: Activities List with Ceiling Constraints
+          <div className="space-y-2 max-h-[400px] overflow-y-auto">
+            {activities.map(renderActivityEntry)}
+          </div>
+          // End: Activities List with Ceiling Constraints
         )}
       </div>
 

@@ -1,7 +1,9 @@
+// Start: Guestbook Component with Win95 Empty State
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
 import GuestbookModeratorControls from './GuestbookModeratorControls';
+import Win95DialogEmptyState from './ui/Win95DialogEmptyState';
 
 const supabase = createMockClient();
 
@@ -71,6 +73,7 @@ function createMockClient(): SupabaseClient {
   };
 }
 
+// Start: Input Sanitization Utilities
 function sanitizeInput(input: string): string {
   let sanitized = input.replace(/<[^>]*>/g, '');
   sanitized = sanitized.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
@@ -79,7 +82,7 @@ function sanitizeInput(input: string): string {
   sanitized = sanitized.replace(/data:\s*[^;]+;base64[^"]*/gi, '');
   sanitized = sanitized.replace(/vbscript:/gi, '');
   sanitized = sanitized.replace(/expression\s*\(/gi, '');
-  sanitized = sanitized.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+  sanitized = sanitized.replace(/[\x00-\x08\x0B\x0C\xx0E-\x1F\x7F]/g, '');
   sanitized = sanitized.replace(/https?:\/\/[^\s"']*/gi, (url) => {
     if (url.startsWith('/') || url.startsWith('mailto:')) {
       return url;
@@ -94,6 +97,7 @@ function sanitizeUsername(username: string): string {
   sanitized = sanitized.replace(/[<>]/g, '');
   return sanitized.substring(0, 30);
 }
+// End: Input Sanitization Utilities
 
 export default function GuestbookComponent({ className }: GuestbookComponentProps) {
   const [entries, setEntries] = useState<GuestbookEntry[]>([]);
@@ -237,6 +241,7 @@ export default function GuestbookComponent({ className }: GuestbookComponentProp
   };
 
   return (
+    // Start: Guestbook Card Container
     <div className={`retro-card ${className || ''}`}>
       {/* Start: Card Header */}
       <div className="retro-card-header">
@@ -257,12 +262,14 @@ export default function GuestbookComponent({ className }: GuestbookComponentProp
       )}
       {/* End: Success Message */}
 
-      {/* Start: Entries List */}
+      {/* Start: Entries List with Empty State */}
       <div className="mb-4 max-h-60 overflow-y-auto retroscrollbar">
         {entries.length === 0 ? (
-          <p className="text-center text-gray-500 dark:text-gray-400 text-sm py-4 pixel-font">
-            Tiada entri lagi. Jadilah yang pertama menandatangani!
-          </p>
+          // Start: Win95 Empty State Injection
+          <Win95DialogEmptyState 
+            message="Buku Pelawat masih suci. Menjadi wargalaya pertama meninggalkan jejak!"
+          />
+          // End: Win95 Empty State Injection
         ) : (
           entries.map((entry) => (
             <div
@@ -298,15 +305,15 @@ export default function GuestbookComponent({ className }: GuestbookComponentProp
       </div>
       {/* End: Entries List */}
 
-      {/* Start: Submission Form */}
-      <form onSubmit={handleSubmit} className="retro-form">
-        <div className="space-y-2">
+      {/* Start: Submission Form with Rigid Flex-Layout Bounds */}
+      <form onSubmit={handleSubmit} className="retro-form flex flex-col gap-3">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full">
           <input
             type="text"
             placeholder="Nama anda..."
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="retro-input w-full"
+            className="retro-input flex-1 min-w-0"
             maxLength={30}
             disabled={loading}
             autoComplete="off"
@@ -315,7 +322,7 @@ export default function GuestbookComponent({ className }: GuestbookComponentProp
             placeholder="Mesej anda..."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            className="retro-textarea w-full"
+            className="retro-textarea flex-1 min-w-0"
             rows={2}
             maxLength={200}
             disabled={loading}
@@ -342,7 +349,7 @@ export default function GuestbookComponent({ className }: GuestbookComponentProp
         <button
           type="submit"
           disabled={loading || !username.trim() || !message.trim()}
-          className="retro-btn-primary w-full mt-2"
+          className="retro-btn-primary w-full sm:w-auto self-end"
         >
           {loading ? 'Menandatangani...' : 'Tandatangani Buku Pelawat'}
         </button>
@@ -357,5 +364,7 @@ export default function GuestbookComponent({ className }: GuestbookComponentProp
       </div>
       {/* End: Footer Controls */}
     </div>
+    // End: Guestbook Card Container
   );
 }
+// End: Guestbook Component with Win95 Empty State

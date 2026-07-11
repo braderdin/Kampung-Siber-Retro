@@ -1,6 +1,8 @@
+// Start: Journal Page with Win95 Empty State
 import { JournalEntry } from "@/types/journal";
 import HydrationGuard from "@/components/HydrationGuard";
 import { JournalEntryForm } from "@/components/JournalEntryForm";
+import Win95DialogEmptyState from "@/components/ui/Win95DialogEmptyState";
 
 interface JournalPageProps {
   params: {
@@ -14,6 +16,7 @@ interface JournalData {
   currentPage: number;
 }
 
+// Start: API Fetch Functions
 async function fetchJournalEntries(username: string, page: number = 1): Promise<JournalData> {
   try {
     const response = await fetch(
@@ -60,6 +63,7 @@ async function fetchUser(username: string) {
     return null;
   }
 }
+// End: API Fetch Functions
 
 export default async function JournalPage({ params }: JournalPageProps) {
   const { username } = params;
@@ -71,9 +75,12 @@ export default async function JournalPage({ params }: JournalPageProps) {
   const { entries, hasNextPage, currentPage } = journalData;
 
   return (
+    // Start: Hydration Guard Wrapper
     <HydrationGuard>
+      {/* Start: Main Background Container */}
       <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black">
         <div className="container mx-auto px-4 py-8">
+          {/* Start: Page Header */}
           <header className="mb-8">
             <h1 className="font-pixel text-3xl text-white mb-2">
               {username}'s Journal
@@ -86,17 +93,18 @@ export default async function JournalPage({ params }: JournalPageProps) {
               })}
             </p>
           </header>
+          {/* End: Page Header */}
 
+          {/* Start: Entries Container */}
           <div className="space-y-6">
             {entries.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="font-pixel text-xs text-gray-500">
-                  No journal entries found.
-                </p>
-                <p className="font-pixel text-xs text-gray-600 mt-2">
-                  Be the first to write something!
-                </p>
+              // Start: Win95 Empty State Injection
+              <div className="py-8">
+                <Win95DialogEmptyState 
+                  message="Residen ini belum melog sebarang kemasukan awam. Jadilah penulis pertama!"
+                />
               </div>
+              // End: Win95 Empty State Injection
             ) : (
               entries.map((entry) => (
                 <article
@@ -153,7 +161,9 @@ export default async function JournalPage({ params }: JournalPageProps) {
               </div>
             )}
           </div>
+          {/* End: Entries Container */}
 
+          {/* Start: New Entry Form Section */}
           <section className="mt-12 pt-8 border-t border-gray-700/30">
             <h2 className="font-pixel text-xl text-white mb-4">Write a New Entry</h2>
             <JournalEntryForm
@@ -169,8 +179,12 @@ export default async function JournalPage({ params }: JournalPageProps) {
               }}
             />
           </section>
+          {/* End: New Entry Form Section */}
         </div>
       </div>
+      {/* End: Main Background Container */}
     </HydrationGuard>
+    // End: Hydration Guard Wrapper
   );
 }
+// End: Journal Page with Win95 Empty State

@@ -1,8 +1,10 @@
+// Start: Root Layout with Unified Top Utility Toolbar
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, VT323 } from "next/font/google";
 import "./globals.css";
 import "../styles/retro.css";
 import RetroNavbar from "@/components/RetroNavbar";
+import NavigationBar from "@/components/ui/navigation-bar";
 import RetroFooter from "@/components/RetroFooter";
 import KeyboardShortcutOverlay from "@/components/KeyboardShortcutOverlay";
 import PageTransitionOverlay from "@/components/PageTransitionOverlay";
@@ -56,8 +58,16 @@ export default function RootLayout({
       />
       {/* End: Inline Pre-Hydration Theme Script */}
       <body className="min-h-full flex flex-col bg-zinc-50 dark:bg-black font-sans">
+        {/* Start: Unified Top Utility Toolbar */}
+        <NavigationBar />
+        {/* End: Unified Top Utility Toolbar */}
+        
+        {/* Start: Retro Navigation Bar */}
         <RetroNavbar />
-        <main className="flex-1 flex">
+        {/* End: Retro Navigation Bar */}
+        
+        {/* Start: Main Content Area */}
+        <main className="flex-1 flex pt-16">
           <PageTransitionOverlay>
             {/* QuickLinksSidebar visible on large screens (lg and up) */}
             <div className="hidden lg:block">
@@ -69,9 +79,12 @@ export default function RootLayout({
             </div>
           </PageTransitionOverlay>
         </main>
+        {/* End: Main Content Area */}
+        
         <RetroFooter />
         <KeyboardShortcutOverlay />
       </body>
     </html>
   );
 }
+// End: Root Layout with Unified Top Utility Toolbar

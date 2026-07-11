@@ -1,3 +1,4 @@
+// Start: Asset Store Page with Empty State
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -6,6 +7,11 @@ import { enDictionary, msDictionary } from '@/i18n/dictionaries';
 import ProductCard from '@/components/ProductCard';
 import PixelCursorEffect from '@/components/PixelCursorEffect';
 import HydrationGuard from '@/components/HydrationGuard';
+import Win95DialogEmptyState from '@/components/ui/Win95DialogEmptyState';
+
+// Start: Empty Asset Catalog for Empty State
+const EMPTY_ASSET_CATALOG: AssetItem[] = [];
+// End: Empty Asset Catalog for Empty State
 
 interface AssetItem {
   id: string;
@@ -17,91 +23,21 @@ interface AssetItem {
   downloads: number;
 }
 
-const ASSET_CATALOG: AssetItem[] = [
-  {
-    id: 'retro-btn-primary',
-    title: 'Butang Utama Retro',
-    category: 'CSS Component',
-    description: 'Butang utama dengan batasan 8-bit dan efek hover neon.',
-    code: `<button class="retro-btn-primary px-4 py-2 rounded pixel-font font-bold text-white bg-gradient-to-r from-pink-500 to-red-500 hover:scale-105 transition-transform shadow-lg">Klik Saya</button>`,
-    tags: ['button', 'css', 'retro', 'neon'],
-    downloads: 1247
-  },
-  {
-    id: 'retro-btn-secondary',
-    title: 'Butang Sekunder Retro',
-    category: 'CSS Component',
-    description: 'Butang sekunder dengan batasan tipis dan corak 8-bit.',
-    code: `<button class="retro-btn-secondary px-3 py-1 rounded pixel-font text-gray-700 dark:text-gray-300 border-2 border-gray-400 hover:border-pink-400 transition-colors">Tindakan</button>`,
-    tags: ['button', 'css', 'retro', 'secondary'],
-    downloads: 982
-  },
-  {
-    id: 'pixel-frame',
-    title: 'Cadangan Pixcel',
-    category: 'CSS Frame',
-    description: 'Kotak papan dengan bingkai hitam 8-bit untuk papar kandungan.',
-    code: `<div class="pixel-frame bg-gray-100 dark:bg-gray-800 border-4 border-black dark:border-white rounded-pixel p-4 shadow-inner">Kandungan anda di sini</div>`,
-    tags: ['frame', 'css', 'pixel', 'container'],
-    downloads: 756
-  },
-  {
-    id: 'mouse-dust-effect',
-    title: 'Efek Debu Embah',
-    category: 'JavaScript',
-    description: 'Skrip ringkas untuk menambah efek debu mengikuti penunjuk mouse.',
-    code: "const mouseTrail = (e) => { const dust = document.createElement('div'); dust.style.cssText = 'position:fixed;left:' + e.clientX + 'px;top:' + e.clientY + 'px;width:4px;height:4px;background:rgba(255,255,255,0.8);border-radius:50%;pointer-events:none;z-index:9999;'; document.body.appendChild(dust); setTimeout(() => dust.remove(), 500); }",
-    tags: ['effect', 'mouse', 'js', 'particle'],
-    downloads: 543
-  },
-  {
-    id: 'audio-loop-bg',
-    title: 'Larangan Audio Latar',
-    category: 'Audio',
-    description: 'Kod untuk memulakan larangan audio latar tidak terbongkar.',
-    code: `const playLoop = (url) => { const audio = new Audio(url); audio.loop = true; audio.volume = 0.3; audio.play().catch(e => console.log('Autoplay blocked')); return audio; }`,
-    tags: ['audio', 'loop', 'js', 'background'],
-    downloads: 421
-  },
-  {
-    id: 'crt-scanlines',
-    title: 'Garis Gatian CRT',
-    category: 'CSS Overlay',
-    description: 'Lapisan CSS untuk menambah efek garis ganjil monitor CRT klasik.',
-    code: `.crt-scanlines { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(0deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 2px); pointer-events: none; z-index: 9998; }`,
-    tags: ['css', 'crt', 'retro', 'overlay'],
-    downloads: 634
-  },
-  {
-    id: 'terminal-cursor',
-    title: 'Kursor Terminal',
-    category: 'CSS Animation',
-    description: 'Kursor berkedip untuk meniru konsol terminal klasik.',
-    code: `.terminal-cursor { display: inline-block; width: 10px; height: 20px; background: #00ff00; animation: blink 1s infinite; } @keyframes blink { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }`,
-    tags: ['cursor', 'animation', 'css', 'terminal'],
-    downloads: 389
-  },
-  {
-    id: 'glitch-text',
-    title: 'Teks Glitch',
-    category: 'CSS/JS',
-    description: 'Efek teks glitch untuk elemen teks statik.',
-    code: `.glitch { position: relative; color: #ff00ff; } .glitch::before, .glitch::after { content: attr(data-text); position: absolute; left: 0; top: 0; }`,
-    tags: ['text', 'glitch', 'css', 'effect'],
-    downloads: 298
-  }
-];
-
 export default function AssetStorePage() {
   const { language } = useLanguageStore();
   const t = language === 'ms' ? msDictionary : enDictionary;
   const [isClient, setIsClient] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [assets, setAssets] = useState<AssetItem[]>([]);
 
+  // Start: Component Initialization
   useEffect(() => {
     setIsClient(true);
+    // Load empty catalog - awaiting user uploads
+    setAssets(EMPTY_ASSET_CATALOG);
   }, []);
+  // End: Component Initialization
 
   if (!isClient) {
     return (
@@ -113,17 +49,22 @@ export default function AssetStorePage() {
     );
   }
 
-  const categories = ['all', ...Array.from(new Set(ASSET_CATALOG.map(a => a.category)))];
+  // Start: Category Extraction
+  const categories = ['all', ...Array.from(new Set(assets.map(a => a.category)))];
+  // End: Category Extraction
 
-  const filteredAssets = ASSET_CATALOG.filter(asset => {
+  // Start: Filtered Assets Calculation
+  const filteredAssets = assets.filter(asset => {
     const matchesCategory = selectedCategory === 'all' || asset.category === selectedCategory;
     const matchesSearch = searchTerm.toLowerCase() === '' || 
       asset.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       asset.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
     return matchesCategory && matchesSearch;
   });
+  // End: Filtered Assets Calculation
 
   return (
+    // Start: Main Container
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300 pt-16">
       <PixelCursorEffect />
 
@@ -170,14 +111,16 @@ export default function AssetStorePage() {
         </div>
         {/* End: Search and Filter */}
 
-        {/* Start: Asset Grid */}
+        {/* Start: Asset Grid with Empty State Injection */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredAssets.length === 0 ? (
-            <div className="col-span-full text-center py-8">
-              <p className="text-gray-500 dark:text-gray-400 pixel-font">
-                Tiada aset yang padu dengan carian anda.
-              </p>
+            // Start: Win95 Empty State for No Assets
+            <div className="col-span-full">
+              <Win95DialogEmptyState 
+                message="Inventori digital Pak Samad masih menunggu muat naik wargalaya. Jadilah pemilik kandungan pertama!"
+              />
             </div>
+            // End: Win95 Empty State for No Assets
           ) : (
             filteredAssets.map(asset => (
               <HydrationGuard key={asset.id}>
@@ -197,5 +140,7 @@ export default function AssetStorePage() {
         {/* End: Asset Grid */}
       </div>
     </main>
+    // End: Main Container
   );
 }
+// End: Asset Store Page with Empty State

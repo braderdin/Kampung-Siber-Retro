@@ -1,3 +1,4 @@
+// Start: Dashboard Page with Clean Grey Layout Frame
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -9,8 +10,6 @@ import RetroCalendar from '@/components/RetroCalendar';
 import VisitorStatGraph from '@/components/VisitorStatGraph';
 import RetroMarqueeTicker from '@/components/RetroMarqueeTicker';
 import TopResidentsLeaderboard from '@/components/TopResidentsLeaderboard';
-import AccountAllocationBox from '@/components/AccountAllocationBox';
-import NewsletterSubscription from '@/components/NewsletterSubscription';
 import HydrationGuard from '@/components/HydrationGuard';
 import FeedbackWidget from '@/components/FeedbackWidget';
 
@@ -22,20 +21,24 @@ export default function DashboardPage() {
   const { language } = useLanguageStore();
   const t = language === 'ms' ? msDictionary : enDictionary;
 
+  // Start: Marquee Auto-Show Effect
   useEffect(() => {
-    // Auto-show marquee on first load
     const timer = setTimeout(() => {
       setShowMarquee(true);
     }, 2000);
 
     return () => clearTimeout(timer);
   }, []);
+  // End: Marquee Auto-Show Effect
 
+  // Start: Tab Toggle Handler
   const handleTabToggle = () => {
     setActiveTab(prev => prev === 'main' ? 'community' : 'main');
   };
+  // End: Tab Toggle Handler
 
   return (
+    // Start: Main Dashboard Container
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
       {/* Start: Navigation Toolbar with Retro Sitemap Button */}
       <div className="sticky top-0 z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b-2 border-dashed border-cyan-500/30">
@@ -82,17 +85,6 @@ export default function DashboardPage() {
         </div>
         {/* End: Dashboard Header */}
 
-        {/* Start: Newsletter Subscription */}
-        <div className="mb-8">
-          <HydrationGuard>
-            <NewsletterSubscription 
-              triggerText="📧 Subscribe to Updates"
-              className="border-2 border-pink-400 bg-pink-500/10 hover:bg-pink-500/20"
-            />
-          </HydrationGuard>
-        </div>
-        {/* End: Newsletter Subscription */}
-
         {/* Start: Tab Navigation */}
         <div className="mb-6">
           <div className="retro-tab-navigation flex space-x-2 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg border border-gray-300 dark:border-gray-600">
@@ -128,41 +120,22 @@ export default function DashboardPage() {
         </div>
         {/* End: Tab Navigation */}
 
-        {/* Start: Tab Content */}
+        {/* Start: Tab Content with Clean Grey Layout Frame */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Start: Main View Tab Content */}
+          {/* Start: Main View Tab Content - Removed complex statistics cards */}
           {activeTab === 'main' && (
             <>
-              {/* Start: Account Allocation Card */}
-              <div className="lg:col-span-1">
+              {/* Start: Clean Grey Layout Frame - Reserved for User Metrics */}
+              <div className="lg:col-span-3">
                 <HydrationGuard>
-                  <AccountAllocationBox />
+                  <div className="retro-card bg-gray-100 dark:bg-gray-800 border-2 border-dashed border-gray-300 dark:border-gray-600 min-h-[200px] flex items-center justify-center">
+                    <p className="text-gray-500 dark:text-gray-400 pixel-font text-sm">
+                      {t.dashboardReady || 'Dashboard bersedia menerima data berasal daripada pengguna'}
+                    </p>
+                  </div>
                 </HydrationGuard>
               </div>
-              {/* End: Account Allocation Card */}
-
-              {/* Start: Visitor Stats Card */}
-              <div className="lg:col-span-2">
-                <HydrationGuard>
-                  <VisitorStatGraph title="Visitor Statistics" />
-                </HydrationGuard>
-              </div>
-              {/* End: Visitor Stats Card */}
-
-              {/* Start: Calendar Card */}
-              <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Start: Calendar Card */}
-                <HydrationGuard>
-                  <RetroCalendar />
-                </HydrationGuard>
-                {/* End: Calendar Card */}
-
-                {/* Start: Leaderboard Card */}
-                <HydrationGuard>
-                  <TopResidentsLeaderboard />
-                </HydrationGuard>
-                {/* End: Leaderboard Card */}
-              </div>
+              {/* End: Clean Grey Layout Frame */}
             </>
           )}
 
@@ -185,5 +158,7 @@ export default function DashboardPage() {
       </div>
       {/* End: Feedback Widget */}
     </main>
+    // End: Main Dashboard Container
   );
 }
+// End: Dashboard Page with Clean Grey Layout Frame

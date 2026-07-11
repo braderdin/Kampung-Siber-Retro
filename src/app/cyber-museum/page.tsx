@@ -1,9 +1,15 @@
+// Start: Cyber Museum Page with Empty State
 "use client";
 
 import { useState, useEffect } from 'react';
 import CyberMuseumArchive from '@/components/CyberMuseumArchive';
 import PixelCursorEffect from '@/components/PixelCursorEffect';
 import HydrationGuard from '@/components/HydrationGuard';
+import Win95DialogEmptyState from '@/components/ui/Win95DialogEmptyState';
+
+// Start: Empty Collection Placeholder
+const EMPTY_COLLECTION: MuseumArtifact[] = [];
+// End: Empty Collection Placeholder
 
 interface MuseumArtifact {
   id: string;
@@ -15,88 +21,14 @@ interface MuseumArtifact {
   historicalSignificance: string;
 }
 
-const MUSEUM_COLLECTION: MuseumArtifact[] = [
-  {
-    id: 'dial-up-1995',
-    title: 'Pautan Dial-Up 56k',
-    era: '1990-an',
-    description: 'Konfigurasi pautan dial-up 56k yang menjadi asas internet domestik pada hari itu.',
-    imagePlaceholder: '🖥️',
-    codeSnippet: `AT&F
-ATZ
-AT&V
-ATDT#944456789;`,
-    historicalSignificance: 'Pautan dial-up 56k membolehkan rumah-rumah mengakses internet pertama kali. Kecepatan 56kbps singkat namun revolusioner.'
-  },
-  {
-    id: 'mirc-slang',
-    title: 'Kumpulan Laluan mIRC',
-    era: '1990-an',
-    description: 'Kumpulan laluan IRC dan slang kaum pada mIRC yang menjadi bahasa digital.',
-    imagePlaceholder: '💬',
-    codeSnippet: `/join #kampung-siber
-/mode #kampung-siber +m
-/topic Selamat datang di kampung siber retro!`,
-    historicalSignificance: 'mIRC dan IRC secara umum memupuk budaya komuniti dalam talian dengan perbualan langsung.'
-  },
-  {
-    id: 'floppy-disk',
-    title: 'Disket 3.5-inch 1.44MB',
-    era: '1980-2000-an',
-    description: 'Media penyimpanan utama untuk data komputer pada zaman sebelum USB.',
-    imagePlaceholder: '💾',
-    codeSnippet: `// Format disket
-FORMAT A: /FS:FAT /V:"KAMPUNG-SIBER"
-COPY *.* A:\
-EJECT A:`,
-    historicalSignificance: 'Disket 3.5-inch 1.44MB adalah standar penyimpanan utama sebelum hard disk keras menjadi murah.'
-  },
-  {
-    id: 'win95-startup',
-    title: 'Layar Masuk Windows 95',
-    era: '1995',
-    description: 'Pengalaman memulakan komputer Windows 95 dengan lagu inspiratif.',
-    imagePlaceholder: '🎵',
-    codeSnippet: `// Start menu sound
-var sound = new Audio('/sounds/start.wav');
-sound.play();`,
-    historicalSignificance: 'Lagu "Start Me Up" Windows 95 menjadi ikon kebangkitan komputer pribadi.'
-  },
-  {
-    id: 'geocities-site',
-    title: 'Laman Geocities',
-    era: '1990-an',
-    description: 'Contoh kod HTML laman web pribadi pada era Geocities.',
-    imagePlaceholder: '🌐',
-    codeSnippet: `<html>
-<head><title>My Homepage</title></head>
-<body bgcolor="#0000FF" text="#FFFFFF">
-<h1>Welcome to My Homepage!</h1>
-<blink>Under Construction...</blink>
-</body>
-</html>`,
-    historicalSignificance: 'Geocities membolehkan pengguna membuat laman web percuma, memupuk kebudayaan web kreatif.'
-  },
-  {
-    id: 'bulletin-board',
-    title: 'Papan Pengumuman BBS',
-    era: '1980-1990-an',
-    description: 'Sistem bulletin board system untuk memuat naik dan menulis mesej.',
-    imagePlaceholder: '📜',
-    codeSnippet: `LOGIN: user
-PASSWORD: ********
-POST:
-Tarikh: 1994-06-15
-Mesej: Selamat datang ke BBS kami!`,
-    historicalSignificance: 'BBS adalah prasyatan utama sebelum internet komersial menjadi terpakai.'
-  }
-];
-
 export default function CyberMuseumPage() {
   const [isClient, setIsClient] = useState(false);
+  const [artifacts, setArtifacts] = useState<MuseumArtifact[]>([]);
 
   useEffect(() => {
     setIsClient(true);
+    // Load from actual data source or keep empty for empty state demonstration
+    setArtifacts(EMPTY_COLLECTION);
   }, []);
 
   const handleArtifactClick = (artifact: MuseumArtifact) => {
@@ -114,6 +46,7 @@ export default function CyberMuseumPage() {
   }
 
   return (
+    // Start: Main Container
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300 pt-16">
       <PixelCursorEffect />
 
@@ -133,13 +66,21 @@ export default function CyberMuseumPage() {
       </div>
       {/* End: Header Section */}
 
-      {/* Start: Museum Gallery with CyberMuseumArchive */}
+      {/* Start: Museum Gallery with Empty State Injection */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <HydrationGuard>
-          <CyberMuseumArchive
-            artifacts={MUSEUM_COLLECTION}
-            onArtifactClick={handleArtifactClick}
-          />
+          {artifacts.length === 0 ? (
+            // Start: Win95 Empty State for No Artifacts
+            <Win95DialogEmptyState 
+              message="Tiada artifak yang telah dikatalog buat masa ini. Wargalaya dijemput untuk menyumbang benda-benda sejarah digital!"
+            />
+            // End: Win95 Empty State for No Artifacts
+          ) : (
+            <CyberMuseumArchive
+              artifacts={artifacts}
+              onArtifactClick={handleArtifactClick}
+            />
+          )}
         </HydrationGuard>
       </div>
       {/* End: Museum Gallery */}
@@ -159,7 +100,7 @@ export default function CyberMuseumPage() {
                 <strong>56k Dial-Up:</strong> Kecepatan pautan dial-up 56k melambatkan muat turun tetapi membuka pintu ke internet global.
               </p>
               <p>
-                <strong>mIRC & IRC:</strong> Internet Relay Chat membolehkan komunikasi langsung dalam bilik perbincangang.
+                <strong>mIRC & IRC:</strong> Internet Relay Chat membolehkan komunikasi langsung dalam bilik perbincangan.
               </p>
               <p>
                 <strong>Geocities & Tripod:</strong> Perkhidmatan ini membolehkan pengguna membuat laman web percuma dengan ruang penyimpanan terhad.
@@ -168,7 +109,7 @@ export default function CyberMuseumPage() {
                 <strong>BBS & FidoNet:</strong> Sistem bulletin board adalah asas komuniti talian sebelum internet komersial.
               </p>
               <p className="border-t-2 border-dashed border-pink-400/30 pt-3">
-                <strong>Kesedaran:</strong> Klik pada setiap artefak untuk melihat detail sejarahnya dengan moda interaktif.
+                <strong>Kesedaran:</strong> Klik pada setiap artifak untuk melihat detail sejarahnya dengan moda interaktif.
               </p>
             </div>
           </div>
@@ -176,5 +117,7 @@ export default function CyberMuseumPage() {
       </div>
       {/* End: Museum Notes Section */}
     </main>
+    // End: Main Container
   );
 }
+// End: Cyber Museum Page with Empty State

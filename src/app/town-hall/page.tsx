@@ -1,3 +1,4 @@
+// Start: Town Hall Page with Empty State
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -7,6 +8,7 @@ import RetroCalendar from '@/components/RetroCalendar';
 import PixelCursorEffect from '@/components/PixelCursorEffect';
 import HydrationGuard from '@/components/HydrationGuard';
 import CommunityBulletin from '@/components/CommunityBulletin';
+import Win95DialogEmptyState from '@/components/ui/Win95DialogEmptyState';
 
 interface EventRecord {
   id: string;
@@ -23,39 +25,13 @@ export default function TownHallPage() {
   const [isClient, setIsClient] = useState(false);
   const [events, setEvents] = useState<EventRecord[]>([]);
 
+  // Start: Component Initialization
   useEffect(() => {
     setIsClient(true);
-    
-    // Sample event data - in production this would come from an API
-    const sampleEvents: EventRecord[] = [
-      {
-        id: '1',
-        title: 'Penyelenggaraan Server',
-        description: 'Pembaruan sistem ke versi 2.5 dengan peningkatan kecekapan.',
-        date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-        type: 'maintenance',
-        priority: 'high'
-      },
-      {
-        id: '2',
-        title: 'Arisan Kumpul Diri',
-        description: 'Kumpul di tempat parkir sentul pada pagi hari.',
-        date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-        type: 'community',
-        priority: 'normal'
-      },
-      {
-        id: '3',
-        title: 'Pembaruan Laman',
-        description: 'Ciri-ciri baru akan diterbitkan minggu ini.',
-        date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
-        type: 'update',
-        priority: 'normal'
-      }
-    ];
-    
-    setEvents(sampleEvents);
+    // Initialize empty events array - in production this would come from an API
+    setEvents([]);
   }, []);
+  // End: Component Initialization
 
   if (!isClient) {
     return (
@@ -68,6 +44,7 @@ export default function TownHallPage() {
   }
 
   return (
+    // Start: Main Container
     <main className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300 pt-16">
       <PixelCursorEffect />
 
@@ -116,7 +93,7 @@ export default function TownHallPage() {
           {/* End: Calendar View */}
         </div>
 
-        {/* Start: Upcoming Events List */}
+        {/* Start: Upcoming Events List with Empty State Injection */}
         <div className="mt-6 retro-card">
           <div className="retro-card-header bg-gray-200 dark:bg-gray-700 px-4 py-2 border-b border-gray-300 dark:border-gray-600">
             <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200 pixel-font flex items-center gap-2">
@@ -125,44 +102,56 @@ export default function TownHallPage() {
             </h2>
           </div>
           <div className="p-4">
-            <div className="space-y-4">
-              {events
-                .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-                .map((event) => (
-                  <div
-                    key={event.id}
-                    className={`
-                      p-4 rounded-lg border-l-4
-                      ${event.priority === 'high' ? 'border-red-400 bg-red-50 dark:bg-red-900/20' : ''}
-                      ${event.priority === 'normal' ? 'border-blue-400 bg-blue-50 dark:bg-blue-900/20' : ''}
-                      ${event.priority === 'low' ? 'border-green-400 bg-green-50 dark:bg-green-900/20' : ''}
-                    `}
-                  >
-                    <div className="flex items-start gap-3">
-                      <span className="text-2xl">
-                        {event.type === 'maintenance' ? '🔧' : 
-                         event.type === 'event' ? '🎉' : 
-                         event.type === 'update' ? '🆕' : '👥'}
-                      </span>
-                      <div>
-                        <h3 className="font-bold text-gray-800 dark:text-gray-200 pixel-font">
-                          {event.title}
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 pixel-font mt-1">
-                          {event.description}
-                        </p>
-                        <div className="text-xs text-gray-500 dark:text-gray-500 pixel-font mt-2">
-                          📅 {new Date(event.date).toLocaleDateString('ms-MY')}
+            {events.length === 0 ? (
+              // Start: Win95 Empty State for No Events
+              <Win95DialogEmptyState 
+                message="Tiada perhimpunan komunal aktif pada masa ini. Jadilah pem organizer pertama!"
+              />
+              // End: Win95 Empty State for No Events
+            ) : (
+              // Start: Events List
+              <div className="space-y-4">
+                {events
+                  .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+                  .map((event) => (
+                    <div
+                      key={event.id}
+                      className={`
+                        p-4 rounded-lg border-l-4
+                        ${event.priority === 'high' ? 'border-red-400 bg-red-50 dark:bg-red-900/20' : ''}
+                        ${event.priority === 'normal' ? 'border-blue-400 bg-blue-50 dark:bg-blue-900/20' : ''}
+                        ${event.priority === 'low' ? 'border-green-400 bg-green-50 dark:bg-green-900/20' : ''}
+                      `}
+                    >
+                      <div className="flex items-start gap-3">
+                        <span className="text-2xl">
+                          {event.type === 'maintenance' ? '🔧' : 
+                           event.type === 'event' ? '🎉' : 
+                           event.type === 'update' ? '🆕' : '👥'}
+                        </span>
+                        <div>
+                          <h3 className="font-bold text-gray-800 dark:text-gray-200 pixel-font">
+                            {event.title}
+                          </h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 pixel-font mt-1">
+                            {event.description}
+                          </p>
+                          <div className="text-xs text-gray-500 dark:text-gray-500 pixel-font mt-2">
+                            📅 {new Date(event.date).toLocaleDateString('ms-MY')}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-            </div>
+                  ))}
+              </div>
+              // End: Events List
+            )}
           </div>
         </div>
         {/* End: Upcoming Events List */}
       </div>
     </main>
+    // End: Main Container
   );
 }
+// End: Town Hall Page with Empty State

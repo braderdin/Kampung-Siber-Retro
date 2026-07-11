@@ -1,3 +1,4 @@
+// Start: Site Directory Grid Component
 'use client';
 
 // Start: Type Definitions
@@ -15,9 +16,9 @@ interface SiteDirectoryGridProps {
 
 // Start: SiteDirectoryGrid Component
 export default function SiteDirectoryGrid({ sites, className }: SiteDirectoryGridProps) {
-  // Start: Render Grid
+  // Start: Render Grid with Responsive Layout
   return (
-    <div className={`grid gap-3 md:grid-cols-2 xl:grid-cols-3 ${className || ''}`}>
+    <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 ${className || ''}`}>
       {sites.map((site) => (
         <a
           key={site.id}
