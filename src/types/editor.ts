@@ -1,6 +1,7 @@
 // Start: Editor TypeScript Type Definitions
 // This file declares strict TypeScript typings governing editor operational modes
 
+// Abangku, these types define the structure and behavior of our editor components.
 // Start: Editor Operational Modes Type
 export type EditorMode = 'edit' | 'preview' | 'split';
 // End: Editor Operational Modes Type

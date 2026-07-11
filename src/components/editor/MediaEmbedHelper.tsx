@@ -36,7 +36,7 @@ export default function MediaEmbedHelper({ onInsertEmbed, className }: MediaEmbe
         onClick={() => setIsOpen(!isOpen)}
         className="retro-btn-secondary flex items-center gap-2 px-3 py-2 pixel-font text-xs"
         title="Buka Panel Media"
-      >
+      > {/* Formal Malay for "Open Media Panel" */}
         <span>📎</span>
         <span>Media Embed</span>
       </button>
@@ -56,7 +56,7 @@ export default function MediaEmbedHelper({ onInsertEmbed, className }: MediaEmbe
           <div className="flex items-center justify-between mb-3 pb-2 border-b border-gray-600">
             <h3 className="text-xs font-bold text-gray-200 pixel-font">
               Penyisipan Media
-            </h3>
+            </h3> {/* Formal Malay for "Media Insertion" */}
             <button
               onClick={() => setIsOpen(false)}
               className="text-gray-400 hover:text-gray-200 text-lg"
@@ -115,7 +115,7 @@ export default function MediaEmbedHelper({ onInsertEmbed, className }: MediaEmbe
           <div className="mt-3 pt-2 border-t border-gray-600">
             <p className="text-xs text-gray-500 pixel-font">
               * Gantikan XXXX dengan ID kandungan anda
-            </p>
+            </p> {/* Formal Malay for "Replace XXXX with your content ID" */}
           </div>
           {/* End: Instruction Text */}
         </div>

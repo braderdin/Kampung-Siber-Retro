@@ -49,7 +49,7 @@ export default function PublishSiteButton({
 
     setIsPublishing(true);
     setPublishStatus('idle');
-
+    setLoadingFrameIndex(0); // Start: Reset loading frame index on new publish attempt
     try {
       const sessionToken = localStorage.getItem('sb-access-token');
       if (!sessionToken) {
@@ -72,7 +72,7 @@ export default function PublishSiteButton({
       const result = await response.json();
 
       if (!result.success) {
-        throw new Error(result.error || 'Gagal menerbitkan kandungan');
+        throw new Error(result.error || 'Gagal menerbitkan kandungan'); // Formal Malay for "Failed to publish content"
       }
 
       setPublishStatus('success');
@@ -89,7 +89,7 @@ export default function PublishSiteButton({
       setTimeout(() => setPublishStatus('idle'), 3000);
     } finally {
       setIsPublishing(false);
-      setLoadingFrameIndex(0);
+      // setLoadingFrameIndex(0); // Removed as it's reset at the start of handlePublish
     }
   };
   // End: Handle Publish to R2

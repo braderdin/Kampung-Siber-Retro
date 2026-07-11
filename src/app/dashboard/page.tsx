@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useLanguageStore } from '@/store/useLanguageStore';
-import { enDictionary, msDictionary } from '@/i18n/dictionaries';
+import { enDictionary, msDictionary } from '@/lib/dictionary'; // Start: Updated dictionary import path
 import Shoutbox from '@/components/Shoutbox';
 import RetroCalendar from '@/components/RetroCalendar';
 import VisitorStatGraph from '@/components/VisitorStatGraph';
@@ -51,7 +51,7 @@ export default function DashboardPage() {
           {/* Start: Retro Sitemap Access Button */}
           <Link href="/sitemap" className="retro-btn-secondary flex items-center gap-2 px-4 py-2 pixel-font font-bold">
             <span className="text-lg">🗺️</span>
-            <span>{t.sitemapTitle || 'Site Sitemap'}</span>
+            <span>{t.sitemapTitle || 'Peta Laman'}</span> {/* Formal Malay for "Site Sitemap" */}
           </Link>
           {/* End: Retro Sitemap Access Button */}
         </div>
@@ -66,7 +66,7 @@ export default function DashboardPage() {
             {t.dashboardTitle}
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
-            {t.welcomeMessage || 'Welcome to your retro dashboard!'}
+            {t.welcomeMessage || 'Selamat datang di papan pengarah retro anda!'} {/* Formal Malay for "Welcome to your retro dashboard!" */}
           </p>
           {/* Start: Editor Access Button with Extreme Pixel Shadow */}
           <div className="mt-4">

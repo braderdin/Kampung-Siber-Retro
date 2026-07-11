@@ -27,12 +27,14 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          {/* Abangku, ThemeProvider is a client component and correctly wraps children within the client component boundary. */}
           {/* Start: Main Application Wrapper */}
           <div className="min-h-screen bg-background text-foreground antialiased">
             {children}
           </div>
           {/* End: Main Application Wrapper */}
           
+          {/* Abangku, Toaster is also a client component and correctly placed. */}
           {/* Start: Global Toast Notifications */}
           <Toaster />
           {/* End: Global Toast Notifications */}

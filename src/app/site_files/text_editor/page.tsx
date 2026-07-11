@@ -4,7 +4,7 @@
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState, useCallback } from 'react';
 import { useLanguageStore } from "@/store/useLanguageStore";
-import { enDictionary, msDictionary } from "@/lib/dictionary";
+import { enDictionary, msDictionary } from "@/lib/dictionary"; // Start: Updated dictionary import path
 import EditorHtmlPreview from '@/components/editor/EditorHtmlPreview';
 import MediaEmbedHelper from '@/components/editor/MediaEmbedHelper';
 import PublishSiteButton from '@/components/editor/PublishSiteButton';
@@ -92,7 +92,7 @@ function TextEditorContent({ className }: TextEditorProps) {
     try {
       const sessionToken = localStorage.getItem('sb-access-token');
       if (!sessionToken) {
-        throw new Error('Sesi tidak sah');
+        throw new Error('Sesi tidak sah'); // Formal Malay for "Invalid session"
       }
 
       const response = await fetch(`/api/storage/read?filename=${encodeURIComponent(file)}`, {
@@ -105,12 +105,15 @@ function TextEditorContent({ className }: TextEditorProps) {
       
       if (data.success && data.content !== undefined) {
         setContent(data.content);
+        setFileLanguage(getFileTypeFromFilename(file)); // Start: Set file language based on filename
       } else {
         setContent(DEFAULT_HTML_TEMPLATE);
+        setFileLanguage('html'); // Default to HTML if content not found
       }
     } catch (error) {
       console.error('Fetch R2 content error:', error);
       setContent(DEFAULT_HTML_TEMPLATE);
+      setFileLanguage('html'); // Default to HTML on error
     } finally {
       setIsLoading(false);
     }
@@ -123,9 +126,11 @@ function TextEditorContent({ className }: TextEditorProps) {
     if (filenameParam) {
       setFilename(filenameParam);
       fetchR2Content(filenameParam);
+      setFileLanguage(getFileTypeFromFilename(filenameParam)); // Set file language on initial load
     } else {
       setFilename('index.html');
       setContent(DEFAULT_HTML_TEMPLATE);
+      setFileLanguage('html'); // Default to HTML for index.html
     }
   }, [searchParams, fetchR2Content]);
 
@@ -149,9 +154,10 @@ function TextEditorContent({ className }: TextEditorProps) {
 
   // Start: Handle Rename
   const handleRename = () => {
-    const newFilename = prompt('Sila masukkan nama fail baru:', filename);
+    const newFilename = prompt('Sila masukkan nama fail baru:', filename); // Formal Malay for "Please enter new file name"
     if (newFilename && newFilename.trim()) {
       setFilename(newFilename.trim());
+      setFileLanguage(getFileTypeFromFilename(newFilename.trim())); // Update file language on rename
     }
   };
   // End: Handle Rename
@@ -166,7 +172,7 @@ function TextEditorContent({ className }: TextEditorProps) {
     try {
       const sessionToken = localStorage.getItem('sb-access-token');
       if (!sessionToken) {
-        throw new Error('Sesi tidak sah - sila log masuk semula');
+        throw new Error('Sesi tidak sah - sila log masuk semula'); // Formal Malay for "Invalid session - please log in again"
       }
 
       const response = await fetch('/api/storage/upload', {
@@ -186,7 +192,7 @@ function TextEditorContent({ className }: TextEditorProps) {
       const result = await response.json();
       
       if (!result.success) {
-        throw new Error(result.error || 'Gagal menyimpan fail');
+        throw new Error(result.error || 'Gagal menyimpan fail'); // Formal Malay for "Failed to save file"
       }
 
       setIsSaved(true);
@@ -194,6 +200,7 @@ function TextEditorContent({ className }: TextEditorProps) {
     } catch (error) {
       console.error('Save to R2 error:', error);
       setSaveError(error instanceof Error ? error.message : 'Gagal menyimpan kandungan');
+      setSaveError(error instanceof Error ? error.message : 'Gagal menyimpan kandungan'); // Formal Malay for "Failed to save content"
     } finally {
       setIsLoading(false);
     }
@@ -219,7 +226,7 @@ function TextEditorContent({ className }: TextEditorProps) {
           title="Kembali ke Papan Kawalan"
         >
           <span className="text-lg">🔙</span>
-          <span>Kembali ke Papan Kawalan</span>
+          <span>Kembali ke Papan Kawalan</span> {/* Formal Malay for "Back to Dashboard" */}
         </a>
       </div>
       {/* End: Back Navigation Button */}
@@ -228,7 +235,7 @@ function TextEditorContent({ className }: TextEditorProps) {
       <div className="bg-gray-800 border-b-2 border-gray-300 px-4 py-3 flex items-center justify-between flex-shrink-0 pt-14">
         <div className="flex items-center space-x-3">
           <h2 className="text-lg font-bold text-gray-200 pixel-font">
-            {filename || 'Editor Fail'}
+            {filename || 'Editor Fail'} {/* Formal Malay for "File Editor" */}
           </h2>
           {isSaved && (
             <span className="text-xs text-green-400 pixel-font">✓ Disimpan</span>
@@ -237,8 +244,7 @@ function TextEditorContent({ className }: TextEditorProps) {
             <span className="text-xs text-red-400 pixel-font">{saveError}</span>
           )}
         </div>
-        <div className="flex items-center space-x-2">
-          <MediaEmbedHelper onInsertEmbed={handleInsertEmbed} />
+        <div className="flex items-center space-x-2"> {/* Start: MediaEmbedHelper moved below for split view */}
           <PublishSiteButton
             filename={filename}
             content={content}
@@ -250,13 +256,13 @@ function TextEditorContent({ className }: TextEditorProps) {
             disabled={isLoading}
             className="retro-btn-primary flex items-center gap-2 px-3 py-2 pixel-font text-xs disabled:opacity-50"
           >
-            {isLoading ? 'MENYIMPAN...' : 'SIMPAN'}
+            {isLoading ? 'MENYIMPAN...' : 'SIMPAN'} {/* Formal Malay for "Saving..." and "Save" */}
           </button>
           <button
             onClick={handleRename}
             className="retro-btn-secondary px-3 py-2 pixel-font text-xs"
           >
-            TUKAR NAMA
+            TUKAR NAMA {/* Formal Malay for "Rename" */}
           </button>
         </div>
       </div>
@@ -282,16 +288,24 @@ function TextEditorContent({ className }: TextEditorProps) {
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 className="w-full h-full bg-gray-900 text-gray-100 font-mono text-sm p-4 resize-none outline-none border-2 border-gray-600 rounded-b-lg"
-                placeholder="Masukkan kandungan HTML anda di sini..."
+                placeholder="Masukkan kandungan HTML anda di sini..." // Formal Malay for "Enter your HTML content here..."
                 spellCheck={false}
               />
             </div>
           </div>
+          {/* Start: Media Embed Helper below editor on mobile, alongside on desktop */}
+          <div className="m-2 md:m-4 md:hidden"> {/* Only show on mobile, hidden on desktop */}
+            <MediaEmbedHelper onInsertEmbed={handleInsertEmbed} />
+          </div>
+          {/* End: Media Embed Helper */}
         </div>
         {/* End: Editor Panel */}
 
         {/* Start: Preview Panel (Right on Desktop, Bottom on Mobile) */}
-        <div className="flex-1 flex flex-col min-h-0 md:max-w-1/2 lg:max-w-2/5">
+        <div className="flex-1 flex flex-col min-h-0 md:max-w-1/2 lg:max-w-2/5"> {/* Start: Responsive width for preview */}
+          <div className="m-2 md:m-4 hidden md:block"> {/* Only show on desktop, hidden on mobile */}
+            <MediaEmbedHelper onInsertEmbed={handleInsertEmbed} />
+          </div>
           <EditorHtmlPreview content={content} />
         </div>
         {/* End: Preview Panel */}
@@ -303,7 +317,7 @@ function TextEditorContent({ className }: TextEditorProps) {
         <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-gray-800 p-6 rounded-lg border-2 border-gray-600">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto mb-2" />
-            <p className="text-gray-300 pixel-font text-sm">Memuat naik ke Cloudflare R2...</p>
+            <p className="text-gray-300 pixel-font text-sm">Memuat naik ke Cloudflare R2...</p> {/* Formal Malay for "Uploading to Cloudflare R2..." */}
           </div>
         </div>
       )}
@@ -318,7 +332,7 @@ export default function TextEditorPage() {
       <div className="flex min-h-screen items-center justify-center bg-gray-900">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4" />
-          <p className="text-gray-400 pixel-font">Memuat editor...</p>
+          <p className="text-gray-400 pixel-font">Memuat editor...</p> {/* Formal Malay for "Loading editor..." */}
         </div>
       </div>
     }>

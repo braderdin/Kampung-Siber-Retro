@@ -31,6 +31,7 @@ export function useEditorAutosave({
   const clearAutosavedContent = useCallback(() => {
     if (filename) {
       localStorage.removeItem(`editor_autosave_${filename}`);
+      console.log(`[Autosave] Cleared autosaved content for ${filename}`); // Start: Log clear action
     }
   }, [filename]);
   // End: Clear Autosaved Content Function
@@ -98,7 +99,9 @@ export function useEditorAutosave({
             lastSavedContentRef.current = parsed.content;
           } else {
             // Clear expired autosave
+            // Abangku, expired autosaved content is cleared to prevent loading old data.
             localStorage.removeItem(`editor_autosave_${filename}`);
+            console.log(`[Autosave] Cleared expired autosaved content for ${filename}`); // Start: Log expired clear action
           }
         }
       }
@@ -138,6 +141,7 @@ export function clearAllEditorAutosaves(): void {
   Object.keys(localStorage).forEach(key => {
     if (key.startsWith('editor_autosave_')) {
       localStorage.removeItem(key);
+      console.log(`[Autosave] Cleared all autosaved content for key: ${key}`); // Start: Log all clear action
     }
   });
 }

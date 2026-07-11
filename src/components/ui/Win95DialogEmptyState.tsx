@@ -1,7 +1,8 @@
 // Start: Windows 95 Style Empty State Dialog Component
 "use client";
 
-interface Win95DialogEmptyStateProps {
+// Start: Win95DialogEmptyState Props Interface
+interface Win95DialogEmptyStateProps { 
   message: string;
   secondaryActionRoute?: string;
   className?: string;
@@ -46,7 +47,7 @@ export default function Win95DialogEmptyState({
           text-sm font-bold
           flex items-center justify-center
         ">
-          <span className="font-pixel">Sistem Maklumat</span>
+          <span className="font-pixel">Sistem Maklumat</span> {/* Formal Malay for "Information System" */}
         </div>
         {/* End: Dialog Title Bar */}
         
@@ -74,7 +75,7 @@ export default function Win95DialogEmptyState({
               active:border-t-gray-700 active:border-l-gray-700 active:border-b-white active:border-r-white
               transition-colors
             "
-            onClick={() => {}}
+            onClick={() => {}} // Abangku, this button currently does nothing. Consider adding a default action like closing the dialog or navigating back.
           >
             OK
           </button>
@@ -93,7 +94,7 @@ export default function Win95DialogEmptyState({
               "
               onClick={handleSecondaryAction}
             >
-              Buka Editor
+              Buka Editor {/* Formal Malay for "Open Editor" */}
             </button>
           )}
         </div>

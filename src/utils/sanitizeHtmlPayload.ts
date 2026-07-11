@@ -26,14 +26,13 @@ const DEFAULT_ALLOWED_TAGS = [
 // Start: Default Allowed Attributes
 const DEFAULT_ALLOWED_ATTRIBUTES: Record<string, string[]> = {
   '*': ['class', 'id', 'style'],
-  'a': ['href', 'title', 'target', 'rel'],
+  '*': ['class', 'id', 'style', 'data-*'], // Start: Added data-* for all elements
+  'a': ['href', 'title', 'target', 'rel'], 
   'img': ['src', 'alt', 'width', 'height'],
-  'iframe': ['src', 'width', 'height', 'frameborder', 'allowfullscreen', 'allow', 'loading'],
-  'meta': ['charset', 'name', 'content', 'viewport'],
+  'iframe': ['src', 'width', 'height', 'frameborder', 'allowfullscreen', 'allow', 'loading', 'sandbox'], // Start: Added sandbox attribute for iframe
+  'meta': ['charset', 'name', 'content', 'viewport', 'http-equiv'], // Start: Added http-equiv for meta tags
   'link': ['rel', 'href', 'type'],
   'script': ['src', 'type', 'async', 'defer'],
-  'div': ['data-*'],
-  'span': ['data-*'],
 };
 // End: Default Allowed Attributes
 
@@ -52,7 +51,7 @@ export function sanitizeHtmlPayload(
   const originalLength = htmlContent.length;
   
   if (originalLength > maxLength) {
-    throw new Error(`Kandungan HTML melebihi had ${maxLength / 1024}KB`);
+    throw new Error(`Kandungan HTML melebihi had ${maxLength / 1024}KB`); // Formal Malay for "HTML content exceeds limit"
   }
   // End: Length Validation
 
@@ -60,7 +59,12 @@ export function sanitizeHtmlPayload(
   const config: DOMPurify.Config = {
     ALLOWED_TAGS: allowedTags,
     ALLOWED_ATTR: Object.values(allowedAttributes).flat(),
+    ALLOWED_ATTR: Object.keys(allowedAttributes).reduce((acc: string[], tag) => { // Start: Flatten all allowed attributes
+      return acc.concat(allowedAttributes[tag]);
+    }, []),
     ADD_ATTR: ['target', 'rel'],
+    FORBID_TAGS: ['form'], // Start: Explicitly forbid form tags for security
+    FORBID_ATTR: ['formaction', 'formmethod', 'formtarget', 'formnovalidate', 'formenctype'], // Start: Forbid form-related attributes
   };
   // End: DOMPurify Configuration
 
@@ -122,13 +126,18 @@ export function validateHtmlStructure(htmlContent: string): { valid: boolean; er
     /document\.cookie/i,
     /localStorage\.setItem/i,
     /sessionStorage\.setItem/i,
+    /window\.top\.location/i, // Start: Added more dangerous patterns
+    /window\.parent\.location/i,
+    /eval\(/i,
+    /document\.write/i,
+    /document\.createElement\('script'\)/i,
   ];
 
   for (const pattern of dangerousPatterns) {
     if (pattern.test(htmlContent)) {
       return {
         valid: false,
-        error: 'Kandungan tidak selamat - elem yang dilarang terdeteksi',
+        error: 'Kandungan tidak selamat - elem yang dilarang terdeteksi', // Formal Malay for "Unsafe content - forbidden element detected"
       };
     }
   }
@@ -142,7 +151,7 @@ export function validateHtmlStructure(htmlContent: string): { valid: boolean; er
 export function sanitizeCssPayload(cssContent: string, maxLength: number = 100 * 1024): string {
   // Length validation
   if (cssContent.length > maxLength) {
-    throw new Error(`Kandungan CSS melebihi had ${maxLength / 1024}KB`);
+    throw new Error(`Kandungan CSS melebihi had ${maxLength / 1024}KB`); // Formal Malay for "CSS content exceeds limit"
   }
 
   // Remove dangerous patterns
@@ -155,6 +164,11 @@ export function sanitizeCssPayload(cssContent: string, maxLength: number = 100 *
   // Remove url() with dangerous protocols
   sanitized = sanitized.replace(/url\s*\(\s*['"]?javascript:/gi, "url('data:text/html,')");
 
+  // Start: Additional CSS Sanitization - Remove @import and @font-face for security
+  sanitized = sanitized.replace(/@import\s*['"]?[^'"]+['"]?;/gi, '');
+  sanitized = sanitized.replace(/@font-face\s*{[^}]*}/gi, '');
+  // End: Additional CSS Sanitization
+
   return sanitized;
 }
 // End: Sanitize CSS Function
@@ -163,7 +177,7 @@ export function sanitizeCssPayload(cssContent: string, maxLength: number = 100 *
 export function sanitizeJsPayload(jsContent: string, maxLength: number = 100 * 1024): string {
   // Length validation
   if (jsContent.length > maxLength) {
-    throw new Error(`Kandungan JavaScript melebihi had ${maxLength / 1024}KB`);
+    throw new Error(`Kandungan JavaScript melebihi had ${maxLength / 1024}KB`); // Formal Malay for "JavaScript content exceeds limit"
   }
 
   // Basic sanitization - in production use proper JS parser
@@ -173,6 +187,13 @@ export function sanitizeJsPayload(jsContent: string, maxLength: number = 100 * 1
     'document.cookie',
     'localStorage.setItem("',
     'sessionStorage.setItem("',
+    'window.top.location',
+    'window.parent.location',
+    'document.write',
+    'document.createElement("script")',
+    'fetch(', // Start: Added more dangerous patterns
+    'XMLHttpRequest',
+    'WebSocket',
   ];
 
   let sanitized = jsContent;
@@ -192,6 +213,7 @@ export function getFileTypeFromFilename(filename: string): 'html' | 'css' | 'jav
   
   switch (ext) {
     case 'html':
+    case 'htm': // Start: Added .htm extension
       return 'html';
     case 'css':
       return 'css';

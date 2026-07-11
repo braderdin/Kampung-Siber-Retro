@@ -1,7 +1,7 @@
 // Start: Cloudflare R2 Storage Upload Handler for Text Editor
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { sanitizeHtmlPayload, sanitizeCssPayload, sanitizeJsPayload } from '@/utils/sanitizeHtmlPayload';
+import { sanitizeHtmlPayload, sanitizeCssPayload, sanitizeJsPayload, getFileTypeFromFilename } from '@/utils/sanitizeHtmlPayload'; // Start: Import Sanitization Utilities
 
 const MAX_FILE_SIZE = 4.5 * 1024 * 1024;
 const MAX_TEXT_SIZE = 500 * 1024; // 500KB for text content
@@ -52,6 +52,7 @@ async function authenticateSession(req: NextRequest): Promise<{ authenticated: b
     return { authenticated: true, userId: user.id };
   } catch (error) {
     console.error('Session authentication error:', error);
+    // Formal Malay: "Ralat pengesahan sesi umum."
     return { authenticated: false };
   }
 }
@@ -99,7 +100,7 @@ const sanitizeFileName = (fileName: string): string => {
 
 // Start: Content Type Detection Function
 const getContentTypeForSanitization = (mimeType: string): 'html' | 'css' | 'javascript' | 'unknown' => {
-  if (mimeType === 'text/html') return 'html';
+  if (mimeType === 'text/html' || mimeType === 'application/xhtml+xml') return 'html'; // Start: Added xhtml+xml
   if (mimeType === 'text/css') return 'css';
   if (mimeType === 'text/javascript') return 'javascript';
   return 'unknown';
@@ -115,7 +116,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<UploadRespons
     if (!authenticated) {
       return NextResponse.json({
         success: false,
-        error: 'Pengesahan diperlukan untuk muat naik fail',
+        error: 'Pengesahan diperlukan untuk muat naik fail', // Formal Malay for "Authentication required for file upload"
         size: 0,
       }, { status: 401 });
     }
@@ -127,11 +128,11 @@ export async function POST(req: NextRequest): Promise<NextResponse<UploadRespons
       JSON.parse(formData.get("metadata") as string) : {};
     
     // Start: Safe Content Length Check
-    const contentLength = req.headers.get('content-length');
-    if (contentLength && parseInt(contentLength) > R2_FREE_TIER_LIMIT) {
+    const contentLengthHeader = req.headers.get('content-length');
+    if (contentLengthHeader && parseInt(contentLengthHeader) > MAX_FILE_SIZE) { // Use MAX_FILE_SIZE for binary uploads
       return NextResponse.json({
         success: false,
-        error: `Saiz kandungan melebihi had ${R2_FREE_TIER_LIMIT / 1024 / 1024}MB (Cloudflare free tier)`,
+        error: `Saiz fail melebihi had ${MAX_FILE_SIZE / 1024 / 1024}MB`, // Formal Malay for "File size exceeds limit"
         size: 0,
       }, { status: 413 });
     }
@@ -140,7 +141,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<UploadRespons
     if (!file) {
       return NextResponse.json({
         success: false,
-        error: "Tiada fail yang diserakan",
+        error: "Tiada fail yang diserakan", // Formal Malay for "No file submitted"
         size: 0,
       }, { status: 400 });
     }
@@ -155,23 +156,26 @@ export async function POST(req: NextRequest): Promise<NextResponse<UploadRespons
       }, { status: 400 });
     }
 
-    // Start: Content Sanitization for HTML/CSS/JS
-    let sanitizedContent = content;
-    const contentType = getContentTypeForSanitization(file.type);
-    
-    if (contentType !== 'unknown' && content) {
+    // Start: Content Sanitization for Text-based Files (POST)
+    let fileContentBuffer = await file.arrayBuffer();
+    let fileContentString: string | undefined;
+
+    if (validation.mimeType.startsWith('text/') || validation.mimeType === 'application/json' || validation.mimeType === 'application/xhtml+xml') {
+      fileContentString = Buffer.from(fileContentBuffer).toString('utf8');
+      const contentType = getContentTypeForSanitization(validation.mimeType);
       try {
         const sanitizationResult = contentType === 'html' 
-          ? sanitizeHtmlPayload(content)
+          ? sanitizeHtmlPayload(fileContentString)
           : contentType === 'css'
-          ? sanitizeCssPayload(content)
-          : sanitizeJsPayload(content);
-        sanitizedContent = sanitizationResult.sanitized || sanitizationResult;
+          ? sanitizeCssPayload(fileContentString)
+          : sanitizeJsPayload(fileContentString); // Assuming JS for other text types if not HTML/CSS
+        fileContentString = sanitizationResult.sanitized || sanitizationResult;
+        fileContentBuffer = Buffer.from(fileContentString, 'utf8'); // Update buffer with sanitized content
       } catch (sanitizeError) {
         console.error('Sanitization error:', sanitizeError);
         return NextResponse.json({
           success: false,
-          error: sanitizeError instanceof Error ? sanitizeError.message : 'Pemprosesan kandungan tidak selamat',
+          error: sanitizeError instanceof Error ? sanitizeError.message : 'Pemprosesan kandungan tidak selamat', // Formal Malay for "Unsafe content processing"
           size: 0,
         }, { status: 400 });
       }
@@ -179,7 +183,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<UploadRespons
     // End: Content Sanitization
 
     const sanitizedFileName = sanitizeFileName(file.name);
-    const timestamp = Date.now();
+    // const timestamp = Date.now(); // Not used, can be removed
     const fileKey = `${userId}/${sanitizedFileName}`;
 
     // Start: R2 Upload Logic (Mock Implementation)
@@ -187,26 +191,28 @@ export async function POST(req: NextRequest): Promise<NextResponse<UploadRespons
       // Placeholder for actual R2 implementation
       // const r2Client = new S3Client({ ... });
       // await r2Client.send(command);
+      console.log(`Mock R2 POST upload for file: ${fileKey}, size: ${fileContentBuffer.byteLength}`);
     } catch (r2Error) {
       console.error('R2 upload error:', r2Error);
+      return NextResponse.json({ success: false, error: 'Gagal memuat naik fail ke simpanan', size: 0 }, { status: 500 }); // Formal Malay for "Failed to upload file to storage"
     }
     // End: R2 Upload Logic
 
     const uploadResponse: UploadResponse = {
       success: true,
       url: `${R2_ENDPOINT}/${R2_BUCKET_NAME}/${fileKey}`,
-      key: fileKey,
-      size: validation.size,
+      key: fileKey, // Start: Use fileContentBuffer.byteLength for actual size
+      size: fileContentBuffer.byteLength,
     };
 
     return NextResponse.json(uploadResponse, { status: 200 });
 
   } catch (error) {
     console.error("Error processing upload:", error);
-    
+    // Formal Malay: "Gagal memproses muat naik."
     return NextResponse.json({
       success: false,
-      error: "Gagal memproses muat naik",
+      error: "Gagal memproses muat naik", // Formal Malay for "Failed to process upload"
       size: 0,
     }, { status: 500 });
   }
@@ -222,7 +228,7 @@ export async function PUT(req: NextRequest): Promise<NextResponse<UploadResponse
     if (!authenticated) {
       return NextResponse.json({
         success: false,
-        error: 'Pengesahan diperlukan untuk mengemas kini kandungan',
+        error: 'Pengesahan diperlukan untuk mengemas kini kandungan', // Formal Malay for "Authentication required to update content"
         size: 0,
       }, { status: 401 });
     }
@@ -236,7 +242,7 @@ export async function PUT(req: NextRequest): Promise<NextResponse<UploadResponse
     if (!fileName) {
       return NextResponse.json({
         success: false,
-        error: "Nama fail diperlukan",
+        error: "Nama fail diperlukan", // Formal Malay for "File name is required"
         size: 0,
       }, { status: 400 });
     }
@@ -244,17 +250,17 @@ export async function PUT(req: NextRequest): Promise<NextResponse<UploadResponse
     if (!content && content !== '') {
       return NextResponse.json({
         success: false,
-        error: "Kandungan fail diperlukan",
+        error: "Kandungan fail diperlukan", // Formal Malay for "File content is required"
         size: 0,
       }, { status: 400 });
     }
 
     // Validate content size with Cloudflare free tier safety check
     const contentSize = Buffer.byteLength(content || '', 'utf8');
-    if (contentSize > R2_FREE_TIER_LIMIT) {
+    if (contentSize > MAX_TEXT_SIZE) { // Use MAX_TEXT_SIZE for text content
       return NextResponse.json({
         success: false,
-        error: `Saiz kandungan melebihi had ${R2_FREE_TIER_LIMIT / 1024 / 1024}MB (Cloudflare free tier)`,
+        error: `Saiz kandungan melebihi had ${MAX_TEXT_SIZE / 1024}KB`, // Formal Malay for "Content size exceeds limit"
         size: contentSize,
       }, { status: 413 });
     }
@@ -262,7 +268,7 @@ export async function PUT(req: NextRequest): Promise<NextResponse<UploadResponse
 
     // Start: Content Sanitization Integration
     let sanitizedContent = content;
-    const contentType = getContentTypeForSanitization(mimeType || 'text/html');
+    const contentType = getContentTypeForSanitization(mimeType || getFileTypeFromFilename(fileName)); // Start: Use helper to detect if mimeType is not provided
     
     if (contentType !== 'unknown') {
       try {
@@ -276,7 +282,7 @@ export async function PUT(req: NextRequest): Promise<NextResponse<UploadResponse
         console.error('Sanitization error:', sanitizeError);
         return NextResponse.json({
           success: false,
-          error: sanitizeError instanceof Error ? sanitizeError.message : 'Kandungan tidak selamat',
+          error: sanitizeError instanceof Error ? sanitizeError.message : 'Kandungan tidak selamat', // Formal Malay for "Unsafe content"
           size: contentSize,
         }, { status: 400 });
       }
@@ -291,9 +297,11 @@ export async function PUT(req: NextRequest): Promise<NextResponse<UploadResponse
     try {
       // Placeholder for actual R2 implementation
       // const r2Client = new S3Client({ ... });
+      console.log(`Mock R2 PUT upload for file: ${fileKey}, size: ${contentSize}`);
       // await r2Client.send(command);
     } catch (r2Error) {
       console.error('R2 text upload error:', r2Error);
+      return NextResponse.json({ success: false, error: 'Gagal mengemas kini kandungan fail ke simpanan', size: contentSize }, { status: 500 }); // Formal Malay for "Failed to update file content to storage"
     }
     // End: R2 Text Content Upload Logic
 
@@ -311,7 +319,7 @@ export async function PUT(req: NextRequest): Promise<NextResponse<UploadResponse
     
     return NextResponse.json({
       success: false,
-      error: "Gagal mengemas kini kandungan fail",
+      error: "Gagal mengemas kini kandungan fail", // Formal Malay for "Failed to update file content"
       size: 0,
     }, { status: 500 });
   }
@@ -330,7 +338,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   } catch (error) {
     return NextResponse.json({
       success: false,
-      error: "Gagal mendapatkan tetapan muat naik",
+      error: "Gagal mendapatkan tetapan muat naik", // Formal Malay for "Failed to get upload settings"
     }, { status: 500 });
   }
 }
@@ -344,7 +352,7 @@ const validateFile = async (file: File): Promise<FileValidation> => {
   if (size > MAX_FILE_SIZE) {
     return {
       valid: false,
-      error: `Saiz fail melebihi had 4.5MB (${(size / 1024 / 1024).toFixed(2)}MB)`,
+      error: `Saiz fail melebihi had ${MAX_FILE_SIZE / 1024 / 1024}MB (${(size / 1024 / 1024).toFixed(2)}MB)`, // Formal Malay for "File size exceeds limit"
       size,
       mimeType,
     };
@@ -353,7 +361,7 @@ const validateFile = async (file: File): Promise<FileValidation> => {
   if (!ALLOWED_MIME_TYPES.includes(mimeType)) {
     return {
       valid: false,
-      error: `Jenis fail ${mimeType} tidak dibenarkan`,
+      error: `Jenis fail ${mimeType} tidak dibenarkan`, // Formal Malay for "File type not allowed"
       size,
       mimeType,
     };
@@ -362,7 +370,7 @@ const validateFile = async (file: File): Promise<FileValidation> => {
   if (size === 0) {
     return {
       valid: false,
-      error: "Fail tidak sah (saiz sifar)",
+      error: "Fail tidak sah (saiz sifar)", // Formal Malay for "Invalid file (zero size)"
       size,
       mimeType,
     };

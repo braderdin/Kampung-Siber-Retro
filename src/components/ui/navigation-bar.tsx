@@ -4,7 +4,8 @@
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { enDictionary, msDictionary } from '@/i18n/dictionaries';
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation'; 
+import { createClient } from '@supabase/supabase-js'; // Start: Import Supabase client
 
 interface ToolbarItem {
   name: string;
@@ -16,11 +17,18 @@ interface NavigationBarProps {
   className?: string;
 }
 
+// Start: Supabase Client Initialization
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_KEY || 'placeholder-key';
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// End: Supabase Client Initialization
+
 export default function NavigationBar({ className }: NavigationBarProps) {
   const { language, setLanguage } = useLanguageStore();
   const router = useRouter();
   const [isToolbarOpen, setIsToolbarOpen] = useState(false);
   const [isCrtEnabled, setIsCrtEnabled] = useState(false);
+  const [userProfileLink, setUserProfileLink] = useState<ToolbarItem | null>(null); // Start: State for dynamic user profile link
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const t = language === 'ms' ? msDictionary : enDictionary;
@@ -36,10 +44,51 @@ export default function NavigationBar({ className }: NavigationBarProps) {
           document.documentElement.classList.add('dark');
         }
       } catch (e) {}
+      catch (e) {
+        console.error('Failed to load theme from localStorage:', e); // Start: Error logging
+      }
     };
     loadDataFromStorage();
   }, []);
   // End: Load CRT Theme State
+
+  // Start: Fetch User Session and Set Profile Link
+  useEffect(() => {
+    const fetchSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          const username = session.user.user_metadata?.user_name || session.user.id; // Use user_name if available, fallback to id
+          setUserProfileLink({
+            name: 'Laman Saya', // Formal Malay for "My Site"
+            icon: '👤',
+            action: () => router.push(`/site/${username}`),
+          });
+        } else {
+          setUserProfileLink(null); // Clear link if no user
+        }
+      } catch (error) {
+        console.error('Failed to fetch Supabase session:', error); // Start: Error logging
+        setUserProfileLink(null);
+      }
+    };
+
+    fetchSession();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        const username = session.user.user_metadata?.user_name || session.user.id;
+        setUserProfileLink({ name: 'Laman Saya', icon: '👤', action: () => router.push(`/site/${username}`) });
+      } else {
+        setUserProfileLink(null);
+      }
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, [router]);
+  // End: Fetch User Session and Set Profile Link
 
   // Start: Click Outside Handler
   useEffect(() => {
@@ -56,7 +105,7 @@ export default function NavigationBar({ className }: NavigationBarProps) {
   // Start: Language Toggle Handler
   const handleLanguageToggle = () => {
     const newLang = language === 'en' ? 'ms' : 'en';
-    setLanguage(newLang);
+    setLanguage(newLang); // Formal Malay for "Bahasa Malaysia" / "English"
   };
   // End: Language Toggle Handler
 
@@ -91,6 +140,10 @@ export default function NavigationBar({ className }: NavigationBarProps) {
       action: () => router.push('/dashboard'),
     },
   ];
+  // Start: Conditionally Add User Profile Link
+  if (userProfileLink) {
+    toolbarItems.splice(2, 0, userProfileLink); // Insert before dashboard link
+  }
   // End: Utility Toolbar Items
 
   return (

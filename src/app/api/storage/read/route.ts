@@ -57,7 +57,7 @@ export async function GET(req: NextRequest): Promise<NextResponse<FileContentRes
   if (!authenticated) {
     return NextResponse.json({
       success: false,
-      error: 'Pengesahan diperlukan untuk mengakses simpanan',
+      error: 'Pengesahan diperlukan untuk mengakses simpanan', // Formal Malay for "Authentication required to access storage"
       errorCode: 401,
     }, { status: 401 });
   }
@@ -70,7 +70,7 @@ export async function GET(req: NextRequest): Promise<NextResponse<FileContentRes
   if (!filename) {
     return NextResponse.json({
       success: false,
-      error: 'Parameter fail (filename) diperlukan',
+      error: 'Parameter fail (filename) diperlukan', // Formal Malay for "File parameter (filename) is required"
       errorCode: 400,
     }, { status: 400 });
   }
@@ -84,7 +84,7 @@ export async function GET(req: NextRequest): Promise<NextResponse<FileContentRes
   if (!sanitizedFilename) {
     return NextResponse.json({
       success: false,
-      error: 'Nama fail tidak sah',
+      error: 'Nama fail tidak sah', // Formal Malay for "Invalid file name"
       errorCode: 400,
     }, { status: 400 });
   }
@@ -98,6 +98,7 @@ export async function GET(req: NextRequest): Promise<NextResponse<FileContentRes
 
   try {
     // Placeholder for actual R2 implementation
+    // Abangku, this is where the actual R2 fetch logic would go.
     if (sanitizedFilename === 'index.html') {
       fileContent = `<!DOCTYPE html>
 <html lang="ms">
@@ -126,10 +127,16 @@ export async function GET(req: NextRequest): Promise<NextResponse<FileContentRes
 <body>
   <div class="container">
     <h1>Selamat Datang ke Teratak Saya!</h1>
-    <p>Halaman ini mempunyai kandungan dari Cloudflare R2.</p>
+        <p>Halaman ini mempunyai kandungan dari Cloudflare R2.</p>
   </div>
 </body>
 </html>`;
+      fileSize = fileContent.length;
+    } else if (sanitizedFilename === 'style.css') { // Start: Mock content for CSS
+      fileContent = `body { background-color: #282c34; color: #abb2bf; }`;
+      fileSize = fileContent.length;
+    } else if (sanitizedFilename === 'script.js') { // Start: Mock content for JS
+      fileContent = `console.log('Hello from R2 script!');`;
       fileSize = fileContent.length;
     }
   } catch (r2Error) {
@@ -143,7 +150,7 @@ export async function GET(req: NextRequest): Promise<NextResponse<FileContentRes
   if (!fileContent) {
     return NextResponse.json({
       success: false,
-      error: 'Fail tidak dijumpai dalam simpanan',
+      error: 'Fail tidak dijumpai dalam simpanan', // Formal Malay for "File not found in storage"
       errorCode: 404,
     }, { status: 404 });
   }
@@ -166,7 +173,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<FileContentRe
     if (!authenticated) {
       return NextResponse.json({
         success: false,
-        error: 'Pengesahan diperlukan untuk mengakses simpanan',
+        error: 'Pengesahan diperlukan untuk mengakses simpanan', // Formal Malay for "Authentication required to access storage"
         errorCode: 401,
       }, { status: 401 });
     }
@@ -177,7 +184,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<FileContentRe
     if (!filename) {
       return NextResponse.json({
         success: false,
-        error: 'Nama fail diperlukan',
+        error: 'Nama fail diperlukan', // Formal Malay for "File name is required"
         errorCode: 400,
       }, { status: 400 });
     }
@@ -211,7 +218,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<FileContentRe
     console.error('Storage read POST error:', error);
     return NextResponse.json({
       success: false,
-      error: 'Gagal membaca fail',
+      error: 'Gagal membaca fail', // Formal Malay for "Failed to read file"
       errorCode: 500,
     }, { status: 500 });
   }
