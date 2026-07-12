@@ -1,7 +1,11 @@
-// Start: Root Layout with Provider Optimizations for Next.js 15 App Router
+// Start: Root Layout mounting Global Retro Navigation + Footer (Next.js 15 App Router)
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import "../styles/retro.css";
+import RetroNavbar from "@/components/RetroNavbar";
+import RetroFooter from "@/components/RetroFooter";
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -16,14 +20,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
-        {/* Start: Main Application Wrapper */}
-        <div className="min-h-screen bg-background text-foreground antialiased">
+      {/* Start: Application Shell with Mounted Navbar + Footer */}
+      <body className={`${inter.className} min-h-full flex flex-col antialiased`}>
+        <RetroNavbar />
+        <main className="flex-1 pt-16">
           {children}
-        </div>
-        {/* End: Main Application Wrapper */}
+        </main>
+        <RetroFooter />
       </body>
+      {/* End: Application Shell with Mounted Navbar + Footer */}
     </html>
   );
 }
-// End: Root Layout with Provider Optimizations
+// End: Root Layout mounting Global Retro Navigation + Footer

@@ -1,6 +1,7 @@
 // Start: Imports
 "use client";
 
+import { useRouter } from 'next/navigation';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { enDictionary, msDictionary } from '@/i18n/dictionaries';
 import FooterLinks from './footer-links';
@@ -23,84 +24,45 @@ const LEGAL_ROUTES = [
 
 // Start: RetroFooter Component
 export default function RetroFooter({ className }: RetroFooterProps) {
+  const router = useRouter();
   const { language } = useLanguageStore();
   const t = language === 'ms' ? msDictionary : enDictionary;
 
-  // Start: Get Footer Links
-  const footerLinks = FooterLinks();
-  // End: Get Footer Links
+  // Start: Get Sectioned Footer Links
+  const sections = FooterLinks();
+  // End: Get Sectioned Footer Links
 
-  // Start: Handle Navigation
+  // Start: Handle Navigation (SPA-friendly)
   const handleNavigation = (href: string) => {
-    window.location.href = href;
+    router.push(href);
   };
   // End: Handle Navigation
 
-  // Start: Render RetroFooter */}
+  // Start: Render RetroFooter
   return (
     <footer className={`bg-gray-100 dark:bg-gray-900 border-t border-gray-300 dark:border-gray-700 py-6 ${className || ''}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Start: Footer Grid Structure */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Start: Dashboard Section */}
-          <div>
-            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-              {t.dashboardTitle}
-            </h4>
-            <ul className="space-y-2">
-              {footerLinks.slice(0, 3).map((link) => (
-                <li key={link.href}>
-                  <button
-                    onClick={() => handleNavigation(link.href)}
-                    className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-gray-100"
-                  >
-                    {link.name}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-          {/* End: Dashboard Section */}
-
-          {/* Start: Settings Section */}
-          <div>
-            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-              {t.settings}
-            </h4>
-            <ul className="space-y-2">
-              {footerLinks.slice(3, 5).map((link) => (
-                <li key={link.href}>
-                  <button
-                    onClick={() => handleNavigation(link.href)}
-                    className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-gray-100"
-                  >
-                    {link.name}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-          {/* End: Settings Section */}
-
-          {/* Start: Guestbook Section */}
-          <div>
-            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-              {t.guestbookTitle}
-            </h4>
-            <ul className="space-y-2">
-              {footerLinks.slice(5).map((link) => (
-                <li key={link.href}>
-                  <button
-                    onClick={() => handleNavigation(link.href)}
-                    className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-gray-100"
-                  >
-                    {link.name}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-          {/* End: Guestbook Section */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {sections.map((section) => (
+            <div key={section.title}>
+              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                {section.title}
+              </h4>
+              <ul className="space-y-2">
+                {section.links.map((link) => (
+                  <li key={link.href}>
+                    <button
+                      onClick={() => handleNavigation(link.href)}
+                      className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+                    >
+                      {link.name}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
         {/* End: Footer Grid Structure */}
 

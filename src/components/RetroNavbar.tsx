@@ -67,9 +67,8 @@ export default function RetroNavbar() {
   // End: Navigation Handler
 
   // Start: Help Links Configuration
-  const helpLinks = [
+   const helpLinks = [
     { name: 'Help Center', href: '/help', icon: '❓' },
-    { name: 'FAQ', href: '/faq', icon: '📋' },
     { name: 'System Status', href: '/status', icon: '📡' },
     { name: 'Contact Support', href: '/contact', icon: '📧' },
   ];
@@ -129,9 +128,54 @@ export default function RetroNavbar() {
           </div>
           {/* End: Mobile Menu Button */}
 
-          {/* Start: Controls Container - Removed Random Explorer button for streamlined header */}
+          {/* Start: Controls Container - Desktop Help dropdown + theme toggle */}
           <div className="flex items-center space-x-2">
-            {/* Controls removed - moved to navigation-bar.tsx toolbar for top-right positioning */}
+            {/* Start: Desktop Help Dropdown */}
+            <div className="hidden md:block relative">
+              <button
+                onClick={() => setHelpDropdownOpen(!helpDropdownOpen)}
+                className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors text-gray-300 hover:text-white hover:bg-cyan-500/10 dark:text-gray-400 dark:hover:text-white dark:hover:bg-cyan-500/10"
+                aria-haspopup="true"
+                aria-expanded={helpDropdownOpen}
+              >
+                <span className="text-lg inline-flex items-center justify-center w-5 h-5">❓</span>
+                <span className="hidden sm:inline inline-flex items-center gap-1 align-middle">Help</span>
+                <span className="text-xs">{helpDropdownOpen ? '▲' : '▼'}</span>
+              </button>
+              {helpDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-52 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black/5 dark:ring-gray-700 py-1 z-50">
+                  {helpLinks.map((link) => (
+                    <button
+                      key={link.href}
+                      onClick={() => {
+                        setHelpDropdownOpen(false);
+                        router.push(link.href);
+                      }}
+                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
+                    >
+                      <span className="text-base mr-2 inline-flex items-center justify-center w-4 h-4">{link.icon}</span>
+                      <span className="inline-flex items-center gap-1 align-middle">{link.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            {/* End: Desktop Help Dropdown */}
+
+            {/* Start: Theme Toggle */}
+            <button
+              onClick={() => {
+                const next = !isDarkMode;
+                setIsDarkMode(next);
+                document.documentElement.classList.toggle('dark', next);
+                localStorage.setItem('theme', next ? 'dark' : 'light');
+              }}
+              className="flex items-center justify-center w-9 h-9 rounded-md text-sm font-medium transition-colors text-gray-300 hover:text-white hover:bg-cyan-500/10 dark:text-gray-400 dark:hover:text-white dark:hover:bg-cyan-500/10"
+              aria-label="Toggle theme"
+            >
+              <span className="text-lg">{isDarkMode ? '☀️' : '🌙'}</span>
+            </button>
+            {/* End: Theme Toggle */}
           </div>
           {/* End: Controls Container */}
         </div>

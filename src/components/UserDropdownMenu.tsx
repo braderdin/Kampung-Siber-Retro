@@ -109,8 +109,9 @@ export default function UserDropdownMenu({ className }: UserDropdownMenuProps) {
       >
         <div className="py-1" role="none">
           {/* Start: Menu Items */}
+          {/* Start: Navigation Link Refactor - fixed dead routes */}
           <button
-            onClick={() => handleNavigation('/profile')}
+            onClick={() => handleNavigation('/dashboard')}
             className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
             role="menuitem"
           >
@@ -131,7 +132,7 @@ export default function UserDropdownMenu({ className }: UserDropdownMenuProps) {
             ⚙️ {t.settings}
           </button>
           <button
-            onClick={() => handleNavigation('/stats')}
+            onClick={() => handleNavigation('/activity')}
             className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
             role="menuitem"
           >
@@ -142,8 +143,9 @@ export default function UserDropdownMenu({ className }: UserDropdownMenuProps) {
             className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700"
             role="menuitem"
           >
-            🚪 {t.greetings.hello}
+            🚪 Sign Out
           </button>
+          {/* End: Navigation Link Refactor */}
           {/* End: Menu Items */}
         </div>
       </div>
