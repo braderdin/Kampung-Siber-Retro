@@ -20,7 +20,7 @@
       "args": [
         "-y",
         "@modelcontextprotocol/server-postgres",
-        "postgresql://postgres.tevpzdlhytekfsboinyo:Sakurasasuke11%40%40@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres"
+        "postgresql://postgres.tevpzdlhytekfsboinyo:Sakurasasuke11%40%40@db.tevpzdlhytekfsboinyo.supabase.co:5432/postgres"
       ]
     }
   }
