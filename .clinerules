@@ -1,4 +1,5 @@
 # CORE EXECUTION PROTOCOL & SYSTEM CONTEXT
+* Terminal Environment: Exclusively use the native Windows PowerShell as the default terminal environment for all command executions. Do not attempt to use WSL, PowerShell 7, or Git Bash.
 * Architecture Setup: Dedicated Active Implementation Engine [ACT Mode Only].
 * Primary Model: tencent/hy3:free (via OpenRouter API).
 * Hard OpenRouter Input Limit: 262,144 tokens (Strict Safety Buffer Set At: 220,000 tokens).
