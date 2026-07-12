@@ -1,0 +1,23 @@
+# Mengabaikan folder dependency pihak ketiga (Sangat Gergasi)
+node_modules/
+jspm_packages/
+
+# Mengabaikan folder binaan automasi Next.js & Vercel
+.next/
+out/
+build/
+dist/
+
+# Mengabaikan folder penjejakan sistem dan log ralat
+.git/
+.idea/
+.vscode/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Mengabaikan fail kunci pakej yang tidak memerlukan analisis kod
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
