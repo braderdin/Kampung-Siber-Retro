@@ -22,6 +22,14 @@
         "@modelcontextprotocol/server-postgres",
         "postgresql://postgres.tevpzdlhytekfsboinyo:Sakurasasuke11%40%40@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres"
       ]
+    },
+    "redis": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-redis",
+        "redis://default:gQAAAAAAAflQAAIgcDE2OTQzZWJkZmZjMjk0NmNjYWQ3ODIzMDJlOTVkMjBlNQ@closing-imp-129360.upstash.io:6379"
+      ]
     }
   }
 }
