@@ -9,8 +9,11 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Start: GET Handler for OAuth Callback
 export async function GET(req: NextRequest): Promise<NextResponse> {
+  // Derive origin dynamically to stay aligned with configured redirect URIs
+  const requestUrl = new URL(req.url);
+  const origin = requestUrl.origin;
+
   try {
-    const requestUrl = new URL(req.url);
     const code = requestUrl.searchParams.get('code');
 
     if (code) {
@@ -19,11 +22,11 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     }
 
     // Return redirect to dashboard
-    return NextResponse.redirect('http://localhost:3000/dashboard');
+    return NextResponse.redirect(`${origin}/dashboard`);
   } catch (error) {
     console.error('Auth callback error:', error);
     // Return redirect to signin on error
-    return NextResponse.redirect('http://localhost:3000/signin');
+    return NextResponse.redirect(`${origin}/signin`);
   }
 }
 // End: GET Handler for OAuth Callback
@@ -43,9 +46,11 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     await supabase.auth.exchangeCodeForSession(code);
 
+    const origin = new URL(req.url).origin;
+
     return NextResponse.json({
       success: true,
-      redirectTo: 'http://localhost:3000/dashboard'
+      redirectTo: `${origin}/dashboard`
     }, { status: 200 });
   } catch (error) {
     console.error('Auth callback POST error:', error);
