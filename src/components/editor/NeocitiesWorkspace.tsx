@@ -4,6 +4,8 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { FOUNDER_DEFAULTS } from "@/lib/founderStarterKit";
+import DeployVictoryModal from "./DeployVictoryModal";
 
 interface NeocitiesWorkspaceProps {
   className?: string;
@@ -61,61 +63,10 @@ const NEON_CYAN =
   "bg-cyan-500 hover:bg-cyan-400 text-black font-bold shadow-[0_0_18px_rgba(0,255,255,0.5)]";
 // End: Neon field + button styles
 
-// Start: Default scaffolding for new projects
-const DEFAULT_HTML = `<!DOCTYPE html>
-<html lang="ms">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Teratak Siber Saya</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-  <main class="village">
-    <h1>Selamat Datang ke Teratak Saya!</h1>
-    <p>Ini ialah laman yang dibina dengan editor Kampung Siber Retro.</p>
-    <button id="magic">Tekan Saya</button>
-  </main>
-  <script src="script.js"></script>
-</body>
-</html>`;
-
-const DEFAULT_CSS = `:root {
-  --bg: #060814;
-  --neon: #00ffff;
-  --pink: #ff007f;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  background: var(--bg);
-  color: var(--neon);
-  font-family: "Courier New", monospace;
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-}
-.village { text-align: center; }
-h1 {
-  color: var(--pink);
-  text-shadow: 0 0 10px var(--pink);
-  margin-bottom: 1rem;
-}
-button {
-  margin-top: 1rem;
-  padding: 0.6rem 1.4rem;
-  background: var(--neon);
-  border: none;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-}`;
-
-const DEFAULT_JS = `const btn = document.getElementById("magic");
-let clicks = 0;
-btn.addEventListener("click", () => {
-  clicks++;
-  btn.textContent = \`Ditekan \${clicks} kali!\`;
-});`;
+// Start: Default scaffolding (Founder's Starter Kit — pre-loaded premium boilerplate)
+const DEFAULT_HTML = FOUNDER_DEFAULTS.html;
+const DEFAULT_CSS = FOUNDER_DEFAULTS.css;
+const DEFAULT_JS = FOUNDER_DEFAULTS.js;
 // End: Default scaffolding
 
 // Start: Build live preview document from three sources
@@ -145,6 +96,8 @@ export default function NeocitiesWorkspace({ className }: NeocitiesWorkspaceProp
   const [deploying, setDeploying] = useState(false);
   const [toast, setToast] = useState<{ kind: "ok" | "err"; msg: string } | null>(null);
   const [deployedUrl, setDeployedUrl] = useState<string | null>(null);
+  const [showVictory, setShowVictory] = useState(false);
+  const [profileUpdated, setProfileUpdated] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   // End: Local state
 
@@ -225,7 +178,10 @@ export default function NeocitiesWorkspace({ className }: NeocitiesWorkspaceProp
       if (res.ok && payload.success) {
         const items = payload.data?.files as DeployResultItem[] | undefined;
         const siteUrl = payload.data?.siteUrl as string | null;
+        const updated = Boolean(payload.data?.profileUpdated);
         setDeployedUrl(siteUrl);
+        setProfileUpdated(updated);
+        setShowVictory(true);
         setToast({ kind: "ok", msg: LABEL.deployedOk });
         void items;
       } else {
@@ -348,6 +304,15 @@ export default function NeocitiesWorkspace({ className }: NeocitiesWorkspaceProp
         )}
       </div>
       {/* End: Action bar */}
+
+      {/* Start: Neon Victory Deployment Modal */}
+      <DeployVictoryModal
+        open={showVictory}
+        siteUrl={deployedUrl}
+        profileUpdated={profileUpdated}
+        onClose={() => setShowVictory(false)}
+      />
+      {/* End: Neon Victory Deployment Modal */}
     </div>
   );
   // End: Render workspace

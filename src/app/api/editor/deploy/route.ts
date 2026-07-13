@@ -73,12 +73,20 @@ function resolveContentType(filename: string): string {
 }
 // End: Content-Type Resolution Map
 
-// Start: Public URL Builder
+// Start: Public URL Builder (Strict fail-safe validation)
 function buildPublicUrl(objectKey: string): string {
+  const safeKey = objectKey.replace(/^\/+/, "");
+  // 1. Preferred: explicit public gateway (custom domain or *.r2.dev)
   if (CLOUDFLARE_R2_PUBLIC_URL) {
-    return `${CLOUDFLARE_R2_PUBLIC_URL.replace(/\/$/, '')}/${objectKey}`;
+    return `${CLOUDFLARE_R2_PUBLIC_URL.replace(/\/$/, "")}/${safeKey}`;
   }
-  return `https://${CLOUDFLARE_R2_BUCKET_NAME}.${CLOUDFLARE_R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${objectKey}`;
+  // 2. Fallback A: bucket-level S3 object URL (works when public access enabled)
+  if (CLOUDFLARE_R2_ACCOUNT_ID) {
+    return `https://${CLOUDFLARE_R2_BUCKET_NAME}.${CLOUDFLARE_R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${safeKey}`;
+  }
+  // 3. Final graceful fallback: deterministic local preview pattern so the
+  //    frontend NEVER breaks or throws undefined links during dry runs.
+  return `/api/editor/preview?site=${encodeURIComponent(safeKey)}`;
 }
 // End: Public URL Builder
 
@@ -105,6 +113,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<DeployRes
 
     const allowed = ['index.html', 'styles.css', 'script.js'];
     const results: DeployResult[] = [];
+    const userPath = (body.username || body.userId || 'anonymous').replace(/[^a-zA-Z0-9_-]/g, '');
 
     for (const file of body.files) {
       if (!file.filename || typeof file.content !== 'string') {
@@ -121,7 +130,6 @@ export async function POST(request: NextRequest): Promise<NextResponse<DeployRes
       }
 
       const safeName = file.filename.replace(/[^a-zA-Z0-9._-]/g, '');
-      const userPath = (body.username || body.userId || 'anonymous').replace(/[^a-zA-Z0-9_-]/g, '');
       const objectKey = `sites/${userPath}/${safeName}`;
       const contentType = resolveContentType(safeName);
       const buffer = Buffer.from(file.content, 'utf-8');
@@ -144,9 +152,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<DeployRes
     }
     // End: Parse + Validate Request
 
-    // Start: Derive Primary Site URL (index.html)
+    // Start: Derive Primary Site URL (index.html) — never undefined
     const indexResult = results.find((r) => r.filename.toLowerCase() === 'index.html');
-    const siteUrl = indexResult ? indexResult.url : (results[0]?.url ?? null);
+    const siteUrl: string = indexResult ? indexResult.url : (results[0]?.url ?? buildPublicUrl(`sites/${userPath}/index.html`));
 
     // Start: Profile Binding (Supabase)
     let profileUpdated = false;
