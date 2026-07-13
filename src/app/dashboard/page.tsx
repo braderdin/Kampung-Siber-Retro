@@ -13,8 +13,9 @@ import TopResidentsLeaderboard from '@/components/TopResidentsLeaderboard';
 import HydrationGuard from '@/components/HydrationGuard';
 import FeedbackWidget from '@/components/FeedbackWidget';
 import NeocitiesWorkspace from '@/components/editor/NeocitiesWorkspace';
+import FileManager from '@/components/FileManager'; // Start: Consolidated File Manager Tab
 
-type ActiveTab = 'main' | 'community';
+type ActiveTab = 'main' | 'community' | 'files';
 type BuilderView = 'main' | 'editor';
 
 export default function DashboardPage() {
@@ -151,6 +152,20 @@ export default function DashboardPage() {
               <span className="text-xl">👥</span>
               <div className="pixel-font text-xs">Community Board</div>
             </button>
+            <button
+              onClick={() => setActiveTab('files')}
+              className={`
+                retro-btn-secondary flex-1 text-center
+                transition-all duration-200
+                ${activeTab === 'files' 
+                  ? 'bg-purple-500 text-white shadow-md' 
+                  : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                }
+              `}
+            >
+              <span className="text-xl">📁</span>
+              <div className="pixel-font text-xs">Fail Saya</div>
+            </button>
           </div>
         </div>
         {/* End: Tab Navigation */}
@@ -184,6 +199,16 @@ export default function DashboardPage() {
             </div>
           )}
           {/* End: Community Board Tab Content */}
+
+          {/* Start: Files Manager Tab Content - Consolidated site_files */}
+          {activeTab === 'files' && (
+            <div className="lg:col-span-3">
+              <HydrationGuard>
+                <FileManager embedded />
+              </HydrationGuard>
+            </div>
+          )}
+          {/* End: Files Manager Tab Content */}
         </div>
         {/* End: Tab Content with Tablet Optimizations */}
       </div>

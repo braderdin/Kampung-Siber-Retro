@@ -7,10 +7,16 @@ import { enDictionary, msDictionary } from '@/i18n/dictionaries';
 import ProfileStatusBadge from '@/components/ProfileStatusBadge';
 import ProfileBioEditor from '@/components/ProfileBioEditor';
 import SettingsTipping from '@/components/SettingsTipping';
+import SettingsGithub from '@/components/SettingsGithub';
+import SettingsNsfw from '@/components/SettingsNsfw';
+import SettingsApiKey from '@/components/SettingsApiKey';
+import SettingsDeleteAccount from '@/components/SettingsDeleteAccount';
 import { showSuccess, showError, showWarning, showInfo } from '@/components/RetroToast';
 import AccessibilityMenu from '@/components/AccessiblityMenu';
 
 type BackgroundTheme = 'space_neon' | 'windows_gray' | 'retro_matrix' | 'neon_cyan' | 'retro_orange';
+
+type SettingsTab = 'profile' | 'sites' | 'supporter' | 'password' | 'email' | 'advanced';
 
 interface ThemeConfig {
   id: BackgroundTheme;
@@ -80,6 +86,7 @@ export default function SettingsPage({ params }: { params: { username: string } 
   const [customBio, setCustomBio] = useState('');
   const [liveStatus, setLiveStatus] = useState<'online' | 'coding' | 'makan'>('online');
   const [showSuccessToast, setShowSuccessToast] = useState(false);
+  const [activeSettingsTab, setActiveSettingsTab] = useState<SettingsTab>('profile');
 
   useEffect(() => {
     // Load saved preferences from localStorage
@@ -146,107 +153,207 @@ export default function SettingsPage({ params }: { params: { username: string } 
         </div>
         {/* End: Page Header */}
 
-        {/* Start: Accessibility Menu */}
-        <div className="retro-card mb-6">
-          <div className="retro-card-header bg-gray-200 dark:bg-gray-700 px-4 py-2 border-b border-gray-300 dark:border-gray-600">
-            <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200 pixel-font flex items-center gap-2">
-              <span className="text-xl">♿</span>
-              <span>{t.accessibility || 'Aksesibiliti'}</span>
-            </h2>
-          </div>
-          <div className="p-4">
-            <AccessibilityMenu />
+        {/* Start: Settings Tab Navigation (unified client tabs) */}
+        <div className="mb-6">
+          <div className="retro-tab-navigation flex flex-wrap gap-2 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg border border-gray-300 dark:border-gray-600">
+            {([
+              { id: 'profile', label: 'Profil', icon: '👤' },
+              { id: 'sites', label: 'Laman', icon: '🌐' },
+              { id: 'supporter', label: 'Penyokong', icon: '💖' },
+              { id: 'password', label: 'Kata Laluan', icon: '🔐' },
+              { id: 'email', label: 'E-mel', icon: '📧' },
+              { id: 'advanced', label: 'Lanjutan', icon: '⚙️' },
+            ] as { id: SettingsTab; label: string; icon: string }[]).map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveSettingsTab(tab.id)}
+                className={`
+                  retro-btn-secondary flex-1 min-w-[100px] text-center text-xs sm:text-sm
+                  transition-all duration-200
+                  ${activeSettingsTab === tab.id 
+                    ? 'bg-purple-500 text-white shadow-md' 
+                    : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                  }
+                `}
+              >
+                <span className="text-base">{tab.icon}</span>
+                <div className="pixel-font">{tab.label}</div>
+              </button>
+            ))}
           </div>
         </div>
-        {/* End: Accessibility Menu */}
+        {/* End: Settings Tab Navigation */}
 
-        {/* Start: Theme Picker Section */}
-        <div className="retro-card mb-6">
-          <div className="retro-card-header bg-gray-200 dark:bg-gray-700 px-4 py-2 border-b border-gray-300 dark:border-gray-600">
-            <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200 pixel-font flex items-center gap-2">
-              <span className="text-xl">🎨</span>
-              <span>{t.themeSettings || 'Latar Belakang Tema'}</span>
-            </h2>
-          </div>
-          <div className="p-4">
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-              {THEME_OPTIONS.map((theme) => (
-                <button
-                  key={theme.id}
-                  onClick={() => handleThemeChange(theme.id)}
-                  className={`
-                    retro-card retro-window-sm p-3 text-center transition-all duration-200
-                    ${selectedTheme === theme.id 
-                      ? 'ring-2 ring-purple-500 transform scale-105' 
-                      : 'hover:transform hover:scale-105'
-                    }
-                  `}
-                >
-                  <div className="text-3xl mb-2">{theme.icon}</div>
-                  <div className={`font-bold text-sm text-gray-800 dark:text-gray-200 mb-1`}>
-                    {theme.name}
-                  </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 pixel-font">
-                    {theme.description}
-                  </div>
-                  <div className={`
-                    mt-2 h-2 rounded-full
-                    ${selectedTheme === theme.id ? 'opacity-100' : 'opacity-30'}
-                  `}
-                    style={{
-                      background: `linear-gradient(90deg, var(--tw-gradient-stops))`
-                    }}
-                  />
-                </button>
-              ))}
+        {/* Start: Profile Tab */}
+        {activeSettingsTab === 'profile' && (
+          <>
+            {/* Start: Accessibility Menu */}
+            <div className="retro-card mb-6">
+              <div className="retro-card-header bg-gray-200 dark:bg-gray-700 px-4 py-2 border-b border-gray-300 dark:border-gray-600">
+                <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200 pixel-font flex items-center gap-2">
+                  <span className="text-xl">♿</span>
+                  <span>{t.accessibility || 'Aksesibiliti'}</span>
+                </h2>
+              </div>
+              <div className="p-4">
+                <AccessibilityMenu />
+              </div>
             </div>
-          </div>
-        </div>
-        {/* End: Theme Picker Section */}
+            {/* End: Accessibility Menu */}
 
-        {/* Start: Status and Bio Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Start: Live Status */}
+            {/* Start: Theme Picker Section */}
+            <div className="retro-card mb-6">
+              <div className="retro-card-header bg-gray-200 dark:bg-gray-700 px-4 py-2 border-b border-gray-300 dark:border-gray-600">
+                <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200 pixel-font flex items-center gap-2">
+                  <span className="text-xl">🎨</span>
+                  <span>{t.themeSettings || 'Latar Belakang Tema'}</span>
+                </h2>
+              </div>
+              <div className="p-4">
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                  {THEME_OPTIONS.map((theme) => (
+                    <button
+                      key={theme.id}
+                      onClick={() => handleThemeChange(theme.id)}
+                      className={`
+                        retro-card retro-window-sm p-3 text-center transition-all duration-200
+                        ${selectedTheme === theme.id 
+                          ? 'ring-2 ring-purple-500 transform scale-105' 
+                          : 'hover:transform hover:scale-105'
+                        }
+                      `}
+                    >
+                      <div className="text-3xl mb-2">{theme.icon}</div>
+                      <div className={`font-bold text-sm text-gray-800 dark:text-gray-200 mb-1`}>
+                        {theme.name}
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 pixel-font">
+                        {theme.description}
+                      </div>
+                      <div className={`
+                        mt-2 h-2 rounded-full
+                        ${selectedTheme === theme.id ? 'opacity-100' : 'opacity-30'}
+                      `}
+                        style={{
+                          background: `linear-gradient(90deg, var(--tw-gradient-stops))`
+                        }}
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            {/* End: Theme Picker Section */}
+
+            {/* Start: Status and Bio Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="retro-card">
+                <div className="retro-card-header bg-gray-200 dark:bg-gray-700 px-4 py-2 border-b border-gray-300 dark:border-gray-600">
+                  <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200 pixel-font flex items-center gap-2">
+                    <span className="text-xl">🟢</span>
+                    <span>{t.liveStatus || 'Status Langsung'}</span>
+                  </h2>
+                </div>
+                <div className="p-4">
+                  <ProfileStatusBadge initialStatus={liveStatus} onStatusChange={handleStatusChange} />
+                </div>
+              </div>
+              <div className="retro-card">
+                <div className="retro-card-header bg-gray-200 dark:bg-gray-700 px-4 py-2 border-b border-gray-300 dark:border-gray-600">
+                  <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200 pixel-font flex items-center gap-2">
+                    <span className="text-xl">📝</span>
+                    <span>{t.bioEditor || 'Bio Editor'}</span>
+                  </h2>
+                </div>
+                <div className="p-4">
+                  <ProfileBioEditor initialBio={customBio || 'Saya warga kampung siber retro yang antara.'} onBioChange={handleBioChange} />
+                </div>
+              </div>
+            </div>
+            {/* End: Status and Bio Section */}
+          </>
+        )}
+        {/* End: Profile Tab */}
+
+        {/* Start: Sites Tab */}
+        {activeSettingsTab === 'sites' && (
           <div className="retro-card">
             <div className="retro-card-header bg-gray-200 dark:bg-gray-700 px-4 py-2 border-b border-gray-300 dark:border-gray-600">
               <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200 pixel-font flex items-center gap-2">
-                <span className="text-xl">🟢</span>
-                <span>{t.liveStatus || 'Status Langsung'}</span>
+                <span className="text-xl">🌐</span>
+                <span>Laman & Domain</span>
               </h2>
             </div>
             <div className="p-4">
-              <ProfileStatusBadge 
-                initialStatus={liveStatus}
-                onStatusChange={handleStatusChange}
-              />
+              <SettingsGithub username={username} />
             </div>
           </div>
-          {/* End: Live Status */}
+        )}
+        {/* End: Sites Tab */}
 
-          {/* Start: Bio Editor */}
+        {/* Start: Supporter Tab */}
+        {activeSettingsTab === 'supporter' && (
           <div className="retro-card">
             <div className="retro-card-header bg-gray-200 dark:bg-gray-700 px-4 py-2 border-b border-gray-300 dark:border-gray-600">
               <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200 pixel-font flex items-center gap-2">
-                <span className="text-xl">📝</span>
-                <span>{t.bioEditor || 'Bio Editor'}</span>
+                <span className="text-xl">💖</span>
+                <span>Penyokong & Derma</span>
               </h2>
             </div>
             <div className="p-4">
-              <ProfileBioEditor 
-                initialBio={customBio || 'Saya warga kampung siber retro yang antara.'}
-                onBioChange={handleBioChange}
-              />
+              <SettingsTipping />
             </div>
           </div>
-          {/* End: Bio Editor */}
-        </div>
-        {/* End: Status and Bio Section */}
+        )}
+        {/* End: Supporter Tab */}
 
-        {/* Start: Tipping Section */}
-        <div className="mt-6">
-          <SettingsTipping />
-        </div>
-        {/* End: Tipping Section */}
+        {/* Start: Password Tab */}
+        {activeSettingsTab === 'password' && (
+          <div className="retro-card">
+            <div className="retro-card-header bg-gray-200 dark:bg-gray-700 px-4 py-2 border-b border-gray-300 dark:border-gray-600">
+              <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200 pixel-font flex items-center gap-2">
+                <span className="text-xl">🔐</span>
+                <span>Keselamatan Kata Laluan</span>
+              </h2>
+            </div>
+            <div className="p-4">
+              <SettingsApiKey />
+            </div>
+          </div>
+        )}
+        {/* End: Password Tab */}
+
+        {/* Start: Email Tab */}
+        {activeSettingsTab === 'email' && (
+          <div className="retro-card">
+            <div className="retro-card-header bg-gray-200 dark:bg-gray-700 px-4 py-2 border-b border-gray-300 dark:border-gray-600">
+              <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200 pixel-font flex items-center gap-2">
+                <span className="text-xl">📧</span>
+                <span>Preferensi E-mel</span>
+              </h2>
+            </div>
+            <div className="p-4">
+              <SettingsNsfw />
+            </div>
+          </div>
+        )}
+        {/* End: Email Tab */}
+
+        {/* Start: Advanced Tab */}
+        {activeSettingsTab === 'advanced' && (
+          <div className="retro-card">
+            <div className="retro-card-header bg-gray-200 dark:bg-gray-700 px-4 py-2 border-b border-gray-300 dark:border-gray-600">
+              <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200 pixel-font flex items-center gap-2">
+                <span className="text-xl">⚙️</span>
+                <span>Tetapan Lanjutan</span>
+              </h2>
+            </div>
+            <div className="p-4">
+              <SettingsDeleteAccount />
+            </div>
+          </div>
+        )}
+        {/* End: Advanced Tab */}
       </div>
     </main>
   );

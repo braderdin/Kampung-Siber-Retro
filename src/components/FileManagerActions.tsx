@@ -9,8 +9,9 @@ import { enDictionary, msDictionary } from '@/i18n/dictionaries';
 // Start: Type Definitions
 interface FileManagerActionsProps {
   onFileUpload: () => void;
-  onFolderCreate: () => void;
-  onFileCreate: () => void;
+  onFolderCreate: (name: string) => void;
+  onFileCreate: (name: string) => void;
+  onSelectAll: () => void;
   selectedCount: number;
   onBatchDelete: () => void;
   className?: string;
@@ -22,6 +23,7 @@ export default function FileManagerActions({
   onFileUpload,
   onFolderCreate,
   onFileCreate,
+  onSelectAll,
   selectedCount,
   onBatchDelete,
   className
@@ -39,7 +41,7 @@ export default function FileManagerActions({
   // Start: Handle Create File
   const handleCreateFile = () => {
     if (newFileName.trim()) {
-      onFileCreate();
+      onFileCreate(newFileName.trim());
       setShowCreateFileModal(false);
       setNewFileName('');
     }
@@ -49,7 +51,7 @@ export default function FileManagerActions({
   // Start: Handle Create Folder
   const handleCreateFolder = () => {
     if (newFolderName.trim()) {
-      onFolderCreate();
+      onFolderCreate(newFolderName.trim());
       setShowCreateFolderModal(false);
       setNewFolderName('');
     }
@@ -80,9 +82,9 @@ export default function FileManagerActions({
   return (
     <div className={`flex items-center space-x-2 mb-4 ${className || ''}`}>
       <button
-        onClick={() => {}}
+        onClick={onSelectAll}
         className="retro-btn-secondary text-sm px-3 py-1"
-        title="Select"
+        title="Pilih Semua"
       >
         📋 Pilih
       </button>
