@@ -4,7 +4,7 @@
 import { usePathname, useRouter } from 'next/navigation';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { enDictionary, msDictionary } from '@/i18n/dictionaries';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import RandomExplorerBtn from '@/components/RandomExplorerBtn';
 
 interface NavItem {
@@ -21,6 +21,7 @@ export default function RetroNavbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileMenuHeight, setMobileMenuHeight] = useState(0);
   const [helpDropdownOpen, setHelpDropdownOpen] = useState(false);
+  const helpContainerRef = useRef<HTMLDivElement | null>(null);
 
   const t = language === 'ms' ? msDictionary : enDictionary;
 
@@ -73,6 +74,35 @@ export default function RetroNavbar() {
     { name: 'Contact Support', href: '/contact', icon: '📧' },
   ];
   // End: Help Links Configuration
+
+  // Start: Help Dropdown Outside-Click + Escape Dismissal
+  useEffect(() => {
+    if (!helpDropdownOpen) return;
+
+    const handlePointerDown = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node;
+      if (helpContainerRef.current && !helpContainerRef.current.contains(target)) {
+        setHelpDropdownOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setHelpDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('touchstart', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('touchstart', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [helpDropdownOpen]);
+  // End: Help Dropdown Outside-Click + Escape Dismissal
 
   return (
     // Start: Navigation Container
@@ -131,7 +161,7 @@ export default function RetroNavbar() {
           {/* Start: Controls Container - Desktop Help dropdown + theme toggle */}
           <div className="flex items-center space-x-2">
             {/* Start: Desktop Help Dropdown */}
-            <div className="hidden md:block relative">
+            <div className="hidden md:block relative" ref={helpContainerRef}>
               <button
                 onClick={() => setHelpDropdownOpen(!helpDropdownOpen)}
                 className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors text-gray-300 hover:text-white hover:bg-cyan-500/10 dark:text-gray-400 dark:hover:text-white dark:hover:bg-cyan-500/10"

@@ -2,11 +2,22 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { getServerSupabase } from "@/lib/supabase-server";
+import { supabase } from "@/lib/supabase";
 import { UserProfile, mapRowToProfile, ProfileRow } from "@/lib/profile-types";
 // End: Imports
 
 // Start: Type Definitions (aligned with 21-field UserProfile schema)
 export type Profile = UserProfile;
+
+// Start: Live Status Update Domain Type (mirrors status_updates table)
+export interface StatusUpdate {
+  id: number;
+  user_id?: string;
+  username: string;
+  status: string;
+  created_at: string;
+}
+// End: Live Status Update Domain Type
 
 interface FetchOptions {
   forceRefresh?: boolean;
@@ -23,6 +34,8 @@ interface ProfilesState {
   fetchProfile: (id: string, options?: FetchOptions) => Promise<Profile | undefined>;
   fetchProfiles: (ids: string[], options?: FetchOptions) => Promise<Profile[]>;
   toggleFollow: (id: string, token?: string) => Promise<boolean>;
+  saveProfile: (userId: string, patch: Record<string, unknown>) => Promise<boolean>;
+  publishStatus: (userId: string, username: string, statusText: string) => Promise<boolean>;
 }
 // End: Type Definitions
 
@@ -159,6 +172,50 @@ export const useProfilesStore = create<ProfilesState>()(
           return wasFollowing;
         }
       },
+
+      // Start: Live Supabase Profile Mutation (profiles table)
+      saveProfile: async (userId, patch) => {
+        try {
+          const { error } = await supabase
+            .from("profiles")
+            .update({ ...patch, last_active: new Date().toISOString() })
+            .eq("user_id", userId);
+
+          if (error) {
+            console.error("saveProfile failed:", error.message);
+            return false;
+          }
+          return true;
+        } catch (err) {
+          console.error("saveProfile exception:", err);
+          return false;
+        }
+      },
+      // End: Live Supabase Profile Mutation
+
+      // Start: Live Supabase Status Mutation (status_updates table)
+      publishStatus: async (userId, username, statusText) => {
+        try {
+          const { error } = await supabase
+            .from("status_updates")
+            .insert({
+              user_id: userId,
+              username,
+              status: statusText,
+              created_at: new Date().toISOString(),
+            });
+
+          if (error) {
+            console.error("publishStatus failed:", error.message);
+            return false;
+          }
+          return true;
+        } catch (err) {
+          console.error("publishStatus exception:", err);
+          return false;
+        }
+      },
+      // End: Live Supabase Status Mutation
     }),
     {
       name: "kampung-siber-profiles",

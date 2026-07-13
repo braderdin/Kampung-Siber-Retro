@@ -12,14 +12,23 @@ import RetroMarqueeTicker from '@/components/RetroMarqueeTicker';
 import TopResidentsLeaderboard from '@/components/TopResidentsLeaderboard';
 import HydrationGuard from '@/components/HydrationGuard';
 import FeedbackWidget from '@/components/FeedbackWidget';
+import NeocitiesProfileBuilder from '@/components/NeocitiesProfileBuilder';
 
 type ActiveTab = 'main' | 'community';
+type BuilderView = 'main' | 'editor';
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('main');
+  const [builderView, setBuilderView] = useState<BuilderView>('main');
   const [showMarquee, setShowMarquee] = useState(false);
   const { language } = useLanguageStore();
   const t = language === 'ms' ? msDictionary : enDictionary;
+
+  // Start: Toggle to live profile builder sub-view
+  const toggleBuilderView = () => {
+    setBuilderView((prev) => (prev === 'main' ? 'editor' : 'main'));
+  };
+  // End: Toggle to live profile builder sub-view
 
   // Start: Marquee Auto-Show Effect
   useEffect(() => {
@@ -68,17 +77,25 @@ export default function DashboardPage() {
           <p className="text-gray-600 dark:text-gray-400 mt-1">
             {t.welcomeMessage || 'Selamat datang di papan pengarah retro anda!'} {/* Formal Malay for "Welcome to your retro dashboard!" */}
           </p>
-          {/* Start: Editor Access Button with Extreme Pixel Shadow */}
+           {/* Start: Editor Access Button with Extreme Pixel Shadow */}
           <div className="mt-4">
-            <Link
-              href="/site_files/text_editor"
+            <button
+              onClick={toggleBuilderView}
               className="retro-btn-primary inline-flex items-center gap-2 px-6 py-3 pixel-font font-bold text-lg shadow-[4px_4px_0_0_rgba(0,0,0,1)] hover:shadow-[6px_6px_0_0_rgba(0,0,0,1)] transition-all"
             >
               <span className="text-xl">💻</span>
-              <span>Buka Editor Kod Teratak Anda</span>
-            </Link>
+              <span>{builderView === 'main' ? 'Buka Editor Kod Teratak Anda' : 'Tutup Editor Kod'}</span>
+            </button>
           </div>
           {/* End: Editor Access Button with Extreme Pixel Shadow */}
+
+          {/* Start: Live Neocities Profile Builder Sub-View */}
+          {builderView === 'editor' && (
+            <div className="mt-6">
+              <NeocitiesProfileBuilder />
+            </div>
+          )}
+          {/* End: Live Neocities Profile Builder Sub-View */}
         </div>
         {/* End: Editor Link Card Container */}
       </div>
