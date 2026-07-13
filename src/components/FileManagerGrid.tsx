@@ -26,6 +26,16 @@ export default function FileManagerGrid({ files, folders, onFileAction, classNam
   };
   // End: Handle Double Click
 
+  // Start: Handle Rename (prompt for new name, then propagate to parent handler)
+  const handleRename = (item: FileManagerItem) => {
+    const currentName = item.type === 'folder' ? item.name : item.filename;
+    const input = window.prompt('Tukar nama fail kepada:', currentName);
+    if (input && input.trim() && input.trim() !== currentName) {
+      onFileAction(item, 'rename', input.trim());
+    }
+  };
+  // End: Handle Rename
+
   // Start: Render Grid View
   return (
     <div className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 ${className || ''}`}>
@@ -63,7 +73,7 @@ export default function FileManagerGrid({ files, folders, onFileAction, classNam
               ✏️
             </button>
             <button
-              onClick={() => onFileAction(file, 'rename')}
+              onClick={() => handleRename(file)}
               className="text-green-500 hover:text-green-700 text-sm"
               title="Tukar Nama Fail"
             >

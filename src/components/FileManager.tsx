@@ -325,8 +325,43 @@ export default function FileManager({ embedded = false }: { embedded?: boolean }
       // Placeholder for sub-directory navigation (root-level view only)
       showToast(`Membuka folder: ${item.name}`, 'info');
     } else if (action === 'rename' && newName) {
-      // Rename not supported on flat R2 keys without copy + delete; surface info
-      showToast('Tukar nama perlu melalui editor fail', 'info');
+      // Start: Real R2 Rename (Copy + Delete via /api/storage/rename)
+      // Flat object stores have no atomic rename, so we compute the new key by
+      // preserving the existing user-prefix directory layout and swapping the
+      // trailing filename/folder segment with the user-supplied newName.
+      if (!token) {
+        setError('Sesi tidak sah');
+        return;
+      }
+      const cleanName = newName.trim().replace(/\/+$/g, '');
+      if (!cleanName || cleanName.includes('/')) {
+        showToast('Nama fail tidak sah', 'error');
+        return;
+      }
+      const oldKey = item.id;
+      const lastSlash = oldKey.lastIndexOf('/');
+      const parentPrefix = lastSlash >= 0 ? oldKey.substring(0, lastSlash + 1) : '';
+      const newKey = `${parentPrefix}${cleanName}`;
+      try {
+        const res = await fetch('/api/storage/rename', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ oldKey, newKey }),
+        });
+        const data = await res.json();
+        if (!data.success) {
+          throw new Error(
+            (data.results && data.results[0] && data.results[0].error) ||
+              data.error ||
+              'Gagal menamakan semula'
+          );
+        }
+        await fetchFiles();
+        showToast('Fail berjaya dinamakan semula', 'success');
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Ralat tukar nama');
+      }
+      // End: Real R2 Rename
     } else if (action === 'delete') {
       if (!token) {
         setError('Sesi tidak sah');
