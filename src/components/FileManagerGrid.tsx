@@ -58,16 +58,16 @@ export default function FileManagerGrid({ files, folders, onFileAction, classNam
             <button
               onClick={() => onFileAction(file, 'edit')}
               className="text-blue-500 hover:text-blue-700 text-sm"
-              title="Edit"
+              title="Sunting Kandungan Fail"
             >
               ✏️
             </button>
             <button
               onClick={() => onFileAction(file, 'rename')}
               className="text-green-500 hover:text-green-700 text-sm"
-              title="Rename"
+              title="Tukar Nama Fail"
             >
-              ✏️
+              🏷️
             </button>
             <button
               onClick={() => onFileAction(file, 'delete')}

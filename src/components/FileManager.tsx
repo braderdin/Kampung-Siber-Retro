@@ -10,6 +10,7 @@ import FileManagerGrid from '@/components/FileManagerGrid';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { enDictionary, msDictionary } from '@/i18n/dictionaries';
 import type { FileAction, FileManagerItem, SiteFile, SiteFolder } from '@/types/fileManager';
+import { convertImageToWebp, isConvertibleImage } from '@/utils/webpConverter';
 // End: Imports
 
 // Start: Format Helpers
@@ -32,9 +33,17 @@ function exceedsFreeTierLimit(size: number): boolean {
 }
 // End: Format Helpers
 
-// Start: Storage Thresholds
-const STORAGE_LIMIT_BYTES = 25 * 1024 * 1024; // 25MB (matches StorageUsageBar)
+// Start: Storage Thresholds (Rule 30)
+const STORAGE_LIMIT_BYTES = 25 * 1024 * 1024; // 25MB exact cap per user
+const MAX_RAW_IMAGE_BYTES = 2 * 1024 * 1024; // 2MB raw image gate
 // End: Storage Thresholds
+
+// Start: Session Token Helper
+function getSessionToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('sb-access-token');
+}
+// End: Session Token Helper
 
 // Start: Size Badge Component
 interface FileSizeBadgeProps {
@@ -70,7 +79,30 @@ function FileSizeBadge({ size }: FileSizeBadgeProps) {
 }
 // End: Size Badge Component
 
-// Start: FileManager Component (Unified, R2-Wired)
+// Start: Toast Component (Rule 30 Hard Limit Alert)
+interface ToastState {
+  message: string;
+  variant: 'error' | 'success' | 'info';
+}
+
+function StorageToast({ toast }: { toast: ToastState | null }) {
+  if (!toast) return null;
+  const base =
+    'fixed top-4 left-1/2 -translate-x-1/2 z-[60] px-4 py-2 rounded-lg border text-sm font-bold shadow-lg retro-border';
+  const variants: Record<ToastState['variant'], string> = {
+    error: 'bg-red-900/40 border-red-500 text-red-200',
+    success: 'bg-green-900/40 border-green-500 text-green-200',
+    info: 'bg-cyan-900/40 border-cyan-500 text-cyan-200',
+  };
+  return (
+    <div className={`${base} ${variants[toast.variant]}`} role="alert">
+      {toast.message}
+    </div>
+  );
+}
+// End: Toast Component
+
+// Start: FileManager Component (Unified, R2-Wired, No Mocks)
 export default function FileManager({ embedded = false }: { embedded?: boolean }) {
   const { language } = useLanguageStore();
   const t = language === 'ms' ? msDictionary : enDictionary;
@@ -83,35 +115,51 @@ export default function FileManager({ embedded = false }: { embedded?: boolean }
   const [selectedFiles, setSelectedFiles] = useState<SiteFile[]>([]);
   const [crtEnabled, setCrtEnabled] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [totalSize, setTotalSize] = useState(0);
+  const [toast, setToast] = useState<ToastState | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Start: Fetch Initial Files (client mock -> will be replaced by R2 list API)
-  useEffect(() => {
-    const fetchFiles = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const mockFiles: SiteFile[] = [
-          { id: '1', filename: 'index.html', size: 1024, contentType: 'text/html', uploadedAt: new Date().toISOString(), url: '/files/index.html', type: 'file' },
-          { id: '2', filename: 'style.css', size: 2048, contentType: 'text/css', uploadedAt: new Date().toISOString(), url: '/files/style.css', type: 'file' },
-          { id: '3', filename: 'script.js', size: 1536, contentType: 'text/javascript', uploadedAt: new Date().toISOString(), url: '/files/script.js', type: 'file' },
-        ];
-        const mockFolders: SiteFolder[] = [
-          { id: 'f1', name: 'images', createdAt: new Date().toISOString(), type: 'folder' },
-          { id: 'f2', name: 'documents', createdAt: new Date().toISOString(), type: 'folder' },
-        ];
-        setFiles(mockFiles);
-        setFolders(mockFolders);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Gagal memuatkan fail');
-      } finally {
+  // Start: Toast Dispatcher
+  const showToast = (message: string, variant: ToastState['variant'] = 'info') => {
+    setToast({ message, variant });
+    window.setTimeout(() => setToast(null), 4000);
+  };
+  // End: Toast Dispatcher
+
+  // Start: Authentic R2 List Fetch (replaces mock arrays)
+  const fetchFiles = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = getSessionToken();
+      if (!token) {
+        setError('Sesi tidak sah - sila log masuk semula');
         setLoading(false);
+        return;
       }
-    };
+      const res = await fetch('/api/storage/list', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Gagal menyenaraikan simpanan');
+      }
+      setFiles(data.files ?? []);
+      setFolders(data.folders ?? []);
+      setTotalSize(data.totalSize ?? 0);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Gagal memuatkan fail');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchFiles();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  // End: Fetch Initial Files
+  // End: Authentic R2 List Fetch
 
   // Start: Theme Sync
   useEffect(() => {
@@ -123,7 +171,7 @@ export default function FileManager({ embedded = false }: { embedded?: boolean }
   }, []);
   // End: Theme Sync
 
-  // Start: Direct R2 Presigned Upload
+  // Start: Direct R2 Presigned Upload with Rule 30 Safeguards
   const handleFileUpload = async () => {
     fileInputRef.current?.click();
   };
@@ -133,16 +181,52 @@ export default function FileManager({ embedded = false }: { embedded?: boolean }
     e.target.value = '';
     if (!file) return;
 
+    let payloadFile = file;
+    let payloadName = file.name;
+    let payloadType = file.type || 'application/octet-stream';
+    let payloadSize = file.size;
+
+    // Rule 30: hard 2MB raw image gate (pre-compression)
+    if (isConvertibleImage(file)) {
+      if (file.size > MAX_RAW_IMAGE_BYTES) {
+        showToast('🚨 Imej mentah melebihi had 2MB!', 'error');
+        return;
+      }
+      // Convert to crisp WebP (80-85% quality, <200KB)
+      try {
+        const converted = await convertImageToWebp(file);
+        payloadFile = converted.blob as unknown as File;
+        payloadName = converted.filename;
+        payloadType = converted.contentType;
+        payloadSize = converted.size;
+        showToast(`Imej ditukar ke WebP (${formatFileSize(payloadSize)})`, 'success');
+      } catch (convErr) {
+        setError(convErr instanceof Error ? convErr.message : 'Penukaran WebP gagal');
+        return;
+      }
+    }
+
+    // Rule 30: exact 25MB total storage ceiling
+    if (totalSize + payloadSize > STORAGE_LIMIT_BYTES) {
+      showToast('🚨 Had Saiz Dilampaui!', 'error');
+      return;
+    }
+
     setUploading(true);
     setError(null);
     try {
+      const token = getSessionToken();
+      if (!token) {
+        throw new Error('Sesi tidak sah - sila log masuk semula');
+      }
+
       const presignRes = await fetch('/api/storage', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          filename: file.name,
-          contentType: file.type || 'application/octet-stream',
-          size: file.size,
+          filename: payloadName,
+          contentType: payloadType,
+          size: payloadSize,
         }),
       });
       const presignData = await presignRes.json();
@@ -152,23 +236,16 @@ export default function FileManager({ embedded = false }: { embedded?: boolean }
 
       const uploadRes = await fetch(presignData.data.presignedUrl, {
         method: 'PUT',
-        headers: { 'Content-Type': file.type || 'application/octet-stream' },
-        body: file,
+        headers: { 'Content-Type': payloadType },
+        body: payloadFile,
       });
       if (!uploadRes.ok) {
         throw new Error('Muat naik ke Cloudflare R2 gagal');
       }
 
-      const newFile: SiteFile = {
-        id: presignData.data.id,
-        filename: file.name,
-        size: file.size,
-        contentType: file.type || 'application/octet-stream',
-        uploadedAt: presignData.data.uploadedAt,
-        url: presignData.data.url,
-        type: 'file',
-      };
-      setFiles((prev) => [...prev, newFile]);
+      // Re-sync from genuine R2 inventory so state never drifts
+      await fetchFiles();
+      showToast('Fail berjaya dimuat naik ke R2', 'success');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ralat muat naik');
     } finally {
@@ -177,13 +254,31 @@ export default function FileManager({ embedded = false }: { embedded?: boolean }
   };
   // End: Direct R2 Presigned Upload
 
-  // Start: Folder Creation (client-side namespace)
-  const handleFolderCreate = (name: string) => {
+  // Start: Folder Persistence (writes .keep placeholder into R2 tree)
+  const handleFolderCreate = async (name: string) => {
     const clean = name.trim();
     if (!clean) return;
-    setFolders((prev) => [...prev, { id: `f${Date.now()}`, name: clean, createdAt: new Date().toISOString(), type: 'folder' }]);
+    try {
+      const token = getSessionToken();
+      if (!token) {
+        throw new Error('Sesi tidak sah - sila log masuk semula');
+      }
+      const res = await fetch('/api/storage/list', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ folderName: clean }),
+      });
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Gagal mencipta folder');
+      }
+      await fetchFiles();
+      showToast('Folder berjaya diwujudkan', 'success');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Ralat folder');
+    }
   };
-  // End: Folder Creation
+  // End: Folder Persistence
 
   // Start: New File Creation -> open editor
   const handleFileCreate = (name: string) => {
@@ -193,12 +288,25 @@ export default function FileManager({ embedded = false }: { embedded?: boolean }
   };
   // End: New File Creation
 
-  // Start: Batch Delete (client state removal)
-  const handleBatchDelete = () => {
+  // Start: Batch Delete (real R2 hard delete)
+  const handleBatchDelete = async () => {
     if (selectedFiles.length === 0) return;
-    const ids = new Set(selectedFiles.map((f) => f.id));
-    setFiles((prev) => prev.filter((f) => !ids.has(f.id)));
-    setSelectedFiles([]);
+    try {
+      const token = getSessionToken();
+      if (!token) throw new Error('Sesi tidak sah');
+      const res = await fetch('/api/storage/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ keys: selectedFiles.map((f) => f.id) }),
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || 'Gagal memadam');
+      await fetchFiles();
+      setSelectedFiles([]);
+      showToast('Fail terpilih berjaya dipadam', 'success');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Ralat padam');
+    }
   };
   // End: Batch Delete
 
@@ -209,30 +317,44 @@ export default function FileManager({ embedded = false }: { embedded?: boolean }
   // End: Select All Toggle
 
   // Start: Handle File Actions
-  const handleFileAction = (item: FileManagerItem, action: FileAction, newName?: string) => {
+  const handleFileAction = async (item: FileManagerItem, action: FileAction, newName?: string) => {
+    const token = getSessionToken();
     if (action === 'edit' && item.type === 'file') {
       router.push('/site_files/text_editor?filename=' + encodeURIComponent(item.filename));
     } else if (action === 'navigate' && item.type === 'folder') {
-      console.log('Navigasi folder:', item.name);
+      // Placeholder for sub-directory navigation (root-level view only)
+      showToast(`Membuka folder: ${item.name}`, 'info');
     } else if (action === 'rename' && newName) {
-      if (item.type === 'file') {
-        setFiles((prev) => prev.map((f) => (f.id === item.id ? { ...f, filename: newName } : f)));
-      } else {
-        setFolders((prev) => prev.map((fo) => (fo.id === item.id ? { ...fo, name: newName } : fo)));
-      }
+      // Rename not supported on flat R2 keys without copy + delete; surface info
+      showToast('Tukar nama perlu melalui editor fail', 'info');
     } else if (action === 'delete') {
-      if (item.type === 'file') {
-        setFiles((prev) => prev.filter((f) => f.id !== item.id));
+      if (!token) {
+        setError('Sesi tidak sah');
+        return;
+      }
+      try {
+        const res = await fetch('/api/storage/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify(
+            item.type === 'file'
+              ? { keys: [item.id] }
+              : { folderNames: [item.name] }
+          ),
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Gagal memadam');
+        await fetchFiles();
         setSelectedFiles((prev) => prev.filter((f) => f.id !== item.id));
-      } else {
-        setFolders((prev) => prev.filter((fo) => fo.id !== item.id));
+        showToast('Berjaya dipadam', 'success');
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Ralat padam');
       }
     }
   };
   // End: Handle File Actions
 
   // Start: Live Storage Metric
-  const totalSize = files.reduce((sum, file) => sum + file.size, 0);
   const totalSizeFormatted = formatFileSize(totalSize);
   const sizePercentage = Math.min((totalSize / STORAGE_LIMIT_BYTES) * 100, 100);
   const warningFiles = files.filter((f) => needsSizeWarning(f.size));
@@ -243,6 +365,7 @@ export default function FileManager({ embedded = false }: { embedded?: boolean }
   // Start: Render FileManager
   return (
     <div className={embedded ? '' : 'mx-auto max-w-7xl p-6'}>
+      <StorageToast toast={toast} />
       {!embedded && <DashboardProfileBanner />}
 
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
