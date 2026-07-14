@@ -39,12 +39,15 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Environment & Authentication Cryptography Secrets
+# Environment Secrets (Surgically Allow .env.example)
 .env
 .env.local
 .env.development
 .env.production
-.env.*
+.env.development.local
+.env.production.local
+.env.test
+.env.test.local
 
 # Aider AI Workspace Artifacts & History Strings
 .aider*
