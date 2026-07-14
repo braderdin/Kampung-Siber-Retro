@@ -1,6 +1,18 @@
 // Start: Server-side Supabase Client (Route Handlers only)
 // Uses the service role key when available to bypass RLS for internal reads,
 // and falls back gracefully to the anon key when secrets are absent.
+// Start: Force IPv4 DNS resolution to bypass WSL IPv6 ENETUNREACH (Phase 1 Fix)
+// This module is server-only. Node resolves the Supabase/Postgres hostnames here,
+// so we bias resolution toward A (IPv4) records. Without this, the WSL network
+// stack attempts AAAA first and crashes with ENETUNREACH before any fallback.
+import dns from "node:dns";
+try {
+  dns.setDefaultResultOrder("ipv4first");
+} catch {
+  /* Older Node runtimes lack setDefaultResultOrder — safe no-op. */
+}
+// End: Force IPv4 DNS resolution
+
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co";

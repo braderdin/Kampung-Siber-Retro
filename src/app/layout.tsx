@@ -6,6 +6,7 @@ import "./globals.css";
 import "../styles/retro.css";
 import RetroNavbar from "@/components/RetroNavbar";
 import RetroFooter from "@/components/RetroFooter";
+import FloatingAiAssistant from "@/components/FloatingAiAssistant";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -61,6 +62,9 @@ export default async function RootLayout({
           {children}
         </main>
         <RetroFooter />
+        {/* Start: Authenticated KawanSiber Floating AI Assistant (Phase 3) */}
+        <FloatingAiAssistant />
+        {/* End: Authenticated KawanSiber Floating AI Assistant */}
       </body>
       {/* End: Application Shell with Mounted Navbar + Footer */}
     </html>
