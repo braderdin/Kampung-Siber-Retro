@@ -100,12 +100,24 @@
   }
 }
 
+/* Start: Single-Scroll Framework (Rule 31 — eliminates duplicate system scrollbar)
+   Lock the viewport to ONE scroll owner. html claims 100% height, body owns the
+   single vertical scroll track. Deep sub-containers keep their scoped overflow-y
+   (chat lists, modals) but never spawn a competing window-level scrollbar. */
+html {
+  height: 100%;
+  overflow-x: hidden;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
   min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
+/* End: Single-Scroll Framework */
 
 body::before {
   content: '';

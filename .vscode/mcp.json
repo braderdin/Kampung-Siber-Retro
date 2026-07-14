@@ -1,7 +1,16 @@
 {
   "mcpServers": {
     "cloudflare": {
-      "url": "https://mcp.cloudflare.com/mcp"
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://mcp.cloudflare.com/mcp"
+      ],
+      "env": {
+        "HOME": "/home/braderdin",
+        "WRANGLER_HOME": "/home/braderdin"
+      }
     },
     "cloudflare-docs": {
       "url": "https://docs.mcp.cloudflare.com/mcp"

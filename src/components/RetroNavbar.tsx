@@ -8,6 +8,7 @@ import { enDictionary, msDictionary } from "@/i18n/dictionaries";
 import { useEffect, useRef, useState } from "react";
 import RandomExplorerBtn from "@/components/RandomExplorerBtn";
 import NeonButton from "@/components/ui/NeonButton";
+import NeonCard from "@/components/ui/NeonCard";
 import { setCookie, getCookie, COOKIE_KEYS, SEVEN_DAYS_SECONDS } from "@/lib/cookies";
 
 type ThemeId = "space-neon" | "windows-gray" | "retro-matrix";
@@ -18,16 +19,25 @@ interface NavItem {
   icon: string;
 }
 
+interface HelpLink {
+  name: string;
+  href: string;
+  icon: string;
+  desc: string;
+}
+
 export default function RetroNavbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { language } = useLanguageStore();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [mobileMenuHeight, setMobileMenuHeight] = useState(0);
-  const [helpDropdownOpen, setHelpDropdownOpen] = useState(false);
-  const helpContainerRef = useRef<HTMLDivElement | null>(null);
-  const helpMobileContainerRef = useRef<HTMLDivElement | null>(null);
+  // Start: Independent reactive dropdown state (Desktop + Mobile split)
+  const [desktopHelpOpen, setDesktopHelpOpen] = useState(false);
+  const [mobileHelpOpen, setMobileHelpOpen] = useState(false);
+  // End: Independent reactive dropdown state
+  const desktopHelpRef = useRef<HTMLDivElement | null>(null);
+  const mobileHelpRef = useRef<HTMLDivElement | null>(null);
 
   const t = language === "ms" ? msDictionary : enDictionary;
 
@@ -59,7 +69,6 @@ export default function RetroNavbar() {
         const itemHeight = 48;
         const paddingBase = 24;
         const totalHeight = itemsCount * itemHeight + paddingBase;
-        setMobileMenuHeight(totalHeight);
         menuElement.style.height = `${totalHeight}px`;
       }
     }
@@ -69,19 +78,21 @@ export default function RetroNavbar() {
   // Start: Navigation Handler
   const handleNavClick = (href: string) => {
     setMobileMenuOpen(false);
+    setMobileHelpOpen(false);
     router.push(href);
   };
   // End: Navigation Handler
 
-  // Start: Help Links Configuration
-  const helpLinks = [
-    { name: "Help Center", href: "/help", icon: "❓" },
-    { name: "System Status", href: "/status", icon: "📡" },
-    { name: "Contact Support", href: "/contact", icon: "📧" },
+  // Start: Help Links Configuration (active platform support items)
+  const helpLinks: HelpLink[] = [
+    { name: "Help Center", href: "/help", icon: "❓", desc: "Pusat bantuan & panduan" },
+    { name: "System Status", href: "/status", icon: "📡", desc: "Status server langsung" },
+    { name: "Contact Support", href: "/contact", icon: "📧", desc: "Hubungi pasukan sokongan" },
+    { name: "Dokumentasi", href: "/docs", icon: "📚", desc: "Manual teknikal" },
   ];
   // End: Help Links Configuration
 
-  // Start: Theme Toggle (persists to cookie, 7-day parity)
+  // Start: Theme Toggle (persists to kampung-siber-theme-cookie, 7-day expiry)
   const handleThemeToggle = () => {
     const next = !isDarkMode;
     setIsDarkMode(next);
@@ -93,20 +104,20 @@ export default function RetroNavbar() {
 
   // Start: Help Dropdown Outside-Click + Escape Dismissal
   useEffect(() => {
-    if (!helpDropdownOpen) return;
+    if (!desktopHelpOpen && !mobileHelpOpen) return;
 
     const handlePointerDown = (event: MouseEvent | TouchEvent) => {
       const target = event.target as Node;
-      const insideDesktop = helpContainerRef.current?.contains(target) ?? false;
-      const insideMobile = helpMobileContainerRef.current?.contains(target) ?? false;
-      if (!insideDesktop && !insideMobile) {
-        setHelpDropdownOpen(false);
-      }
+      const insideDesktop = desktopHelpRef.current?.contains(target) ?? false;
+      const insideMobile = mobileHelpRef.current?.contains(target) ?? false;
+      if (!insideDesktop) setDesktopHelpOpen(false);
+      if (!insideMobile) setMobileHelpOpen(false);
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setHelpDropdownOpen(false);
+        setDesktopHelpOpen(false);
+        setMobileHelpOpen(false);
       }
     };
 
@@ -119,25 +130,61 @@ export default function RetroNavbar() {
       document.removeEventListener("touchstart", handlePointerDown);
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [helpDropdownOpen]);
+  }, [desktopHelpOpen, mobileHelpOpen]);
   // End: Help Dropdown Outside-Click + Escape Dismissal
 
+  // Start: Render Help Panel (reactive, NeonCard premium layout)
+  const renderHelpPanel = (variant: "desktop" | "mobile") => (
+    <NeonCard
+      accent="cyan"
+      className={`z-50 border border-[#00ffff]/40 bg-[#0e1330]/95 shadow-[0_0_22px_rgba(0,255,255,0.30)] ${
+        variant === "desktop"
+          ? "absolute right-0 mt-2 w-60 rounded-lg"
+          : "mt-2 ml-6 w-[88%] rounded-lg"
+      }`}
+      bodyClassName="p-1.5 space-y-1"
+    >
+      {helpLinks.map((link) => (
+        <button
+          key={link.href}
+          type="button"
+          onClick={() => {
+            setDesktopHelpOpen(false);
+            setMobileHelpOpen(false);
+            setMobileMenuOpen(false);
+            router.push(link.href);
+          }}
+          className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-gray-300 transition-colors hover:bg-[#00ffff]/10 hover:text-white"
+        >
+          <span className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-[#00ffff]/30 bg-[#060814]/70 text-base">
+            {link.icon}
+          </span>
+          <span className="flex flex-col">
+            <span className="text-sm font-medium">{link.name}</span>
+            <span className="text-[11px] leading-tight text-gray-500">{link.desc}</span>
+          </span>
+        </button>
+      ))}
+    </NeonCard>
+  );
+  // End: Render Help Panel
+
   return (
-    // Start: Navigation Container
-    <nav className="fixed top-0 left-0 right-0 z-50 retro-nav bg-[#060814]/80 backdrop-blur-md border-b border-[#00ffff]/30 overflow-x-hidden w-full">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+    // Start: Navigation Container (clip X to avoid duplicate scrollbar; keep Y visible so dropdown shows)
+    <nav className="fixed left-0 right-0 top-0 z-50 w-full border-b border-[#00ffff]/30 bg-[#060814]/80 backdrop-blur-md overflow-x-clip">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between">
           {/* Start: Logo/Brand — KAMPUNG SIBER (rebranded, reset-to-home link) */}
-          <div className="flex-shrink-0 flex items-center">
+          <div className="flex flex-shrink-0 items-center">
             <Link
               href="/"
-              className="group flex items-center gap-2 select-none"
+              className="group flex select-none items-center gap-2"
               aria-label="Kembali ke laman utama Kampung Siber"
             >
-              <span className="inline-flex items-center justify-center w-8 h-8 text-lg rounded-md border border-[#00ffff]/40 bg-[#0e1330]/80 shadow-[0_0_12px_rgba(0,255,255,0.25)] group-hover:shadow-[0_0_18px_rgba(0,255,255,0.45)] transition-all">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-[#00ffff]/40 bg-[#0e1330]/80 shadow-[0_0_12px_rgba(0,255,255,0.25)] transition-all group-hover:shadow-[0_0_18px_rgba(0,255,255,0.45)]">
                 🖥️
               </span>
-              <span className="hidden sm:inline font-pixel text-xl tracking-wide text-[#00ffff] group-hover:text-white transition-colors neon-text-glow">
+              <span className="hidden font-pixel text-xl tracking-wide text-[#00ffff] transition-colors group-hover:text-white neon-text-glow sm:inline">
                 KAMPUNG SIBER
               </span>
             </Link>
@@ -155,8 +202,8 @@ export default function RetroNavbar() {
                   onClick={() => handleNavClick(item.href)}
                   className="!font-pixel"
                 >
-                  <span className="text-base inline-flex items-center justify-center w-5 h-5">{item.icon}</span>
-                  <span className="hidden sm:inline inline-flex items-center gap-1 align-middle">{item.name}</span>
+                  <span className="inline-flex h-5 w-5 items-center justify-center text-base">{item.icon}</span>
+                  <span className="hidden items-center gap-1 align-middle sm:inline-flex">{item.name}</span>
                 </NeonButton>
               ))}
             </div>
@@ -166,8 +213,11 @@ export default function RetroNavbar() {
           {/* Start: Mobile Menu Button */}
           <div className="md:hidden">
             <button
+              type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="text-gray-300 hover:text-white focus:outline-none p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-md border border-[#00ffff]/30 bg-[#0e1330]/70 hover:shadow-[0_0_12px_rgba(0,255,255,0.3)] transition-all"
+              className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md border border-[#00ffff]/30 bg-[#0e1330]/70 p-2 text-gray-300 transition-all hover:shadow-[0_0_12px_rgba(0,255,255,0.3)] focus:outline-none"
+              aria-label="Buka menu navigasi"
+              aria-expanded={mobileMenuOpen}
             >
               <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {mobileMenuOpen ? (
@@ -183,40 +233,26 @@ export default function RetroNavbar() {
           {/* Start: Controls Container - Desktop Help dropdown + theme toggle */}
           <div className="flex items-center space-x-2">
             {/* Start: Desktop Help Dropdown */}
-            <div className="hidden md:block relative" ref={helpContainerRef}>
+            <div className="relative hidden md:block" ref={desktopHelpRef}>
               <NeonButton
+                type="button"
                 variant="secondary"
                 size="md"
-                onClick={() => setHelpDropdownOpen(!helpDropdownOpen)}
+                onClick={() => setDesktopHelpOpen((v) => !v)}
                 aria-haspopup="true"
-                aria-expanded={helpDropdownOpen}
+                aria-expanded={desktopHelpOpen}
               >
-                <span className="text-base inline-flex items-center justify-center w-5 h-5">❓</span>
-                <span className="hidden sm:inline inline-flex items-center gap-1 align-middle">Help</span>
-                <span className="text-xs">{helpDropdownOpen ? "▲" : "▼"}</span>
+                <span className="inline-flex h-5 w-5 items-center justify-center text-base">❓</span>
+                <span className="hidden items-center gap-1 align-middle sm:inline-flex">Help</span>
+                <span className="text-xs">{desktopHelpOpen ? "▲" : "▼"}</span>
               </NeonButton>
-              {helpDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-52 rounded-md border border-[#00ffff]/30 bg-[#0e1330]/95 backdrop-blur-sm shadow-[0_0_18px_rgba(0,255,255,0.25)] py-1 z-50">
-                  {helpLinks.map((link) => (
-                    <button
-                      key={link.href}
-                      onClick={() => {
-                        setHelpDropdownOpen(false);
-                        router.push(link.href);
-                      }}
-                      className="flex items-center w-full px-4 py-2 text-sm text-gray-300 hover:text-white hover:bg-[#00ffff]/10 transition-colors"
-                    >
-                      <span className="text-base mr-2 inline-flex items-center justify-center w-4 h-4">{link.icon}</span>
-                      <span className="inline-flex items-center gap-1 align-middle">{link.name}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
+              {desktopHelpOpen && renderHelpPanel("desktop")}
             </div>
             {/* End: Desktop Help Dropdown */}
 
             {/* Start: Theme Toggle */}
             <NeonButton
+              type="button"
               variant="ghost"
               size="md"
               onClick={handleThemeToggle}
@@ -235,10 +271,9 @@ export default function RetroNavbar() {
       {mobileMenuOpen && (
         <div
           id="mobile-nav"
-          className="md:hidden bg-[#060814]/90 border-t border-[#00ffff]/30 transition-all duration-300 ease-out"
-          style={{ height: mobileMenuHeight ? `${mobileMenuHeight}px` : "auto" }}
+          className="border-t border-[#00ffff]/30 bg-[#060814]/90 transition-all duration-300 ease-out md:hidden"
         >
-          <div className="px-2 pt-2 pb-3 space-y-1">
+          <div className="space-y-1 px-2 pb-3 pt-2">
             {navItems.map((item) => (
               <NeonButton
                 key={item.href}
@@ -247,46 +282,30 @@ export default function RetroNavbar() {
                 onClick={() => handleNavClick(item.href)}
                 className="w-full !justify-start"
               >
-                <span className="text-lg mr-2 inline-flex items-center justify-center w-5 h-5">{item.icon}</span>
+                <span className="mr-2 inline-flex h-5 w-5 items-center justify-center text-lg">{item.icon}</span>
                 <span className="inline-flex items-center gap-1 align-middle">{item.name}</span>
               </NeonButton>
             ))}
 
-            {/* Start: Help & FAQ Dropdown Controller */}
-            <div className="relative" ref={helpMobileContainerRef}>
+            {/* Start: Mobile Help & FAQ Dropdown Controller */}
+            <div className="relative" ref={mobileHelpRef}>
               <NeonButton
+                type="button"
                 variant="secondary"
                 size="md"
-                onClick={() => setHelpDropdownOpen(!helpDropdownOpen)}
+                onClick={() => setMobileHelpOpen((v) => !v)}
                 className="w-full !justify-start"
+                aria-haspopup="true"
+                aria-expanded={mobileHelpOpen}
               >
-                <span className="text-lg mr-2 inline-flex items-center justify-center w-4 h-4">❓</span>
+                <span className="mr-2 inline-flex h-4 w-4 items-center justify-center text-lg">❓</span>
                 <span className="inline-flex items-center gap-1 align-middle">Help & FAQ</span>
-                <span className="ml-auto text-xs">{helpDropdownOpen ? "▲" : "▼"}</span>
+                <span className="ml-auto text-xs">{mobileHelpOpen ? "▲" : "▼"}</span>
               </NeonButton>
 
-              {/* Start: Help Dropdown Menu */}
-              {helpDropdownOpen && (
-                <div className="mt-1 ml-8 space-y-1">
-                  {helpLinks.map((link) => (
-                    <button
-                      key={link.href}
-                      onClick={() => {
-                        setMobileMenuOpen(false);
-                        setHelpDropdownOpen(false);
-                        router.push(link.href);
-                      }}
-                      className="flex items-center w-full px-3 py-2 rounded-md text-sm font-medium transition-colors text-gray-400 hover:text-white hover:bg-[#00ffff]/10 border border-transparent hover:border-[#00ffff]/30"
-                    >
-                      <span className="text-base mr-2 inline-flex items-center justify-center w-4 h-4">{link.icon}</span>
-                      <span className="inline-flex items-center gap-1 align-middle">{link.name}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-              {/* End: Help Dropdown Menu */}
+              {mobileHelpOpen && renderHelpPanel("mobile")}
             </div>
-            {/* End: Help & FAQ Dropdown Controller */}
+            {/* End: Mobile Help & FAQ Dropdown Controller */}
           </div>
         </div>
       )}
