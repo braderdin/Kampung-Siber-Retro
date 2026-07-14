@@ -1,33 +1,36 @@
-// Start: Dashboard Page with Pixel Shadow and Tablet Optimizations
+// Start: Dashboard Page — Cyber-Village Retro-Modern Overhaul (Rule 31)
 "use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { useLanguageStore } from '@/store/useLanguageStore';
-import { enDictionary, msDictionary } from '@/lib/dictionary'; // Start: Updated dictionary import path
-import Shoutbox from '@/components/Shoutbox';
-import RetroCalendar from '@/components/RetroCalendar';
-import VisitorStatGraph from '@/components/VisitorStatGraph';
-import RetroMarqueeTicker from '@/components/RetroMarqueeTicker';
-import TopResidentsLeaderboard from '@/components/TopResidentsLeaderboard';
-import HydrationGuard from '@/components/HydrationGuard';
-import FeedbackWidget from '@/components/FeedbackWidget';
-import NeocitiesWorkspace from '@/components/editor/NeocitiesWorkspace';
-import FileManager from '@/components/FileManager'; // Start: Consolidated File Manager Tab
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useLanguageStore } from "@/store/useLanguageStore";
+import { enDictionary, msDictionary } from "@/lib/dictionary";
+import Shoutbox from "@/components/Shoutbox";
+import RetroCalendar from "@/components/RetroCalendar";
+import VisitorStatGraph from "@/components/VisitorStatGraph";
+import RetroMarqueeTicker from "@/components/RetroMarqueeTicker";
+import TopResidentsLeaderboard from "@/components/TopResidentsLeaderboard";
+import HydrationGuard from "@/components/HydrationGuard";
+import FeedbackWidget from "@/components/FeedbackWidget";
+import NeocitiesWorkspace from "@/components/editor/NeocitiesWorkspace";
+import FileManager from "@/components/FileManager";
+import NeonCard from "@/components/ui/NeonCard";
+import NeonButton from "@/components/ui/NeonButton";
+import DashboardSidebar from "@/components/DashboardSidebar";
 
-type ActiveTab = 'main' | 'community' | 'files';
-type BuilderView = 'main' | 'editor';
+type ActiveTab = "main" | "community" | "files";
+type BuilderView = "main" | "editor";
 
 export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState<ActiveTab>('main');
-  const [builderView, setBuilderView] = useState<BuilderView>('main');
+  const [activeTab, setActiveTab] = useState<ActiveTab>("main");
+  const [builderView, setBuilderView] = useState<BuilderView>("main");
   const [showMarquee, setShowMarquee] = useState(false);
   const { language } = useLanguageStore();
-  const t = language === 'ms' ? msDictionary : enDictionary;
+  const t = language === "ms" ? msDictionary : enDictionary;
 
   // Start: Toggle to live profile builder sub-view
   const toggleBuilderView = () => {
-    setBuilderView((prev) => (prev === 'main' ? 'editor' : 'main'));
+    setBuilderView((prev) => (prev === "main" ? "editor" : "main"));
   };
   // End: Toggle to live profile builder sub-view
 
@@ -43,73 +46,40 @@ export default function DashboardPage() {
 
   // Start: Tab Toggle Handler
   const handleTabToggle = () => {
-    setActiveTab(prev => prev === 'main' ? 'community' : 'main');
+    setActiveTab((prev) => (prev === "main" ? "community" : "main"));
   };
   // End: Tab Toggle Handler
 
   return (
-    // Start: Main Dashboard Container
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
-      {/* Start: Navigation Toolbar with Retro Sitemap Button */}
-      <div className="sticky top-0 z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b-2 border-dashed border-cyan-500/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+    // Start: Main Dashboard Container — pitch-black Cyber-Village canvas
+    <main className="min-h-screen bg-[#060814] text-gray-100 transition-colors duration-300">
+      {/* Start: Top Navigation Toolbar with Sitemap + Sidebar hook */}
+      <div className="sticky top-0 z-50 border-b border-cyan-500/20 bg-[#0e1330]/90 backdrop-blur-md">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
-            <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200 pixel-font">
-              {t.dashboardTitle || 'Dashboard'}
+            <h2 className="font-pixel text-base font-bold text-cyan-200 sm:text-lg">
+              {t.dashboardTitle || "Dashboard"}
             </h2>
           </div>
-          {/* Start: Retro Sitemap Access Button */}
-          <Link href="/sitemap" className="retro-btn-secondary flex items-center gap-2 px-4 py-2 pixel-font font-bold">
-            <span className="text-lg">🗺️</span>
-            <span>{t.sitemapTitle || 'Peta Laman'}</span> {/* Formal Malay for "Site Sitemap" */}
+          <Link
+            href="/sitemap"
+            className="retro-btn-secondary flex items-center gap-2 rounded-md border border-cyan-400/40 bg-cyan-500/10 px-4 py-2 font-pixel text-xs text-cyan-200 transition-all hover:border-cyan-300 hover:shadow-[0_0_15px_rgba(0,255,255,0.30)] sm:text-sm"
+          >
+            <span className="text-base">🗺️</span>
+            <span>{t.sitemapTitle || "Peta Laman"}</span>
           </Link>
-          {/* End: Retro Sitemap Access Button */}
         </div>
       </div>
-      {/* End: Navigation Toolbar */}
-
-      {/* Start: Dashboard Header with Editor Link Card */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-        {/* Start: Editor Link Card Container with Pixel Shadow */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 pixel-font">
-            {t.dashboardTitle}
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
-            {t.welcomeMessage || 'Selamat datang di papan pengarah retro anda!'} {/* Formal Malay for "Welcome to your retro dashboard!" */}
-          </p>
-           {/* Start: Editor Access Button with Extreme Pixel Shadow */}
-          <div className="mt-4">
-            <button
-              onClick={toggleBuilderView}
-              className="retro-btn-primary inline-flex items-center gap-2 px-6 py-3 pixel-font font-bold text-lg shadow-[4px_4px_0_0_rgba(0,0,0,1)] hover:shadow-[6px_6px_0_0_rgba(0,0,0,1)] transition-all"
-            >
-              <span className="text-xl">💻</span>
-              <span>{builderView === 'main' ? 'Buka Editor Kod Teratak Anda' : 'Tutup Editor Kod'}</span>
-            </button>
-          </div>
-          {/* End: Editor Access Button with Extreme Pixel Shadow */}
-
-          {/* Start: Live Neocities Web Interactive Workspace Sub-View */}
-          {builderView === 'editor' && (
-            <div className="mt-6">
-              <NeocitiesWorkspace />
-            </div>
-          )}
-          {/* End: Live Neocities Web Interactive Workspace Sub-View */}
-        </div>
-        {/* End: Editor Link Card Container */}
-      </div>
-      {/* End: Dashboard Header */}
+      {/* End: Top Navigation Toolbar */}
 
       {/* Start: Marquee Ticker */}
       {showMarquee && (
-        <div className="fixed top-16 left-0 right-0 z-40">
-          <RetroMarqueeTicker 
+        <div className="fixed left-0 right-0 top-14 z-40">
+          <RetroMarqueeTicker
             messages={[
-              '🚀 Selamat datang di Kampung Siber Retro Dashboard!',
-              '🌟 Kunjungi komuniti kami untuk berkongsi idea dan projek.',
-              '🔧 Kami sentiasa memperbarui platform dengan ciri-ciri baru.',
+              "🚀 Selamat datang di Kampung Siber Retro Dashboard!",
+              "🌟 Kunjungi komuniti kami untuk berkongsi idea dan projek.",
+              "🔧 Kami sentiasa memperbarui platform dengan ciri-ciri baru.",
             ]}
             speed={15}
           />
@@ -117,104 +87,123 @@ export default function DashboardPage() {
       )}
       {/* End: Marquee Ticker */}
 
-      {/* Start: Tab Navigation and Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Start: Main Content Area */}
-
-        {/* Start: Tab Navigation */}
+      {/* Start: Dashboard Header + Sidebar Grid */}
+      <div className="mx-auto max-w-7xl px-4 pt-8 sm:px-6 lg:px-8">
+        {/* Start: Editor Link Header */}
         <div className="mb-6">
-          <div className="retro-tab-navigation flex space-x-2 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg border border-gray-300 dark:border-gray-600">
-            <button
-              onClick={() => setActiveTab('main')}
-              className={`
-                retro-btn-secondary flex-1 text-center
-                transition-all duration-200
-                ${activeTab === 'main' 
-                  ? 'bg-purple-500 text-white shadow-md' 
-                  : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
-                }
-              `}
+          <h1 className="font-pixel text-2xl font-bold text-gray-50 sm:text-3xl">
+            {t.dashboardTitle}
+          </h1>
+          <p className="mt-1 text-sm text-gray-400">
+            {t.welcomeMessage || "Selamat datang di papan pengarah retro anda!"}
+          </p>
+          <div className="mt-4">
+            <NeonButton
+              size="lg"
+              variant="primary"
+              icon="💻"
+              onClick={toggleBuilderView}
             >
-              <span className="text-xl">🏠</span>
-              <div className="pixel-font text-xs">Main View</div>
-            </button>
-            <button
-              onClick={() => setActiveTab('community')}
-              className={`
-                retro-btn-secondary flex-1 text-center
-                transition-all duration-200
-                ${activeTab === 'community' 
-                  ? 'bg-purple-500 text-white shadow-md' 
-                  : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
-                }
-              `}
-            >
-              <span className="text-xl">👥</span>
-              <div className="pixel-font text-xs">Community Board</div>
-            </button>
-            <button
-              onClick={() => setActiveTab('files')}
-              className={`
-                retro-btn-secondary flex-1 text-center
-                transition-all duration-200
-                ${activeTab === 'files' 
-                  ? 'bg-purple-500 text-white shadow-md' 
-                  : 'bg-transparent text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
-                }
-              `}
-            >
-              <span className="text-xl">📁</span>
-              <div className="pixel-font text-xs">Fail Saya</div>
-            </button>
+              {builderView === "main"
+                ? "Buka Editor Kod Teratak Anda"
+                : "Tutup Editor Kod"}
+            </NeonButton>
           </div>
-        </div>
-        {/* End: Tab Navigation */}
 
-        {/* Start: Tab Content with Tablet Optimizations */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Start: Main View Tab Content - Tablet Padding Adjustments */}
-          {activeTab === 'main' && (
-            <>
-              {/* Start: Clean Grey Layout Frame - Tablet Responsive */}
-              <div className="lg:col-span-3">
-                <HydrationGuard>
-                  <div className="retro-card bg-gray-100 dark:bg-gray-800 border-2 border-dashed border-gray-300 dark:border-gray-600 min-h-[200px] flex items-center justify-center p-4 sm:p-6 md:p-8">
-                    <p className="text-gray-500 dark:text-gray-400 pixel-font text-sm text-center sm:text-left">
-                      {t.dashboardReady || 'Dashboard bersedia menerima data berasal daripada pengguna'}
-                    </p>
-                  </div>
-                </HydrationGuard>
+          {/* Start: Live Neocities Web Interactive Workspace Sub-View */}
+          {builderView === "editor" && (
+            <div className="mt-6">
+              <NeonCard title="Editor Kod Teratak" icon="💻" accent="cyan">
+                <NeocitiesWorkspace />
+              </NeonCard>
+            </div>
+          )}
+          {/* End: Live Neocities Web Interactive Workspace Sub-View */}
+        </div>
+        {/* End: Editor Link Header */}
+
+        {/* Start: Sidebar + Content two-column layout (fluid on mobile) */}
+        <div className="grid grid-cols-1 gap-6 pb-8 lg:grid-cols-[220px_1fr]">
+          {/* Start: Sidebar column */}
+          <aside className="lg:sticky lg:top-24 lg:self-start">
+            <NeonCard title="Navigasi" icon="🧭" accent="volt">
+              <DashboardSidebar />
+            </NeonCard>
+          </aside>
+          {/* End: Sidebar column */}
+
+          {/* Start: Main content column */}
+          <div className="min-w-0 space-y-6">
+            {/* Start: Tab Navigation with Neon triggers */}
+            <div className="flex flex-wrap gap-2">
+              <NeonButton
+                size="sm"
+                variant={activeTab === "main" ? "primary" : "ghost"}
+                icon="🏠"
+                onClick={() => setActiveTab("main")}
+              >
+                Main View
+              </NeonButton>
+              <NeonButton
+                size="sm"
+                variant={activeTab === "community" ? "primary" : "ghost"}
+                icon="👥"
+                onClick={() => setActiveTab("community")}
+              >
+                Community Board
+              </NeonButton>
+              <NeonButton
+                size="sm"
+                variant={activeTab === "files" ? "primary" : "ghost"}
+                icon="📁"
+                onClick={() => setActiveTab("files")}
+              >
+                Fail Saya
+              </NeonButton>
+            </div>
+            {/* End: Tab Navigation */}
+
+            {/* Start: Tab Content clusters */}
+            {activeTab === "main" && (
+              <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+                <NeonCard title="Status Sedia" icon="📡" accent="cyan">
+                  <p className="font-pixel text-sm text-gray-400">
+                    {t.dashboardReady ||
+                      "Dashboard bersedia menerima data berasal daripada pengguna"}
+                  </p>
+                </NeonCard>
+                <NeonCard title="Kalendar Retro" icon="📅" accent="magenta">
+                  <RetroCalendar />
+                </NeonCard>
+                <NeonCard title="Statistik Pelawat" icon="📈" accent="volt">
+                  <VisitorStatGraph />
+                </NeonCard>
+                <NeonCard title="Penduduk Teratas" icon="🏆" accent="cyan">
+                  <TopResidentsLeaderboard />
+                </NeonCard>
               </div>
-              {/* End: Clean Grey Layout Frame */}
-            </>
-          )}
-          {/* End: Main View Tab Content */}
+            )}
 
-          {/* Start: Community Board Tab Content */}
-          {activeTab === 'community' && (
-            <div className="lg:col-span-3">
-              <HydrationGuard>
+            {activeTab === "community" && (
+              <NeonCard title="Papan Komuniti" icon="💬" accent="magenta">
                 <Shoutbox />
-              </HydrationGuard>
-            </div>
-          )}
-          {/* End: Community Board Tab Content */}
+              </NeonCard>
+            )}
 
-          {/* Start: Files Manager Tab Content - Consolidated site_files */}
-          {activeTab === 'files' && (
-            <div className="lg:col-span-3">
-              <HydrationGuard>
+            {activeTab === "files" && (
+              <NeonCard title="Pengurus Fail" icon="📁" accent="volt">
                 <FileManager embedded />
-              </HydrationGuard>
-            </div>
-          )}
-          {/* End: Files Manager Tab Content */}
+              </NeonCard>
+            )}
+            {/* End: Tab Content clusters */}
+          </div>
+          {/* End: Main content column */}
         </div>
-        {/* End: Tab Content with Tablet Optimizations */}
+        {/* End: Sidebar + Content two-column layout */}
       </div>
-      {/* End: Tab Navigation and Content */}
+      {/* End: Dashboard Header + Sidebar Grid */}
 
-      {/* Start: Feedback Widget - Fixed bottom-right corner */}
+      {/* Start: Feedback Widget — fixed bottom-right */}
       <div className="fixed bottom-6 right-6 z-40">
         <FeedbackWidget />
       </div>
@@ -223,4 +212,4 @@ export default function DashboardPage() {
     // End: Main Dashboard Container
   );
 }
-// End: Dashboard Page with Pixel Shadow and Tablet Optimizations
+// End: Dashboard Page — Cyber-Village Retro-Modern Overhaul (Rule 31)
