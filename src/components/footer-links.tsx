@@ -19,14 +19,14 @@ export default function FooterLinks(): FooterSection[] {
   const { language } = useLanguageStore();
   const t = language === 'ms' ? msDictionary : enDictionary;
 
-  // Start: Sectioned Footer Link Configuration (label matches href)
+  // Start: Sectioned Footer Link Configuration (consolidated hubs)
   const sections: FooterSection[] = [
     {
       title: t.dashboardTitle,
       links: [
         { name: t.dashboardTitle, href: '/dashboard' },
-        { name: 'Directory', href: '/directory' },
-        { name: t.guestbookTitle, href: '/guestbook' },
+        { name: 'Hab Komuniti', href: '/hub' },
+        { name: 'Dokumentasi', href: '/docs' },
       ],
     },
     {
@@ -40,16 +40,18 @@ export default function FooterLinks(): FooterSection[] {
     {
       title: 'Community',
       links: [
-        { name: 'About', href: '/about' },
-        { name: 'Donate', href: '/donate' },
+        { name: 'Tentang', href: '/about' },
+        { name: 'Penyokong', href: '/supporter' },
+        { name: 'Derma', href: '/donate' },
+        { name: 'Tutorial', href: '/tutorials' },
         { name: 'CLI', href: '/cli' },
-        { name: 'Press', href: '/press' },
+        { name: 'Akhbar', href: '/press' },
         { name: 'Status', href: '/status' },
-        { name: 'Terms', href: '/terms' },
-        { name: 'Contact', href: '/contact' },
-        { name: 'Privacy Policy', href: '/privacy' },
-        { name: 'Themes', href: '/themes' },
-        { name: 'Sitemap', href: '/sitemap' },
+        { name: 'Terma', href: '/terms' },
+        { name: 'Hubungi', href: '/contact' },
+        { name: 'Privasi', href: '/privacy' },
+        { name: 'Tema', href: '/themes' },
+        { name: 'Peta Laman', href: '/sitemap' },
       ],
     },
   ];

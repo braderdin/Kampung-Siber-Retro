@@ -26,11 +26,11 @@ export default function RetroNavbar() {
 
   const t = language === 'ms' ? msDictionary : enDictionary;
 
-  // Start: Primary Navigation Items
+  // Start: Primary Navigation Items (consolidated hubs)
   const navItems: NavItem[] = [
     { name: t.dashboardTitle, href: '/dashboard', icon: '🏠' },
-    { name: 'Directory', href: '/directory', icon: '👥' },
-    { name: t.guestbookTitle, href: '/guestbook', icon: '📘' },
+    { name: 'Hab Komuniti', href: '/hub', icon: '🌐' },
+    { name: 'Dokumentasi', href: '/docs', icon: '📚' },
     { name: t.settings, href: '/settings', icon: '⚙️' },
   ];
   // End: Primary Navigation Items
