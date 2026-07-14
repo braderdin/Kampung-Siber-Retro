@@ -59,7 +59,9 @@ async function readR2Object(objectKey: string): Promise<string> {
 
 // Start: Single-Object Stream Handler (for explicit .html/.htm keys)
 async function streamSingleHtml(objectKey: string): Promise<string> {
-  return await readR2Object(objectKey);
+  const html = await readR2Object(objectKey);
+  const base = objectKey.includes("/") ? objectKey.slice(0, objectKey.lastIndexOf("/")) : "";
+  return injectThemeAndLoaders(html, base);
 }
 // End: Single-Object Stream Handler
 
@@ -142,9 +144,72 @@ async function compileSiteBundle(sitePrefix: string): Promise<string> {
     html = html.replace(/<\/body>/i, `<script data-compiled="script.js">\n${js}\n</script>\n</body>`);
   }
 
-  return html;
+  return injectThemeAndLoaders(html, base);
 }
 // End: Multi-Asset Compile Handler
+
+// Start: Kampung Siber Neon Theme Inline Variables
+// Compiled into every preview document so framed renderings inherit the
+// premium retro-modern cyber-village identity regardless of authored CSS.
+const KAMPUNG_THEME_VARS = `
+:root{
+  --ks-bg-black:#060814;
+  --ks-bg-deep:#0e1330;
+  --ks-neon-cyan:#00ffff;
+  --ks-neon-magenta:#ff007f;
+  --ks-neon-volt:#aaff00;
+  --ks-border:1px solid #00ffff55;
+  --ks-glow:0 0 40px #00ffff33;
+}`;
+// End: Kampung Siber Neon Theme Inline Variables
+
+// Start: Theme + Script Loader Injection (live browser framing)
+// 1. Resolves relative asset URLs (images/media) to absolute R2 endpoints.
+// 2. Injects the neon theme variable block into <head>.
+// 3. Appends a bootstrap script loader that fires a custom DOM-ready event
+//    after all compiled inline scripts have been evaluated.
+async function injectThemeAndLoaders(html: string, base: string): Promise<string> {
+  // Rewrite relative image / source attributes to absolute R2 URLs.
+  const r2Base = `https://${CLOUDFLARE_R2_BUCKET_NAME}.${CLOUDFLARE_R2_ACCOUNT_ID}.r2.cloudflarestorage.com`;
+  const assetAttrRegex = /(src|href|poster)=["'](?!https?:|\/\/|data:|#|mailto:)([^"']+)["']/gi;
+  let rewritten = html;
+  let attrMatch: RegExpExecArray | null;
+  const replacements: { from: string; to: string }[] = [];
+  while ((attrMatch = assetAttrRegex.exec(html)) !== null) {
+    const full = attrMatch[0];
+    const attr = attrMatch[1];
+    const rel = attrMatch[2].replace(/^\/+/, "");
+    const resolved = `${r2Base}/${base ? `${base}/` : ""}${rel}`;
+    replacements.push({ from: full, to: `${attr}="${resolved}"` });
+  }
+  for (const r of replacements) {
+    rewritten = rewritten.split(r.from).join(r.to);
+  }
+
+  // Inject neon theme variables + preconnect into <head>.
+  const headInject = `<style data-ks-theme>${KAMPUNG_THEME_VARS}</style>`;
+  if (rewritten.match(/<head[^>]*>/i)) {
+    rewritten = rewritten.replace(/<head[^>]*>/i, (m) => `${m}\n${headInject}`);
+  } else {
+    rewritten = `${headInject}\n${rewritten}`;
+  }
+
+  // Append bootstrap loader script just before </body>.
+  const loader = `<script data-ks-loader>
+(function(){
+  function ready(fn){ if(document.readyState!=='loading'){fn();} else {document.addEventListener('DOMContentLoaded',fn);} }
+  ready(function(){ window.dispatchEvent(new Event('kampung:preview-ready')); });
+})();
+</script>`;
+  if (rewritten.match(/<\/body>/i)) {
+    rewritten = rewritten.replace(/<\/body>/i, `${loader}\n</body>`);
+  } else {
+    rewritten = `${rewritten}\n${loader}`;
+  }
+
+  return rewritten;
+}
+// End: Theme + Script Loader Injection
 
 // Start: Native HTML Error Page (genuine failure state, not a fake placeholder)
 function buildErrorHtml(status: number, title: string, message: string): string {

@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { S3Client, ListObjectsV2Command, PutObjectCommand } from '@aws-sdk/client-s3';
 import { createClient } from '@supabase/supabase-js';
+import { getServerSupabase } from '@/lib/supabase-server';
 
 // Start: Environment Configuration
 const CLOUDFLARE_R2_ACCOUNT_ID = process.env.CLOUDFLARE_R2_ACCOUNT_ID || '';
@@ -84,33 +85,60 @@ export async function GET(req: NextRequest): Promise<NextResponse<StorageListRes
     );
   }
 
-  const prefix = `${userId}/`;
+    const prefix = `${userId}/`;
 
-  try {
-    const command = new ListObjectsV2Command({
-      Bucket: CLOUDFLARE_R2_BUCKET_NAME,
-      Prefix: prefix,
-      Delimiter: '/',
-    });
-    const result = await s3Client.send(command);
+    try {
+      const command = new ListObjectsV2Command({
+        Bucket: CLOUDFLARE_R2_BUCKET_NAME,
+        Prefix: prefix,
+        Delimiter: '/',
+      });
+      const result = await s3Client.send(command);
 
-    const folders: ListedFolder[] = [];
-    const folderNameSet = new Set<string>();
+      const folders: ListedFolder[] = [];
+      const folderNameSet = new Set<string>();
 
-    // Common prefixes represent true sub-directory trees
-    for (const cp of result.CommonPrefixes ?? []) {
-      const raw = cp.Prefix ?? '';
-      const name = raw.slice(prefix.length).replace(/\/$/, '');
-      if (name) {
-        folderNameSet.add(name);
-        folders.push({
-          id: `folder:${name}`,
-          name,
-          createdAt: new Date().toISOString(),
-          type: 'folder',
-        });
+      // Common prefixes represent true sub-directory trees
+      for (const cp of result.CommonPrefixes ?? []) {
+        const raw = cp.Prefix ?? '';
+        const name = raw.slice(prefix.length).replace(/\/$/, '');
+        if (name) {
+          folderNameSet.add(name);
+          folders.push({
+            id: `folder:${name}`,
+            name,
+            createdAt: new Date().toISOString(),
+            type: 'folder',
+          });
+        }
       }
-    }
+
+      // Start: Supabase-Backed Virtual Folder Map (Phase 2)
+      // Merge persistent virtual directory rows so custom folders survive
+      // R2 remounts and page refreshes even when no .keep object exists.
+      try {
+        const serverSupabase = getServerSupabase();
+        const { data: vFolders, error: vErr } = await serverSupabase
+          .from('virtual_folders')
+          .select('id, name, created_at, parent')
+          .eq('user_id', userId)
+          .is('parent', null);
+        if (!vErr && vFolders) {
+          for (const vf of vFolders) {
+            if (folderNameSet.has(vf.name)) continue;
+            folderNameSet.add(vf.name);
+            folders.push({
+              id: `vfolder:${vf.id}`,
+              name: vf.name,
+              createdAt: new Date(vf.created_at).toISOString(),
+              type: 'folder',
+            });
+          }
+        }
+      } catch (vfError) {
+        console.error('Supabase virtual_folders read skipped:', vfError);
+      }
+      // End: Supabase-Backed Virtual Folder Map
 
     const files: ListedFile[] = [];
     let totalSize = 0;
@@ -185,6 +213,20 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         ContentType: 'application/x-directory',
       })
     );
+
+    // Start: Persist virtual directory map to Supabase (Phase 2)
+    try {
+      const serverSupabase = getServerSupabase();
+      await serverSupabase
+        .from('virtual_folders')
+        .upsert(
+          { user_id: userId, name: folderName, parent: null },
+          { onConflict: 'user_id,parent,name' }
+        );
+    } catch (vfError) {
+      console.error('Supabase virtual_folders write skipped:', vfError);
+    }
+    // End: Persist virtual directory map to Supabase
 
     return NextResponse.json({ success: true, key: keepKey }, { status: 200 });
   } catch (error) {
