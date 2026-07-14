@@ -10,8 +10,26 @@ import FloatingAiAssistant from "@/components/FloatingAiAssistant";
 
 const inter = Inter({ subsets: ["latin"] });
 
+// Start: Dynamic Production Site URL Resolution (eliminates placeholder domain)
+// Binds metadataBase, OpenGraph, and Twitter canonical URLs to the active
+// production host (Vercel) or a configured env override, falling back to the
+// official kampung-siber.vercel.app deploy target.
+function resolveSiteUrl(): URL {
+  const fromEnv =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null);
+  try {
+    return new URL(fromEnv ?? "https://kampung-siber.vercel.app");
+  } catch {
+    return new URL("https://kampung-siber.vercel.app");
+  }
+}
+// End: Dynamic Production Site URL Resolution
+
+const SITE_URL = resolveSiteUrl();
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://kampung-siber.retro"),
+  metadataBase: SITE_URL,
   title: {
     default: "Kampung Siber Retro",
     template: "%s · Kampung Siber Retro",
@@ -31,6 +49,9 @@ export const metadata: Metadata = {
   creator: "Kampung Siber",
   publisher: "Kampung Siber",
   formatDetection: { email: false, address: false, telephone: false },
+  alternates: {
+    canonical: SITE_URL.toString(),
+  },
   icons: {
     icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
     apple: [{ url: "/icon.svg" }],
@@ -39,7 +60,7 @@ export const metadata: Metadata = {
     title: "Kampung Siber Retro",
     description:
       "Platform komuniti retro dengan Cloudflare R2 storage integration.",
-    url: "https://kampung-siber.retro",
+    url: SITE_URL.toString(),
     siteName: "Kampung Siber Retro",
     locale: "ms_MY",
     type: "website",
