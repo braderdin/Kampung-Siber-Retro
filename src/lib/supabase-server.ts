@@ -14,6 +14,7 @@ try {
 // End: Force IPv4 DNS resolution
 
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { validateSupabaseEnv } from "./env-validation";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co";
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
@@ -28,6 +29,10 @@ let cachedClient: SupabaseClient | null = null;
 
 export function getServerSupabase(): SupabaseClient {
   if (cachedClient) return cachedClient;
+
+  // Start: Environment Validation Guard (Rule 35) — warn before silent fallback
+  validateSupabaseEnv();
+  // End: Environment Validation Guard (Rule 35)
 
   const key = supabaseServiceKey || supabaseAnonKey;
   cachedClient = createClient(supabaseUrl, key, {

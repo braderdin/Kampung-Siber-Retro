@@ -1,5 +1,10 @@
 // Start: Kampung Siber 7-Day Persistent Session Engine (Rule 31 Brand Auth)
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { validateSupabaseEnv } from './env-validation';
+
+// Start: Environment Validation Guard (Rule 35) — warn before silent fallback
+validateSupabaseEnv();
+// End: Environment Validation Guard (Rule 35)
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_KEY || 'placeholder-key';
