@@ -59,6 +59,7 @@ Thumbs.db
 !README.md
 
 # Lain2 Files Serabut Di Github
+.geminiignore
 .geminirules
 .clinerules
 .aider.conf.yml
