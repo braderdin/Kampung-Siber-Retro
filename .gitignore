@@ -52,6 +52,12 @@ tsc_out.txt
 .DS_Store
 Thumbs.db
 
+# Abaikan semua fail markdown
+*.md
+
+# KECUALI README.md (kita nak kekalkan ini di GitHub)
+!README.md
+
 # Lain2 Files Serabut Di Github
 .geminirules
 .clinerules
