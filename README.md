@@ -1,47 +1,78 @@
-# 📟 Kampung Siber Retro 🌐
+# 🌐 KAMPUNG SIBER RETRO
 
-> Platform ruang kerja retro modular gred industri yang menggabungkan estetika Windows 95 klasik dengan kuasa teknologi web moden. Dibina dengan cermat, responsif sepenuhnya, dan dioptimumkan untuk fasa Kos RM0 (Free Tier Sandbox)!
+> **Where 90s web nostalgia meets modern engine velocity — rebuild your personal corner of the internet, the retro way.**
 
----
+[![Live Demo](https://img.shields.io/badge/🔗_Visit-Kampung_Siber-ff71ce?style=for-the-badge)](https://kampung-siber.vercel.app)
+[![Next.js](https://img.shields.io/badge/Engine-Next.js_15-black?style=for-the-badge&logo=next.js)](https://nextjs.org)
+[![TypeScript](https://img.shields.io/badge/Language-TypeScript-3178c6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org)
+[![React](https://img.shields.io/badge/UI-React_19-61dafb?style=for-the-badge&logo=react)](https://react.dev)
+[![Edge-Ready](https://img.shields.io/badge/Deploy-Edge_Optimised-00c7b7?style=for-the-badge)](https://vercel.com)
+[![License](https://img.shields.io/badge/License-Custom-fe0d2f?style=for-the-badge)](./LICENSE.txt)
 
-## 🌟 Pautan Projek
-
-*   **🤖 Repositori Kod:** [GitHub Braderdin](https://github.com/braderdin/Kampung-Siber-Retro)
-*   **⚡ Pelancaran Live:** [Kampung Siber Vercel](https://kampung-siber.vercel.app/)
-
----
-
-## 🛠️ Ringkasan Ekosistem (44 Keadaan Laluan Berantai)
-
-Kampung Siber Retro dibina menggunakan **Next.js (Turbopack)** bersama pengurusan memori **Zustand store** yang sangat ringan. Kesemua komponen dipecahkan di bawah had **500 baris kod** demi kemudahan penyelenggaraan:
-
-*   **🖥️ Papan Pemuka (/dashboard):** Hab pengurusan peribadi warga siber bersama kawalan folder direktori.
-*   **📂 Pengurus Fail (/site_files):** Antaramuka grafik (GUI) ikon folder gaya Neocities dengan sistem pensuisan Grid/Senarai kompak.
-*   **📝 Penyunting Teks (/site_files/text_editor):** Editor kod CodeMirror terbina untuk menyunting kod HTML/CSS/JS secara langsung di pelayar web.
-*   **🌐 Hab Komuniti (/activity):** Dinding coretan status komuniti lengkap dengan fungsi interaksi sosial (*Suka, Komen, Ikut*).
-*   **🌙 Suis Mod Gelap & DBP i18n:** Bar navigasi universal dengan butang pensuisan tema global dan kamus dwi-bahasa rasmi Malaysia.
+🌐 **Live at:** [https://kampung-siber.vercel.app](https://kampung-siber.vercel.app)
 
 ---
 
-## 🎛️ Disiplin Seni Bina & Perlindungan Storan (RM0 Free Tier)
+## 📖 Introduction
 
-Untuk memastikan kelangsungan operasi berjalan tanpa kos, sistem kami dilengkapi dengan kawalan sempadan keselamatan sebelah klien:
-1. **Had Saiz Tegar Imej:** Maksimum **2MB** bagi setiap transaksi muat naik imej.
-2. **Enjin Pemampat Klien:** Menggunakan pemampatan `<canvas>` HTML5 asli pada kualiti 0.8 sebelum dihantar ke Cloudflare R2 untuk menjamin visual kekal cantik dan ringan.
-3. **Kuota Fail Maksimum:** Sekatan tegar storan akaun terkumpul sebanyak **25MB** bagi setiap warga kampung.
+Kampung Siber Retro is a community-first web platform that revives the golden era of personal
+homepages, guestbooks, and digital town squares — reimagined with a modern, high-performance
+engine. We believe the internet should feel human again: owned, personal, and delightfully
+tactile. No sterile feeds. Just your space, your neighbours, your vibe.
 
----
+## ✨ Key Features
 
-## 💻 Panduan Pembangun (Pembangunan Lokal)
+- 🏘️ **Community Dashboard** — A personalised command centre for your digital kampung.
+- 👾 **Retro Personal Profiles** — Build a Geocities/Neocities-style homepage that's uniquely yours.
+- 📣 **Town-Hall Space** — Open community bulletin & discussion grounds for residents.
+- 🔒 **Secure File Management** — Safe, private asset handling with zero-bloat local drafting.
+- 🕹️ **Arcade & Cyber Museum** — Nostalgic mini-games and a living archive of web history.
+- 📻 **Ambient Retro Experience** — Optional synth audio, CRT effects, and pixel-perfect theming.
 
-Pastikan anda mempunyai persekitaran Node.js terkini, kemudian jalankan rantaian arahan di bawah:
+## 🛡️ Slick Tech Philosophy
+
+- **Zero-Flash Theme Persistence** — Server-read theme state eliminates white-screen flash on load.
+- **High-Performance Hybrid State Persistence** — A layered cookie architecture keeps UI state snappy.
+- **Decoupled Static Asset Cloud Storage** — Media served from optimised edge storage, not the core cluster.
+- **Edge-Optimised Rate Limiting** — Application traffic gracefully controlled at the edge.
+- **Enterprise-Grade Headless Database** — Row-Level Security keeps resident data strictly isolated.
+- **Surgical Optimisation** — Every component built lean, modular, and responsive by default.
+
+## 📸 Screenshots
+
+> _Visual previews will live here. Drop your retro dashboard & profile shots in `/public/showcase/`._
+
+| Dashboard | Retro Profile |
+|-----------|---------------|
+| _Coming soon_ | _Coming soon_ |
+
+## 🚀 Getting Started (Abstract)
 
 ```bash
-# 1. Pasang dependensi modular
+git clone <your-fork-url>
+cd kampung-siber-retro
 npm install
-
-# 2. Jalankan server pembangunan tempatan
+cp .env.example .env.local   # fill in your own keys — never commit real credentials
 npm run dev
+```
 
-# 3. Jalankan ujian build industri (Standard Ubuntu)
-npx tsc --noEmit && npm run build
+> ⚠️ **Note:** Real API keys, database URLs, and storage credentials are intentionally omitted.
+> Copy `.env.example` and supply your own secrets locally.
+
+## 🗺️ Roadmap
+
+- [x] Core community dashboard & retro profiles
+- [x] Town-hall & guestbook grounds
+- [ ] Native mobile companion app
+- [ ] Federated cross-kampung networking
+- [ ] Creator monetisation & tipping marketplace
+- [ ] AI-assisted retro page builder
+
+## 🤝 Contributing
+
+We welcome builders who love the retro web. Open an issue, fork, and submit a PR. Please respect
+our privacy-by-design philosophy — do not expose internal infrastructure details in public forks.
+
+## 📜 License
+
+See `LICENSE.txt` for terms.
