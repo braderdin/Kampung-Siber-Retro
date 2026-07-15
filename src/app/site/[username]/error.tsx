@@ -236,7 +236,7 @@ export default function Error404({ error, reset }: ErrorProps) {
             <div className="pixel-font text-xs text-gray-500 text-center">
               <div className="flex items-center justify-center gap-2">
                 <span className="text-green-400">💚</span>
-                <span>Kampung Siber Retro - Digital Village Hub</span>
+                <span>Kampung Siber Retro</span>
                 <span className="text-green-400">💚</span>
               </div>
               <div className="mt-1 text-xs text-gray-600/70">
