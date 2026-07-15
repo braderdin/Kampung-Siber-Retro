@@ -10,11 +10,11 @@ env/
 
 # Version Control Systems
 .git/
-.gitignore
+# .gitignore
 
 # Build, Bundler & Cache Outputs (Ultra-Heavy Context)
 .next/
-.cline/
+# .cline/
 out/
 dist/
 build/
