@@ -1,0 +1,1335 @@
+{
+  "generatedAt": "2026-07-15T06:48:37.022Z",
+  "routes": {
+    "/": {
+      "desktop": {
+        "status": 200,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 1,
+        "clipped": [
+          {
+            "tag": "div",
+            "cls": "marquee-content inline-block whitespace-nowrap ani",
+            "right": 2920
+          }
+        ],
+        "buttons": [
+          {
+            "t": "🖥️KAMPUNG SIBER",
+            "w": 203,
+            "h": 32
+          },
+          {
+            "t": "🏠Dashboard",
+            "w": 141,
+            "h": 38
+          },
+          {
+            "t": "🌐Hab Komuniti",
+            "w": 167,
+            "h": 38
+          },
+          {
+            "t": "📚Dokumentasi",
+            "w": 159,
+            "h": 38
+          },
+          {
+            "t": "⚙️Settings",
+            "w": 132,
+            "h": 38
+          },
+          {
+            "t": "",
+            "w": 0,
+            "h": 0
+          },
+          {
+            "t": "❓Help▼",
+            "w": 113,
+            "h": 38
+          },
+          {
+            "t": "🌙",
+            "w": 49,
+            "h": 46
+          },
+          {
+            "t": "MASUK & LOG MASUK SEKARANG",
+            "w": 267,
+            "h": 38
+          },
+          {
+            "t": "├─Dashboard",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─Hab Komuniti",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "└─Dokumentasi",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─Settings",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─My Files",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "└─File Editor",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─Tentang",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─Penyokong",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─Derma",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─Tutorial",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─CLI",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─Akhbar",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─Status",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─Terma",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─Hubungi",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─Privasi",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─Tema",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "└─Peta Laman",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "~/privacy",
+            "w": 75,
+            "h": 31
+          },
+          {
+            "t": "~/terms",
+            "w": 67,
+            "h": 31
+          },
+          {
+            "t": "~/status",
+            "w": 85,
+            "h": 31
+          }
+        ],
+        "title": "Kampung Siber - Digital Village Hub",
+        "bodyH": 1320
+      },
+      "mobile": {
+        "status": 200,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [
+          {
+            "t": "🖥️KAMPUNG SIBER",
+            "w": 32,
+            "h": 32
+          },
+          {
+            "t": "🏠Dashboard",
+            "w": 0,
+            "h": 0
+          },
+          {
+            "t": "🌐Hab Komuniti",
+            "w": 0,
+            "h": 0
+          },
+          {
+            "t": "📚Dokumentasi",
+            "w": 0,
+            "h": 0
+          },
+          {
+            "t": "⚙️Settings",
+            "w": 0,
+            "h": 0
+          },
+          {
+            "t": "",
+            "w": 44,
+            "h": 44
+          },
+          {
+            "t": "❓Help▼",
+            "w": 0,
+            "h": 0
+          },
+          {
+            "t": "🌙",
+            "w": 49,
+            "h": 46
+          },
+          {
+            "t": "MASUK & LOG MASUK SEKARANG",
+            "w": 267,
+            "h": 38
+          },
+          {
+            "t": "├─Dashboard",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─Hab Komuniti",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "└─Dokumentasi",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─Settings",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─My Files",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "└─File Editor",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─Tentang",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─Penyokong",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─Derma",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─Tutorial",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─CLI",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─Akhbar",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─Status",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─Terma",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─Hubungi",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─Privasi",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─Tema",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "└─Peta Laman",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "~/privacy",
+            "w": 75,
+            "h": 31
+          },
+          {
+            "t": "~/terms",
+            "w": 67,
+            "h": 31
+          },
+          {
+            "t": "~/status",
+            "w": 85,
+            "h": 31
+          }
+        ],
+        "title": "Kampung Siber - Digital Village Hub",
+        "bodyH": 1866
+      }
+    },
+    "/hub": {
+      "desktop": {
+        "status": 200,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [
+          {
+            "t": "🖥️KAMPUNG SIBER",
+            "w": 203,
+            "h": 32
+          },
+          {
+            "t": "🏠Dashboard",
+            "w": 141,
+            "h": 38
+          },
+          {
+            "t": "🌐Hab Komuniti",
+            "w": 167,
+            "h": 38
+          },
+          {
+            "t": "📚Dokumentasi",
+            "w": 159,
+            "h": 38
+          },
+          {
+            "t": "⚙️Settings",
+            "w": 132,
+            "h": 38
+          },
+          {
+            "t": "",
+            "w": 0,
+            "h": 0
+          },
+          {
+            "t": "❓Help▼",
+            "w": 113,
+            "h": 38
+          },
+          {
+            "t": "🌙",
+            "w": 49,
+            "h": 46
+          },
+          {
+            "t": "📊Aktiviti",
+            "w": 214,
+            "h": 42
+          },
+          {
+            "t": "🔍Carian",
+            "w": 214,
+            "h": 42
+          },
+          {
+            "t": "🛒Lihat",
+            "w": 214,
+            "h": 42
+          },
+          {
+            "t": "📘Buku Pelawat",
+            "w": 214,
+            "h": 42
+          },
+          {
+            "t": "🎮Kafe Siber",
+            "w": 214,
+            "h": 42
+          },
+          {
+            "t": "Hantar",
+            "w": 79,
+            "h": 37
+          },
+          {
+            "t": "❤️ Like",
+            "w": 82,
+            "h": 37
+          },
+          {
+            "t": "👤 Follow",
+            "w": 98,
+            "h": 37
+          },
+          {
+            "t": "Send",
+            "w": 68,
+            "h": 37
+          },
+          {
+            "t": "Cuba Semula",
+            "w": 109,
+            "h": 30
+          },
+          {
+            "t": "├─Dashboard",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─Hab Komuniti",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "└─Dokumentasi",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─Settings",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─My Files",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "└─File Editor",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─Tentang",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─Penyokong",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─Derma",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─Tutorial",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─CLI",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─Akhbar",
+            "w": 364,
+            "h": 20
+          }
+        ],
+        "title": "Kampung Siber Retro",
+        "bodyH": 1773
+      },
+      "mobile": {
+        "status": 200,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [
+          {
+            "t": "🖥️KAMPUNG SIBER",
+            "w": 32,
+            "h": 32
+          },
+          {
+            "t": "🏠Dashboard",
+            "w": 0,
+            "h": 0
+          },
+          {
+            "t": "🌐Hab Komuniti",
+            "w": 0,
+            "h": 0
+          },
+          {
+            "t": "📚Dokumentasi",
+            "w": 0,
+            "h": 0
+          },
+          {
+            "t": "⚙️Settings",
+            "w": 0,
+            "h": 0
+          },
+          {
+            "t": "",
+            "w": 44,
+            "h": 44
+          },
+          {
+            "t": "❓Help▼",
+            "w": 0,
+            "h": 0
+          },
+          {
+            "t": "🌙",
+            "w": 49,
+            "h": 46
+          },
+          {
+            "t": "📊Aktiviti",
+            "w": 333,
+            "h": 38
+          },
+          {
+            "t": "🔍Carian",
+            "w": 333,
+            "h": 38
+          },
+          {
+            "t": "🛒Lihat",
+            "w": 333,
+            "h": 38
+          },
+          {
+            "t": "📘Buku Pelawat",
+            "w": 333,
+            "h": 38
+          },
+          {
+            "t": "🎮Kafe Siber",
+            "w": 333,
+            "h": 38
+          },
+          {
+            "t": "Hantar",
+            "w": 79,
+            "h": 37
+          },
+          {
+            "t": "❤️ Like",
+            "w": 82,
+            "h": 37
+          },
+          {
+            "t": "👤 Follow",
+            "w": 98,
+            "h": 37
+          },
+          {
+            "t": "Send",
+            "w": 68,
+            "h": 37
+          },
+          {
+            "t": "Cuba Semula",
+            "w": 109,
+            "h": 30
+          },
+          {
+            "t": "├─Dashboard",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─Hab Komuniti",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "└─Dokumentasi",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─Settings",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─My Files",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "└─File Editor",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─Tentang",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─Penyokong",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─Derma",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─Tutorial",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─CLI",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─Akhbar",
+            "w": 301,
+            "h": 20
+          }
+        ],
+        "title": "Kampung Siber Retro",
+        "bodyH": 2387
+      }
+    },
+    "/arcade": {
+      "desktop": {
+        "status": 200,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [
+          {
+            "t": "🖥️KAMPUNG SIBER",
+            "w": 203,
+            "h": 32
+          },
+          {
+            "t": "🏠Dashboard",
+            "w": 141,
+            "h": 38
+          },
+          {
+            "t": "🌐Hab Komuniti",
+            "w": 167,
+            "h": 38
+          },
+          {
+            "t": "📚Dokumentasi",
+            "w": 159,
+            "h": 38
+          },
+          {
+            "t": "⚙️Settings",
+            "w": 132,
+            "h": 38
+          },
+          {
+            "t": "",
+            "w": 0,
+            "h": 0
+          },
+          {
+            "t": "❓Help▼",
+            "w": 113,
+            "h": 38
+          },
+          {
+            "t": "🌙",
+            "w": 49,
+            "h": 46
+          },
+          {
+            "t": "STATUS: AKTIF> ./launch retro-pong ",
+            "w": 528,
+            "h": 345
+          },
+          {
+            "t": "STATUS: AKTIF> ./launch retro-snake",
+            "w": 528,
+            "h": 345
+          },
+          {
+            "t": "├─Dashboard",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─Hab Komuniti",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "└─Dokumentasi",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─Settings",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─My Files",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "└─File Editor",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─Tentang",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─Penyokong",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─Derma",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─Tutorial",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─CLI",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─Akhbar",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─Status",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─Terma",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─Hubungi",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─Privasi",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "├─Tema",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "└─Peta Laman",
+            "w": 364,
+            "h": 20
+          },
+          {
+            "t": "~/privacy",
+            "w": 75,
+            "h": 31
+          },
+          {
+            "t": "~/terms",
+            "w": 67,
+            "h": 31
+          }
+        ],
+        "title": "Kampung Siber Retro",
+        "bodyH": 1773
+      },
+      "mobile": {
+        "status": 200,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [
+          {
+            "t": "🖥️KAMPUNG SIBER",
+            "w": 32,
+            "h": 32
+          },
+          {
+            "t": "🏠Dashboard",
+            "w": 0,
+            "h": 0
+          },
+          {
+            "t": "🌐Hab Komuniti",
+            "w": 0,
+            "h": 0
+          },
+          {
+            "t": "📚Dokumentasi",
+            "w": 0,
+            "h": 0
+          },
+          {
+            "t": "⚙️Settings",
+            "w": 0,
+            "h": 0
+          },
+          {
+            "t": "",
+            "w": 44,
+            "h": 44
+          },
+          {
+            "t": "❓Help▼",
+            "w": 0,
+            "h": 0
+          },
+          {
+            "t": "🌙",
+            "w": 49,
+            "h": 46
+          },
+          {
+            "t": "STATUS: AKTIF> ./launch retro-pong ",
+            "w": 343,
+            "h": 403
+          },
+          {
+            "t": "STATUS: AKTIF> ./launch retro-snake",
+            "w": 343,
+            "h": 403
+          },
+          {
+            "t": "├─Dashboard",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─Hab Komuniti",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "└─Dokumentasi",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─Settings",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─My Files",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "└─File Editor",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─Tentang",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─Penyokong",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─Derma",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─Tutorial",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─CLI",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─Akhbar",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─Status",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─Terma",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─Hubungi",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─Privasi",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "├─Tema",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "└─Peta Laman",
+            "w": 301,
+            "h": 20
+          },
+          {
+            "t": "~/privacy",
+            "w": 75,
+            "h": 31
+          },
+          {
+            "t": "~/terms",
+            "w": 67,
+            "h": 31
+          }
+        ],
+        "title": "Kampung Siber Retro",
+        "bodyH": 2380
+      }
+    },
+    "/cyber-museum": {
+      "desktop": {
+        "status": 500,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [],
+        "title": "",
+        "bodyH": 0
+      },
+      "mobile": {
+        "status": 500,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [],
+        "title": "",
+        "bodyH": 0
+      }
+    },
+    "/bbs-room": {
+      "desktop": {
+        "status": 500,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [],
+        "title": "",
+        "bodyH": 0
+      },
+      "mobile": {
+        "status": 500,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [],
+        "title": "",
+        "bodyH": 0
+      }
+    },
+    "/guestbook": {
+      "desktop": {
+        "status": 500,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [],
+        "title": "",
+        "bodyH": 0
+      },
+      "mobile": {
+        "status": 500,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [],
+        "title": "",
+        "bodyH": 0
+      }
+    },
+    "/directory": {
+      "desktop": {
+        "status": 500,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [],
+        "title": "",
+        "bodyH": 0
+      },
+      "mobile": {
+        "status": 500,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [],
+        "title": "",
+        "bodyH": 0
+      }
+    },
+    "/browse": {
+      "desktop": {
+        "status": 500,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [],
+        "title": "",
+        "bodyH": 0
+      },
+      "mobile": {
+        "status": 500,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [],
+        "title": "",
+        "bodyH": 0
+      }
+    },
+    "/docs": {
+      "desktop": {
+        "status": 500,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [],
+        "title": "",
+        "bodyH": 0
+      },
+      "mobile": {
+        "status": 500,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [],
+        "title": "",
+        "bodyH": 0
+      }
+    },
+    "/signin": {
+      "desktop": {
+        "status": 500,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [],
+        "title": "",
+        "bodyH": 0
+      },
+      "mobile": {
+        "status": 500,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [],
+        "title": "",
+        "bodyH": 0
+      }
+    },
+    "/about": {
+      "desktop": {
+        "status": 500,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [],
+        "title": "",
+        "bodyH": 0
+      },
+      "mobile": {
+        "status": 500,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [],
+        "title": "",
+        "bodyH": 0
+      }
+    },
+    "/map": {
+      "desktop": {
+        "status": 500,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [],
+        "title": "",
+        "bodyH": 0
+      },
+      "mobile": {
+        "status": 500,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [],
+        "title": "",
+        "bodyH": 0
+      }
+    },
+    "/themes": {
+      "desktop": {
+        "status": 500,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [],
+        "title": "",
+        "bodyH": 0
+      },
+      "mobile": {
+        "status": 500,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [],
+        "title": "",
+        "bodyH": 0
+      }
+    },
+    "/dashboard": {
+      "desktop": {
+        "status": 500,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [],
+        "title": "",
+        "bodyH": 0
+      },
+      "mobile": {
+        "status": 500,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [],
+        "title": "",
+        "bodyH": 0
+      }
+    },
+    "/status": {
+      "desktop": {
+        "status": 500,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [],
+        "title": "",
+        "bodyH": 0
+      },
+      "mobile": {
+        "status": 500,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [],
+        "title": "",
+        "bodyH": 0
+      }
+    },
+    "/contact": {
+      "desktop": {
+        "status": 500,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [],
+        "title": "",
+        "bodyH": 0
+      },
+      "mobile": {
+        "status": 500,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [],
+        "title": "",
+        "bodyH": 0
+      }
+    },
+    "/help": {
+      "desktop": {
+        "status": 500,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [],
+        "title": "",
+        "bodyH": 0
+      },
+      "mobile": {
+        "status": 500,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [],
+        "title": "",
+        "bodyH": 0
+      }
+    },
+    "/balai_raya": {
+      "desktop": {
+        "status": 500,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [],
+        "title": "",
+        "bodyH": 0
+      },
+      "mobile": {
+        "status": 500,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [],
+        "title": "",
+        "bodyH": 0
+      }
+    },
+    "/town-hall": {
+      "desktop": {
+        "status": 500,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [],
+        "title": "",
+        "bodyH": 0
+      },
+      "mobile": {
+        "status": 500,
+        "overflowX": false,
+        "overflowPx": 0,
+        "clippedTotal": 0,
+        "clipped": [],
+        "buttons": [],
+        "title": "",
+        "bodyH": 0
+      }
+    }
+  }
+}
