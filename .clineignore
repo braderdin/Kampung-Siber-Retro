@@ -40,8 +40,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # Environment Secrets (Surgically Allow .env.example)
-.env
-.env.local
+# .env
+# .env.local
 .env.development
 .env.production
 .env.development.local
