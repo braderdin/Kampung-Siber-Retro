@@ -40,6 +40,7 @@ tsc_out.txt
 # Kunci Rahsia & Kredensial Pangkalan Data (Sangat Kritikal!)
 .env
 .env.local
+.env.example
 .env.development.local
 .env.production.local
 .env.test.local
@@ -50,3 +51,21 @@ tsc_out.txt
 # Sistem Operasi & Sampah Tempatan
 .DS_Store
 Thumbs.db
+
+# Lain2 Files Serabut Di Github
+.geminirules
+.clinerules
+.aider.conf.yml
+.aider.instruction.md
+.clineignore
+AGENTS.md
+braderdin ALL=(ALL) NOPASSWD:ALL
+CLAUDE.md
+GEMINI.md
+INFRA_PATCH_REPORT.md
+MCP_VALIDATION_REPORT.md
+PAGES_UPGRADE_BluePrint.md
+PROJECT_STATE_MAP.md
+PROJECT_STRUCTURE.md
+PROJECT_UPGRADE_MAP.md
+WSL_INTEGRATION_REPORT.md
