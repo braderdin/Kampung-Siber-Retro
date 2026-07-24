@@ -11,6 +11,7 @@
 /out/
 /build
 dist/
+.next/
 
 # Konfigurasi Editor & IDE (Menyekat Ralat Folder VS Code)
 /.vscode/
